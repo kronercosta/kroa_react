@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { Logo } from '../Logo';
+import { useClinic } from '../../contexts/ClinicContext';
 
 const AppLayout: React.FC = () => {
   const location = useLocation();
@@ -14,8 +15,7 @@ const AppLayout: React.FC = () => {
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   // Estados para seletores de unidade e centro de custo
-  const [multiplasUnidadesEnabled] = useState(true);
-  const [centroCustoEnabled] = useState(true);
+  const { multiplasUnidadesEnabled, centroCustoEnabled } = useClinic();
   const [unidades] = useState([
     { id: 1, name: 'Unidade Principal' },
     { id: 2, name: 'Unidade Setor Oeste' },

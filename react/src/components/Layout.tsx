@@ -3,12 +3,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { Logo } from './Logo';
 import { Navigation } from './Navigation';
 import { MultiSelect } from './ui/MultiSelect';
+import { useClinic } from '../contexts/ClinicContext';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
+  const { multiplasUnidadesEnabled, centroCustoEnabled } = useClinic();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [configMenuOpen, setConfigMenuOpen] = useState(false);
@@ -339,28 +341,36 @@ export function Layout({ children }: LayoutProps) {
             {/* Ações do header - Lado direito */}
             <div className="flex items-center gap-4">
               {/* 1. Superfiltros */}
-              <div className="flex items-center gap-3">
-                {/* Seletor de Unidades (Múltipla Seleção) */}
-                <MultiSelect
-                  placeholder="Todas as Unidades"
-                  options={unidadesOptions}
-                  value={selectedUnidades}
-                  onChange={setSelectedUnidades}
-                  multiple={true}
-                />
+              {(multiplasUnidadesEnabled || centroCustoEnabled) && (
+                <div className="flex items-center gap-3">
+                  {/* Seletor de Unidades (Múltipla Seleção) */}
+                  {multiplasUnidadesEnabled && (
+                    <MultiSelect
+                      placeholder="Todas as Unidades"
+                      options={unidadesOptions}
+                      value={selectedUnidades}
+                      onChange={setSelectedUnidades}
+                      multiple={true}
+                    />
+                  )}
 
-                {/* Seletor de Centro de Custo (Seleção Múltipla) */}
-                <MultiSelect
-                  placeholder="Todos os Centros"
-                  options={centrosOptions}
-                  value={selectedCentros}
-                  onChange={setSelectedCentros}
-                  multiple={true}
-                />
-              </div>
+                  {/* Seletor de Centro de Custo (Seleção Múltipla) */}
+                  {centroCustoEnabled && (
+                    <MultiSelect
+                      placeholder="Todos os Centros"
+                      options={centrosOptions}
+                      value={selectedCentros}
+                      onChange={setSelectedCentros}
+                      multiple={true}
+                    />
+                  )}
+                </div>
+              )}
 
               {/* Divisor sutil */}
-              <div className="h-6 w-px bg-gray-300"></div>
+              {(multiplasUnidadesEnabled || centroCustoEnabled) && (
+                <div className="h-6 w-px bg-gray-300"></div>
+              )}
 
               {/* 2. Busca */}
               <button className="text-gray-500 hover:text-gray-700 transition-colors">

@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Trash2, Plus, Clock, Users, Calendar, ChevronDown, X, GripVertical, Edit2, ChevronRight, AlertTriangle, TrendingUp, TrendingDown, Minus, TriangleAlert } from 'lucide-react';
+import { Trash2, Plus, Clock, Users, Calendar, ChevronDown, X, GripVertical, Edit2, ChevronRight, AlertTriangle, TrendingUp, TrendingDown, Minus, TriangleAlert, Settings, FileText, Briefcase, CreditCard, Layout } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { Input, EmailInput, PhoneInput } from '../components/ui/Input';
+import { Input, EmailInput, PhoneInput, CPFInput } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { TextArea } from '../components/ui/TextArea';
 import { Switch } from '../components/ui/Switch';
 import { Card } from '../components/ui/Card';
 import { Modal } from '../components/ui/Modal';
+import { SubMenu } from '../components/ui/SubMenu';
+import { useClinic } from '../contexts/ClinicContext';
+import { MultiSelect } from '../components/ui/MultiSelect';
 
 interface Professional {
   id: string;
@@ -36,10 +39,32 @@ interface Chair {
 }
 
 const ConfigClinica: React.FC = () => {
+  const { multiplasUnidadesEnabled, setMultiplasUnidadesEnabled, centroCustoEnabled, setCentroCustoEnabled } = useClinic();
   const [activeTab, setActiveTab] = useState('dados');
   const [pessoaJuridica, setPessoaJuridica] = useState(true);
-  const [multiplesUnidades, setMultiplesUnidades] = useState(true);
   const [editingUnit, setEditingUnit] = useState<number | null>(null);
+
+  // Opções para os MultiSelects
+  const centralOptions = [
+    { value: 'central1', label: 'Central 1' },
+    { value: 'central2', label: 'Central 2' },
+    { value: 'central3', label: 'Central 3' },
+    { value: 'central4', label: 'Central 4' }
+  ];
+
+  const centroCustoOptions = [
+    { value: 'cc001', label: 'CC 001' },
+    { value: 'cc002', label: 'CC 002' },
+    { value: 'cc003', label: 'CC 003' },
+    { value: 'cc004', label: 'CC 004' }
+  ];
+
+  const colaboradoresOptions = [
+    { value: '1', label: 'Dr. João Silva' },
+    { value: '2', label: 'Dra. Maria Santos' },
+    { value: '3', label: 'Dr. Pedro Costa' },
+    { value: '4', label: 'Dra. Ana Lima' }
+  ];
 
   // Estados para Parâmetros
   const [monitorarTempoEspera, setMonitorarTempoEspera] = useState(true);
@@ -109,7 +134,6 @@ const ConfigClinica: React.FC = () => {
   const [isAnalysisExpanded, setIsAnalysisExpanded] = useState(true);
 
   // Centro de Custo states
-  const [centroCustoEnabled, setCentroCustoEnabled] = useState(false);
   const [editingCostCenter, setEditingCostCenter] = useState<number | null>(null);
   const [costCenters, setCostCenters] = useState([
     { id: 1, name: 'Ortodontia', description: 'Centro de custo para tratamentos ortodônticos' },
@@ -153,20 +177,20 @@ const ConfigClinica: React.FC = () => {
     {
       id: 1,
       titulo: 'Setor Oeste',
-      centralComunicacao: 'Central 1',
-      centroCusto: 'CC 001',
-      colaboradores: []
+      centralComunicacao: ['central1', 'central3'],
+      centroCusto: ['cc001', 'cc003'],
+      colaboradores: ['1', '3']
     },
     {
       id: 2,
       titulo: 'Setor Central',
-      centralComunicacao: 'Central 2',
-      centroCusto: 'CC 002',
-      colaboradores: []
+      centralComunicacao: ['central2'],
+      centroCusto: ['cc002', 'cc004'],
+      colaboradores: ['2', '4']
     }
   ]);
 
-  const tabs = [
+  const tabItems = [
     { id: 'dados', label: 'Conta' },
     { id: 'parametros', label: 'Parâmetros' },
     { id: 'cadeiras', label: 'Cadeiras' },
@@ -451,13 +475,53 @@ const ConfigClinica: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-full px-6 py-2 flex justify-between items-center">
-          <div>
-            <h1 className="text-lg font-bold text-krooa-dark">Configurações da Clínica</h1>
-            <p className="text-xs text-gray-600">Gerencie as informações e configurações da sua clínica</p>
+
+      {/* Language Change Alert */}
+      {showLanguageAlert && pendingLanguage && (
+        <div className="bg-gradient-to-r from-yellow-500 to-orange-500 p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <TriangleAlert className="w-8 h-8 text-white" />
+              <div>
+                <h2 className="text-xl font-bold text-white">Atenção: Mudança de Região</h2>
+                <p className="text-white/90 text-sm mt-1">
+                  Confirma a alteração para {languages.find(lang => lang.code === pendingLanguage)?.name}?
+                  Isso afetará idioma, moeda e formatos de data.
+                </p>
+                <div className="flex gap-3 mt-4">
+                  <button
+                    onClick={confirmLanguageChange}
+                    className="px-4 py-2 bg-white text-orange-600 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                  >
+                    Confirmar
+                  </button>
+                  <button
+                    onClick={cancelLanguageChange}
+                    className="px-4 py-2 bg-white/20 text-white rounded-lg font-medium hover:bg-white/30 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={cancelLanguageChange}
+              className="text-white hover:bg-white/20 p-1 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
+        </div>
+      )}
+
+      {/* Page Header */}
+      <div className="bg-white px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-krooa-dark">Configurações da Clínica</h1>
+            <p className="text-sm text-gray-600 mt-1">Gerencie as informações e configurações da sua clínica</p>
+          </div>
+
           <div className="flex items-center gap-3">
             {/* Timezone selector */}
             <div className="relative">
@@ -514,76 +578,13 @@ const ConfigClinica: React.FC = () => {
         </div>
       </div>
 
-      {/* Language Change Alert */}
-      {showLanguageAlert && pendingLanguage && (
-        <div className="bg-gradient-to-r from-yellow-500 to-orange-500 p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <TriangleAlert className="w-8 h-8 text-white" />
-              <div>
-                <h2 className="text-xl font-bold text-white">Atenção: Mudança de Região</h2>
-                <p className="text-white/90 text-sm mt-1">
-                  Confirma a alteração para {languages.find(lang => lang.code === pendingLanguage)?.name}?
-                  Isso afetará idioma, moeda e formatos de data.
-                </p>
-                <div className="flex gap-3 mt-4">
-                  <button
-                    onClick={confirmLanguageChange}
-                    className="px-4 py-2 bg-white text-orange-600 rounded-lg font-medium hover:bg-gray-100 transition-colors"
-                  >
-                    Confirmar
-                  </button>
-                  <button
-                    onClick={cancelLanguageChange}
-                    className="px-4 py-2 bg-white/20 text-white rounded-lg font-medium hover:bg-white/30 transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={cancelLanguageChange}
-              className="text-white hover:bg-white/20 p-1 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Tabs */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="px-6">
-          <div className="flex gap-1 border-b border-gray-200 min-w-max">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`
-                  relative px-4 py-3 text-sm font-medium transition-all duration-200
-                  ${activeTab === tab.id
-                    ? 'text-krooa-dark'
-                    : 'text-gray-500 hover:text-gray-700'
-                  }
-                `}
-              >
-                {activeTab === tab.id && (
-                  <>
-                    <div className="absolute inset-0 bg-krooa-dark rounded-t-lg"></div>
-                    <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-krooa-green"></div>
-                  </>
-                )}
-                <span className={`relative z-10 flex items-center gap-2 ${
-                  activeTab === tab.id ? 'text-krooa-green' : ''
-                }`}>
-                  {tab.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Tabs using SubMenu component */}
+      <SubMenu
+        items={tabItems}
+        activeItem={activeTab}
+        onItemClick={setActiveTab}
+        variant="default"
+      />
 
       {/* Content */}
       <div className="px-6 py-4">
@@ -609,7 +610,6 @@ const ConfigClinica: React.FC = () => {
                   label="E-mail"
                   value={formData.email}
                   onChange={(value) => setFormData({ ...formData, email: value })}
-                  placeholder="contato@empresa.com"
                 />
 
                 <Input
@@ -619,11 +619,10 @@ const ConfigClinica: React.FC = () => {
                   placeholder="Nome completo"
                 />
 
-                <Input
+                <CPFInput
                   label="CPF do Responsável"
                   value={formData.responsibleDocument}
-                  onChange={(e) => setFormData({ ...formData, responsibleDocument: e.target.value })}
-                  placeholder="000.000.000-00"
+                  onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
                 />
 
                 <PhoneInput
@@ -751,74 +750,183 @@ const ConfigClinica: React.FC = () => {
                     <p className="text-sm text-gray-500">Gerencie múltiplas unidades da sua clínica</p>
                   </div>
                   <Switch
-                    checked={multiplesUnidades}
-                    onChange={setMultiplesUnidades}
+                    checked={multiplasUnidadesEnabled}
+                    onChange={setMultiplasUnidadesEnabled}
                   />
                 </div>
               </div>
             </Card>
 
             {/* Unidades Section */}
-            {multiplesUnidades && (
+            {multiplasUnidadesEnabled && (
               <Card>
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-bold text-gray-900">Unidades</h2>
                   <Button
                     onClick={() => setUnidades([...unidades, {
                       id: Date.now(),
-                      titulo: '',
-                      centralComunicacao: '',
-                      centroCusto: '',
+                      titulo: 'Nova Unidade',
+                      centralComunicacao: [],
+                      centroCusto: [],
                       colaboradores: []
                     }])}
-                    variant="outline"
+                    variant="primary"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
                     Nova Unidade
                   </Button>
                 </div>
 
-                <div className="space-y-4">
-                  {unidades.map((unidade) => (
-                    <div key={unidade.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-3">
-                          <Input
-                            label="Título"
-                            value={unidade.titulo}
-                            onChange={() => {}}
-                            placeholder="Nome da unidade"
-                          />
-
-                          <Input
-                            label="Central de Comunicação"
-                            value={unidade.centralComunicacao}
-                            onChange={() => {}}
-                            placeholder="Central 1"
-                          />
-
-                          <Input
-                            label="Centro de Custo"
-                            value={unidade.centroCusto}
-                            onChange={() => {}}
-                            placeholder="CC 001"
-                          />
-                        </div>
-                        <Button
-                          onClick={() => {
-                            if (unidades.length > 1) {
-                              setDeleteUnitModal({ open: true, sourceUnitId: unidade.id, targetUnitId: null });
-                            }
-                          }}
-                          variant="destructive"
-                          size="sm"
-                          className="ml-4"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                <div className="overflow-x-auto rounded-lg border border-gray-200">
+                  <table className="min-w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider first:rounded-tl-lg">
+                          Título
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Central de Comunicação
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Centro de Custo
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Colaboradores
+                        </th>
+                        <th className="text-right py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider last:rounded-tr-lg">
+                          Ações
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {unidades.map((unidade) => (
+                        <tr key={unidade.id} className="hover:bg-gray-50">
+                          <td className="py-2.5 px-4 text-sm text-gray-900">
+                            {editingUnit === unidade.id ? (
+                              <Input
+                                value={unidade.titulo}
+                                onChange={(e) => {
+                                  const newUnidades = unidades.map(u =>
+                                    u.id === unidade.id ? {...u, titulo: e.target.value} : u
+                                  );
+                                  setUnidades(newUnidades);
+                                }}
+                                className="w-full py-1"
+                              />
+                            ) : (
+                              unidade.titulo
+                            )}
+                          </td>
+                          <td className="py-2.5 px-4 text-sm text-gray-900">
+                            {editingUnit === unidade.id ? (
+                              <MultiSelect
+                                options={centralOptions}
+                                value={unidade.centralComunicacao}
+                                onChange={(values) => {
+                                  const newUnidades = unidades.map(u =>
+                                    u.id === unidade.id ? {...u, centralComunicacao: values} : u
+                                  );
+                                  setUnidades(newUnidades);
+                                }}
+                                placeholder="Selecione as centrais"
+                                multiple={true}
+                              />
+                            ) : (
+                              unidade.centralComunicacao.map(c =>
+                                centralOptions.find(opt => opt.value === c)?.label
+                              ).join(', ')
+                            )}
+                          </td>
+                          <td className="py-2.5 px-4 text-sm text-gray-900">
+                            {editingUnit === unidade.id ? (
+                              <MultiSelect
+                                options={centroCustoOptions}
+                                value={unidade.centroCusto}
+                                onChange={(values) => {
+                                  const newUnidades = unidades.map(u =>
+                                    u.id === unidade.id ? {...u, centroCusto: values} : u
+                                  );
+                                  setUnidades(newUnidades);
+                                }}
+                                placeholder="Selecione os centros"
+                                multiple={true}
+                              />
+                            ) : (
+                              unidade.centroCusto.map(c =>
+                                centroCustoOptions.find(opt => opt.value === c)?.label
+                              ).join(', ')
+                            )}
+                          </td>
+                          <td className="py-2.5 px-4 text-sm text-gray-900">
+                            {editingUnit === unidade.id ? (
+                              <MultiSelect
+                                options={colaboradoresOptions}
+                                value={unidade.colaboradores}
+                                onChange={(values) => {
+                                  const newUnidades = unidades.map(u =>
+                                    u.id === unidade.id ? {...u, colaboradores: values} : u
+                                  );
+                                  setUnidades(newUnidades);
+                                }}
+                                placeholder="Selecione colaboradores"
+                                multiple={true}
+                              />
+                            ) : (
+                              unidade.colaboradores.length > 0
+                                ? unidade.colaboradores.map(c =>
+                                    colaboradoresOptions.find(opt => opt.value === c)?.label
+                                  ).join(', ')
+                                : '-'
+                            )}
+                          </td>
+                          <td className="py-2.5 px-4 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <button
+                                onClick={() => {
+                                  if (editingUnit === unidade.id) {
+                                    setEditingUnit(null);
+                                  } else {
+                                    setEditingUnit(unidade.id);
+                                  }
+                                }}
+                                className={`p-1.5 rounded-lg transition-all ${
+                                  editingUnit === unidade.id
+                                    ? 'bg-green-100 text-green-600 hover:bg-green-200'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                                title={editingUnit === unidade.id ? "Salvar" : "Editar"}
+                              >
+                                {editingUnit === unidade.id ? (
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                ) : (
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                )}
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (unidades.length > 1) {
+                                    setDeleteUnitModal({ open: true, sourceUnitId: unidade.id, targetUnitId: null });
+                                  }
+                                }}
+                                className="p-1.5 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition-all"
+                                title="Excluir"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </Card>
             )}
@@ -875,8 +983,10 @@ const ConfigClinica: React.FC = () => {
           <Card>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-bold text-gray-900">Configuração de Cadeiras</h2>
-              <Button onClick={() => openAside()}>
-                <Plus className="w-4 h-4 mr-2" />
+              <Button onClick={() => openAside()} variant="primary">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
                 Nova Cadeira
               </Button>
             </div>
@@ -1035,55 +1145,119 @@ const ConfigClinica: React.FC = () => {
             {/* Cost Centers List */}
             {centroCustoEnabled && (
               <Card>
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-bold text-gray-900">Centros de Custo</h2>
                   <Button
                     onClick={() => setCostCenters([...costCenters, {
                       id: Date.now(),
-                      name: '',
-                      description: ''
+                      name: 'Novo Centro',
+                      description: 'Descrição do centro'
                     }])}
-                    variant="outline"
+                    variant="primary"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
                     Novo Centro
                   </Button>
                 </div>
 
-                <div className="space-y-4">
-                  {costCenters.map((center) => (
-                    <div key={center.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4">
-                          <Input
-                            label="Nome"
-                            value={center.name}
-                            onChange={() => {}}
-                            placeholder="Nome do centro de custo"
-                          />
-
-                          <Input
-                            label="Descrição"
-                            value={center.description}
-                            onChange={() => {}}
-                            placeholder="Descrição do centro"
-                          />
-                        </div>
-                        <Button
-                          onClick={() => {
-                            if (costCenters.length > 1) {
-                              setDeleteCostCenterModal({ open: true, sourceCostCenterId: center.id, targetCostCenterId: null });
-                            }
-                          }}
-                          variant="destructive"
-                          size="sm"
-                          className="ml-4"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                <div className="overflow-x-auto rounded-lg border border-gray-200">
+                  <table className="min-w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider first:rounded-tl-lg">
+                          Nome
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Descrição
+                        </th>
+                        <th className="text-right py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider last:rounded-tr-lg">
+                          Ações
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {costCenters.map((center) => (
+                        <tr key={center.id} className="hover:bg-gray-50">
+                          <td className="py-2.5 px-4 text-sm text-gray-900">
+                            {editingCostCenter === center.id ? (
+                              <Input
+                                value={center.name}
+                                onChange={(e) => {
+                                  const newCenters = costCenters.map(c =>
+                                    c.id === center.id ? {...c, name: e.target.value} : c
+                                  );
+                                  setCostCenters(newCenters);
+                                }}
+                                className="w-full py-1"
+                              />
+                            ) : (
+                              center.name
+                            )}
+                          </td>
+                          <td className="py-2.5 px-4 text-sm text-gray-900">
+                            {editingCostCenter === center.id ? (
+                              <Input
+                                value={center.description}
+                                onChange={(e) => {
+                                  const newCenters = costCenters.map(c =>
+                                    c.id === center.id ? {...c, description: e.target.value} : c
+                                  );
+                                  setCostCenters(newCenters);
+                                }}
+                                className="w-full py-1"
+                              />
+                            ) : (
+                              center.description
+                            )}
+                          </td>
+                          <td className="py-2.5 px-4 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <button
+                                onClick={() => {
+                                  if (editingCostCenter === center.id) {
+                                    setEditingCostCenter(null);
+                                  } else {
+                                    setEditingCostCenter(center.id);
+                                  }
+                                }}
+                                className={`p-1.5 rounded-lg transition-all ${
+                                  editingCostCenter === center.id
+                                    ? 'bg-green-100 text-green-600 hover:bg-green-200'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                                title={editingCostCenter === center.id ? "Salvar" : "Editar"}
+                              >
+                                {editingCostCenter === center.id ? (
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                ) : (
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                )}
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (costCenters.length > 1) {
+                                    setDeleteCostCenterModal({ open: true, sourceCostCenterId: center.id, targetCostCenterId: null });
+                                  }
+                                }}
+                                className="p-1.5 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition-all"
+                                title="Excluir"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </Card>
             )}

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 
 import { Layout } from './components/Layout';
+import { ClinicProvider } from './contexts/ClinicContext';
 
 // Páginas - Lazy loading para melhor performance
 const Login = lazy(() => import('./pages/Login'));
@@ -76,31 +77,33 @@ const LoadingScreen = () => (
 
 function App() {
   return (
-    <BrowserRouter>
-      <Suspense fallback={<LoadingScreen />}>
-        <Routes>
-          {/* Rota de Login */}
-          <Route path="/login" element={<Login />} />
+    <ClinicProvider>
+      <BrowserRouter>
+        <Suspense fallback={<LoadingScreen />}>
+          <Routes>
+            {/* Rota de Login */}
+            <Route path="/login" element={<Login />} />
 
-          {/* Rotas principais */}
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/agenda" element={<Agenda />} />
-          <Route path="/pacientes" element={<Pacientes />} />
-          <Route path="/financeiro" element={<Financeiro />} />
-          <Route path="/crm" element={<CRM />} />
-          <Route path="/components" element={<Components />} />
-          <Route path="/configuracoes/clinica" element={
-            <Layout>
-              <ConfigClinica />
-            </Layout>
-          } />
+            {/* Rotas principais */}
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/agenda" element={<Agenda />} />
+            <Route path="/pacientes" element={<Pacientes />} />
+            <Route path="/financeiro" element={<Financeiro />} />
+            <Route path="/crm" element={<CRM />} />
+            <Route path="/components" element={<Components />} />
+            <Route path="/configuracoes/clinica" element={
+              <Layout>
+                <ConfigClinica />
+              </Layout>
+            } />
 
-          {/* Rota 404 */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+            {/* Rota 404 */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </ClinicProvider>
   );
 }
 

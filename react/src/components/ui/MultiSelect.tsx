@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 interface Option {
-  id: string;
-  name: string;
+  value: string;
+  label: string;
 }
 
 interface MultiSelectProps {
@@ -33,14 +33,14 @@ export function MultiSelect({ placeholder, options, value, onChange, multiple = 
     };
   }, [isOpen]);
 
-  const handleOptionClick = (optionId: string) => {
+  const handleOptionClick = (optionValue: string) => {
     if (multiple) {
-      const newValue = value.includes(optionId)
-        ? value.filter(id => id !== optionId)
-        : [...value, optionId];
+      const newValue = value.includes(optionValue)
+        ? value.filter(v => v !== optionValue)
+        : [...value, optionValue];
       onChange(newValue);
     } else {
-      onChange([optionId]);
+      onChange([optionValue]);
       setIsOpen(false);
     }
   };
@@ -48,8 +48,8 @@ export function MultiSelect({ placeholder, options, value, onChange, multiple = 
   const getDisplayText = () => {
     if (value.length === 0) return placeholder;
     if (value.length === 1) {
-      const option = options.find(opt => opt.id === value[0]);
-      return option?.name || placeholder;
+      const option = options.find(opt => opt.value === value[0]);
+      return option?.label || placeholder;
     }
     return `${value.length} selecionados`;
   };
@@ -75,24 +75,24 @@ export function MultiSelect({ placeholder, options, value, onChange, multiple = 
         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
           {options.map((option) => (
             <div
-              key={option.id}
-              onClick={() => handleOptionClick(option.id)}
+              key={option.value}
+              onClick={() => handleOptionClick(option.value)}
               className={`flex items-center px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 transition-colors ${
-                value.includes(option.id) ? 'bg-krooa-green/10 text-krooa-dark font-medium' : 'text-gray-700'
+                value.includes(option.value) ? 'bg-krooa-green/10 text-krooa-dark font-medium' : 'text-gray-700'
               }`}
             >
               {multiple && (
                 <div className={`w-4 h-4 border border-gray-300 rounded mr-2 flex items-center justify-center ${
-                  value.includes(option.id) ? 'bg-krooa-green border-krooa-green' : ''
+                  value.includes(option.value) ? 'bg-krooa-green border-krooa-green' : ''
                 }`}>
-                  {value.includes(option.id) && (
+                  {value.includes(option.value) && (
                     <svg className="w-3 h-3 text-krooa-dark" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   )}
                 </div>
               )}
-              <span className="truncate">{option.name}</span>
+              <span className="truncate">{option.label}</span>
             </div>
           ))}
         </div>

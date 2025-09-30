@@ -138,25 +138,35 @@ export function CompactInput({
 }
 
 // Componente de Input com validação de email
+interface EmailInputProps extends Omit<InputProps, 'type' | 'onChange'> {
+  onChange?: (value: string) => void;
+}
+
 export function EmailInput({
-  label = 'Email',
+  label = 'E-mail',
   error: externalError,
   onBlur,
   onChange,
   value,
   ...props
-}: Omit<InputProps, 'type'>) {
+}: EmailInputProps) {
   const [emailError, setEmailError] = useState<string | undefined>();
 
   const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Regex mais completa para validação de email
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const email = e.target.value;
-    if (email && !validateEmail(email)) {
-      setEmailError('Email inválido');
+    // Só valida se tiver conteúdo
+    if (email && email.length > 0) {
+      if (!validateEmail(email)) {
+        setEmailError('E-mail inválido');
+      } else {
+        setEmailError(undefined);
+      }
     } else {
       setEmailError(undefined);
     }
@@ -164,14 +174,17 @@ export function EmailInput({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const email = e.target.value;
-    // Limpa o erro quando o usuário está digitando
+    const email = e.target.value.toLowerCase(); // Converte para minúsculas
+
+    // Chama onChange com o valor
+    onChange?.(email);
+
+    // Limpa o erro quando o usuário corrige o email
     if (emailError && email) {
       if (validateEmail(email)) {
         setEmailError(undefined);
       }
     }
-    onChange?.(e);
   };
 
   return (
@@ -182,6 +195,107 @@ export function EmailInput({
       onBlur={handleBlur}
       onChange={handleChange}
       value={value}
+      placeholder="exemplo@email.com"
+      autoComplete="email"
+      {...props}
+    />
+  );
+}
+
+// Componente de Input com máscara e validação de CPF
+export function CPFInput({
+  label = 'CPF',
+  error: externalError,
+  onBlur,
+  onChange,
+  value = '',
+  ...props
+}: Omit<InputProps, 'type' | 'onChange'> & { onChange?: (value: string) => void }) {
+  const [cpfError, setCpfError] = useState<string | undefined>();
+
+  // Formata o CPF com máscara
+  const formatCPF = (cpf: string) => {
+    // Remove tudo que não for número
+    const numbers = cpf.replace(/\D/g, '');
+
+    // Limita a 11 dígitos
+    const limited = numbers.substring(0, 11);
+
+    // Aplica a máscara
+    if (limited.length <= 3) return limited;
+    if (limited.length <= 6) return `${limited.slice(0, 3)}.${limited.slice(3)}`;
+    if (limited.length <= 9) return `${limited.slice(0, 3)}.${limited.slice(3, 6)}.${limited.slice(6)}`;
+    return `${limited.slice(0, 3)}.${limited.slice(3, 6)}.${limited.slice(6, 9)}-${limited.slice(9)}`;
+  };
+
+  // Valida o CPF
+  const validateCPF = (cpf: string) => {
+    // Remove caracteres não numéricos
+    const cleaned = cpf.replace(/\D/g, '');
+
+    // Verifica se tem 11 dígitos
+    if (cleaned.length !== 11) return false;
+
+    // Verifica se todos os dígitos são iguais (ex: 111.111.111-11)
+    if (/^(\d)\1{10}$/.test(cleaned)) return false;
+
+    // Validação do primeiro dígito verificador
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+      sum += parseInt(cleaned[i]) * (10 - i);
+    }
+    let digit = 11 - (sum % 11);
+    if (digit >= 10) digit = 0;
+    if (digit !== parseInt(cleaned[9])) return false;
+
+    // Validação do segundo dígito verificador
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+      sum += parseInt(cleaned[i]) * (11 - i);
+    }
+    digit = 11 - (sum % 11);
+    if (digit >= 10) digit = 0;
+    if (digit !== parseInt(cleaned[10])) return false;
+
+    return true;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCPF(e.target.value);
+    onChange?.(formatted);
+
+    // Limpa o erro se o CPF ficar válido enquanto digita
+    if (cpfError && formatted.replace(/\D/g, '').length === 11) {
+      if (validateCPF(formatted)) {
+        setCpfError(undefined);
+      }
+    }
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const cpf = e.target.value;
+    const cleaned = cpf.replace(/\D/g, '');
+
+    if (cleaned.length > 0 && cleaned.length < 11) {
+      setCpfError('CPF incompleto');
+    } else if (cleaned.length === 11 && !validateCPF(cpf)) {
+      setCpfError('CPF inválido');
+    } else {
+      setCpfError(undefined);
+    }
+
+    onBlur?.(e);
+  };
+
+  return (
+    <Input
+      label={label}
+      error={externalError || cpfError}
+      value={value}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      placeholder="000.000.000-00"
+      maxLength={14}
       {...props}
     />
   );
@@ -221,7 +335,9 @@ export function PhoneInput({
 }: PhoneInputProps) {
   const [selectedCountry, setSelectedCountry] = useState(countryCodes[0]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const hasValue = value && String(value).length > 0;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -268,19 +384,22 @@ export function PhoneInput({
     onCountryChange?.(country);
   };
 
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+  };
+
   return (
     <div className="relative">
-      {label && (
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          {label}
-        </label>
-      )}
-      <div className="flex">
+      <div className="relative flex">
         <div className="relative" ref={dropdownRef}>
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-1.5 rounded-l-xl border border-r-0 border-gray-300 bg-gray-50 px-3 h-[42px] hover:bg-gray-100"
+            className="flex items-center gap-1.5 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 px-3 h-10 hover:bg-gray-100"
           >
             <span className="text-lg">{selectedCountry.flag}</span>
             <span className="text-sm text-gray-700">{selectedCountry.code}</span>
@@ -307,19 +426,39 @@ export function PhoneInput({
           )}
         </div>
 
-        <input
-          type="tel"
-          className={`
-            w-full rounded-r-xl border border-gray-300 px-4 h-[42px]
-            focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20
-            disabled:bg-gray-50 disabled:text-gray-500
-            ${error ? 'border-red-300' : ''}
-          `}
-          placeholder={selectedCountry.country === 'BR' ? '(11) 98765-4321' : '(555) 123-4567'}
-          value={value}
-          onChange={handlePhoneChange}
-          {...props}
-        />
+        <div className="relative flex-1">
+          <input
+            type="tel"
+            className={`
+              peer w-full rounded-r-lg border border-gray-300 px-3 py-2 h-10
+              focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20
+              disabled:bg-gray-50 disabled:text-gray-500
+              ${error ? 'border-red-300' : ''}
+            `}
+            placeholder=" "
+            value={value}
+            onChange={handlePhoneChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            {...props}
+          />
+
+          {label && (
+            <label
+              className={`
+                absolute left-3 transition-all duration-200 pointer-events-none
+                ${hasValue || isFocused
+                  ? 'top-0 -translate-y-1/2 text-xs bg-white px-1 text-gray-600'
+                  : 'top-1/2 -translate-y-1/2 text-sm text-gray-500'
+                }
+                peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-gray-600
+                ${error ? 'text-red-500' : ''}
+              `}
+            >
+              {label}
+            </label>
+          )}
+        </div>
       </div>
       {error && (
         <p className="mt-1 text-sm text-red-600">{error}</p>
@@ -478,16 +617,11 @@ export function Textarea({
   onBlur,
   ...props
 }: TextareaProps) {
-  const [isFocused, setIsFocused] = useState(false);
-  const hasValue = value && String(value).length > 0;
-
   const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-    setIsFocused(true);
     onFocus?.(e);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-    setIsFocused(false);
     onBlur?.(e);
   };
 
