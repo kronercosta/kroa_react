@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Trash2, Clock, ChevronDown, X, GripVertical, TrendingUp, TrendingDown, Minus, Plus } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { Input, EmailInput, PhoneInput, CPFInput } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
-import { Switch } from '../components/ui/Switch';
-import { Card } from '../components/ui/Card';
-import { Modal } from '../components/ui/Modal';
-import { SubMenu } from '../components/ui/SubMenu';
-import { useClinic } from '../contexts/ClinicContext';
-import { MultiSelect } from '../components/ui/MultiSelect';
-import { useRegion } from '../contexts/RegionContext';
+import { Button } from '../../../../components/ui/Button';
+import { Input, EmailInput, PhoneInput, CPFInput } from '../../../../components/ui/Input';
+import { Select } from '../../../../components/ui/Select';
+import { Switch } from '../../../../components/ui/Switch';
+import { Card } from '../../../../components/ui/Card';
+import { Modal } from '../../../../components/ui/Modal';
+import { SubMenu } from '../../../../components/ui/SubMenu';
+import { useClinic } from '../../../../contexts/ClinicContext';
+import { MultiSelect } from '../../../../components/ui/MultiSelect';
+import { useRegion } from '../../../../contexts/RegionContext';
 
 interface Professional {
   id: string;

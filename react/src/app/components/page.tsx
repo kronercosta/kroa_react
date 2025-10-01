@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Button, IconButton } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
-import { TextArea } from '../components/ui/TextArea';
-import { Checkbox } from '../components/ui/Checkbox';
-import { Radio } from '../components/ui/Radio';
-import { DatePicker } from '../components/ui/DatePicker';
-import { TimeInput } from '../components/ui/TimeInput';
-import { Modal } from '../components/ui/Modal';
-import { Card } from '../components/ui/Card';
-import { Switch } from '../components/ui/Switch';
+import { Button, IconButton } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Select } from '../../components/ui/Select';
+import { TextArea } from '../../components/ui/TextArea';
+import { Checkbox } from '../../components/ui/Checkbox';
+import { Radio } from '../../components/ui/Radio';
+import { DatePicker } from '../../components/ui/DatePicker';
+import { TimeInput } from '../../components/ui/TimeInput';
+import { Modal } from '../../components/ui/Modal';
+import { Card } from '../../components/ui/Card';
+import { Switch } from '../../components/ui/Switch';
 
 const Components: React.FC = () => {
   const [showModal, setShowModal] = useState(false);

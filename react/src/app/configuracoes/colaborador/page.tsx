@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
+import { Button } from '../../../components/ui/Button';
+import { Card } from '../../../components/ui/Card';
 import {
   Plus,
   Calendar,

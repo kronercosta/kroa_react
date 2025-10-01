@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Icon } from '@iconify/react';
-import { Logo } from './Logo';
-import { Navigation } from './Navigation';
-import { MultiSelect } from './ui/MultiSelect';
+import { Logo } from '../components/Logo';
+import { Navigation } from '../components/layout/Sidebar';
+import { MultiSelect } from '../components/ui/MultiSelect';
 import { useClinic } from '../contexts/ClinicContext';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-export function Layout({ children }: LayoutProps) {
+export function MainLayout({ children }: LayoutProps) {
   const { multiplasUnidadesEnabled, centroCustoEnabled } = useClinic();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
