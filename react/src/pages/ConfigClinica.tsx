@@ -130,9 +130,16 @@ const ConfigClinica: React.FC = () => {
   const [isAsideOpen, setIsAsideOpen] = useState(false);
   const [editingChair, setEditingChair] = useState<any>({});
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [isProfessionalsDropdownOpen, setIsProfessionalsDropdownOpen] = useState(false);
   const [hasSpecificDates, setHasSpecificDates] = useState(false);
   const [isAnalysisExpanded, setIsAnalysisExpanded] = useState(true);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [calendarDate, setCalendarDate] = useState(new Date());
+  const [showStartTimeDropdown, setShowStartTimeDropdown] = useState(false);
+  const [showEndTimeDropdown, setShowEndTimeDropdown] = useState(false);
+  const [startTimeSearch, setStartTimeSearch] = useState('');
+  const [endTimeSearch, setEndTimeSearch] = useState('');
+  const [showDurationDropdown, setShowDurationDropdown] = useState(false);
 
   // Centro de Custo states
   const [editingCostCenter, setEditingCostCenter] = useState<number | null>(null);
@@ -149,7 +156,7 @@ const ConfigClinica: React.FC = () => {
   // Modal states
   const [deleteUnitModal, setDeleteUnitModal] = useState<{open: boolean, targetUnitId: number | null, sourceUnitId: number | null}>({open: false, targetUnitId: null, sourceUnitId: null});
   const [deleteCostCenterModal, setDeleteCostCenterModal] = useState<{open: boolean, targetCostCenterId: number | null, sourceCostCenterId: number | null}>({open: false, targetCostCenterId: null, sourceCostCenterId: null});
-  const [deleteChairModal, setDeleteChairModal] = useState<{open: boolean, targetChairId: number | null}>({open: false, targetChairId: null});
+  const [deleteChairModal, setDeleteChairModal] = useState<{open: boolean, targetChairId: number | null, sourceChairId: number | null}>({open: false, targetChairId: null, sourceChairId: null});
 
   // Header states
   const [selectedTimezone, setSelectedTimezone] = useState('São Paulo - Brasília');
@@ -249,6 +256,18 @@ const ConfigClinica: React.FC = () => {
     const interval = setInterval(updateTime, 1000); // Atualiza a cada segundo para teste
     return () => clearInterval(interval);
   }, []);
+
+  // Close date picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (showDatePicker && !(e.target as Element).closest('.date-picker-container')) {
+        setShowDatePicker(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showDatePicker]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -387,17 +406,38 @@ const ConfigClinica: React.FC = () => {
       return;
     }
 
-    setDeleteChairModal({ open: true, targetChairId: chairId });
+    setDeleteChairModal({ open: true, targetChairId: null, sourceChairId: chairId });
   };
 
   const confirmDeleteChair = () => {
-    if (deleteChairModal.targetChairId) {
-      const remainingChairs = chairs.filter((chair: any) => chair.id !== deleteChairModal.targetChairId);
-      remainingChairs.forEach((chair, index) => {
+    if (deleteChairModal.sourceChairId) {
+      // Se há transferência, transfere os horários
+      if (deleteChairModal.targetChairId) {
+        const sourceChair = chairs.find((c: any) => c.id === deleteChairModal.sourceChairId);
+        const targetChair = chairs.find((c: any) => c.id === deleteChairModal.targetChairId);
+
+        if (sourceChair && targetChair) {
+          // Transfere os slots da cadeira de origem para a de destino
+          Object.keys(sourceChair.slots).forEach(day => {
+            if (!targetChair.slots[day]) {
+              targetChair.slots[day] = [];
+            }
+            targetChair.slots[day] = [...targetChair.slots[day], ...sourceChair.slots[day]];
+          });
+        }
+      }
+
+      const remainingChairs = chairs.filter((chair: any) => chair.id !== deleteChairModal.sourceChairId);
+      remainingChairs.forEach((chair: any, index: number) => {
         chair.order = index + 1;
       });
       setChairs(remainingChairs);
-      setDeleteChairModal({ open: false, targetChairId: null });
+      setDeleteChairModal({ open: false, targetChairId: null, sourceChairId: null });
+
+      // Se estava editando a cadeira que foi excluída, fecha o aside
+      if (editingChair?.id === deleteChairModal.sourceChairId) {
+        setEditingChair(null);
+      }
     }
   };
 
@@ -1273,8 +1313,13 @@ const ConfigClinica: React.FC = () => {
                                     setDeleteCostCenterModal({ open: true, sourceCostCenterId: center.id, targetCostCenterId: null });
                                   }
                                 }}
-                                className="p-1.5 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition-all"
-                                title="Excluir"
+                                className={`p-1.5 rounded-lg transition-all ${
+                                  costCenters.length === 1
+                                    ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                                    : 'bg-red-100 text-red-600 hover:bg-red-200'
+                                }`}
+                                title={costCenters.length === 1 ? 'Não é possível excluir o único centro de custo' : 'Excluir'}
+                                disabled={costCenters.length === 1}
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -1314,15 +1359,6 @@ const ConfigClinica: React.FC = () => {
 
               {/* Botões à direita */}
               <div className="flex items-center gap-2">
-                {editingChair.id && (
-                  <button
-                    onClick={() => deleteChair(editingChair.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                    title="Excluir Cadeira"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                )}
                 <Button
                   onClick={saveChair}
                   variant="primary"
@@ -1332,33 +1368,50 @@ const ConfigClinica: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 overflow-y-auto h-[calc(100%-64px)]">
-              {/* Nome da Cadeira */}
-              <div>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={editingChair.name || ''}
-                    onChange={(e) => setEditingChair({ ...editingChair, name: e.target.value })}
-                    className="peer w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20 placeholder-transparent"
-                    placeholder="Nome da Cadeira"
-                    id="chairName"
-                  />
-                  <label
-                    htmlFor="chairName"
-                    className="absolute left-3 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-gray-600"
-                  >
-                    Nome da Cadeira
-                  </label>
-                </div>
-              </div>
-
+            <div className="p-4 sm:p-6 lg:p-8 space-y-4 overflow-y-auto h-[calc(100%-64px)]">
               {/* Seção de Configurar Horários */}
-              <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-gray-900">Configurar Horários</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-semibold text-gray-900">Configurar Horários</h3>
+                  <button
+                    onClick={() => {
+                      if (editingChair?.id) {
+                        setDeleteChairModal({
+                          open: true,
+                          targetChairId: null,
+                          sourceChairId: editingChair.id
+                        });
+                      }
+                    }}
+                    className="p-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+                    title="Excluir cadeira"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Nome da Cadeira */}
+                <div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={editingChair.name || ''}
+                      onChange={(e) => setEditingChair({ ...editingChair, name: e.target.value })}
+                      className="peer w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20 placeholder-transparent"
+                      placeholder="Nome da Cadeira"
+                      id="chairName"
+                    />
+                    <label
+                      htmlFor="chairName"
+                      className="absolute left-3 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-gray-600"
+                    >
+                      Nome da Cadeira
+                    </label>
+                  </div>
+                </div>
 
                 {/* Toggle de Datas Específicas */}
-                <div className="mb-6">
+                <div>
                   <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200 hover:shadow-md transition-all duration-200">
                     <div>
                       <label className="text-sm font-medium text-gray-700">Datas Específicas</label>
@@ -1393,7 +1446,7 @@ const ConfigClinica: React.FC = () => {
                               });
                             }
                           }}
-                          className={`flex-1 px-3 py-2.5 text-sm font-medium rounded-xl border-2 transition-all duration-200 transform ${
+                          className={`flex-1 px-3 py-2 text-sm font-medium rounded-xl border-2 transition-all duration-200 transform ${
                             editingChair.selectedDays?.includes(day)
                               ? 'bg-krooa-green text-white border-krooa-green shadow-lg scale-105'
                               : 'bg-white text-gray-600 border-gray-200 hover:border-krooa-green hover:bg-krooa-green/5 hover:text-krooa-dark hover:shadow-md hover:scale-105'
@@ -1408,30 +1461,162 @@ const ConfigClinica: React.FC = () => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Datas Específicas</label>
                     <div className="space-y-2">
-                      <div className="flex gap-2">
-                        <input
-                          type="date"
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-krooa-green/20 focus:border-krooa-green"
-                          onChange={(e) => {
-                            const dates = editingChair.specificDates || [];
-                            if (e.target.value && !dates.includes(e.target.value)) {
-                              setEditingChair({
-                                ...editingChair,
-                                specificDates: [...dates, e.target.value]
-                              });
-                              e.target.value = '';
-                            }
-                          }}
-                        />
-                        <button className="px-4 py-2 bg-krooa-green text-white rounded-lg hover:bg-krooa-dark transition-colors">
-                          Adicionar
-                        </button>
+                      <div className="relative date-picker-container">
+                        <div className="flex gap-2">
+                          <div
+                            className="flex-1 relative"
+                            onClick={() => setShowDatePicker(!showDatePicker)}
+                          >
+                            <input
+                              type="text"
+                              value={selectedDate ? new Date(selectedDate + 'T00:00:00').toLocaleDateString('pt-BR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                              }) : ''}
+                              placeholder="Selecione uma data"
+                              readOnly
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-krooa-green/20 focus:border-krooa-green"
+                            />
+                            <svg className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <Button
+                            onClick={() => {
+                              if (selectedDate) {
+                                const dates = editingChair.specificDates || [];
+                                if (!dates.includes(selectedDate)) {
+                                  setEditingChair({
+                                    ...editingChair,
+                                    specificDates: [...dates, selectedDate]
+                                  });
+                                  setSelectedDate('');
+                                }
+                              }
+                            }}
+                            variant="primary"
+                          >
+                            Adicionar
+                          </Button>
+                        </div>
+
+                        {/* Custom Calendar */}
+                        {showDatePicker && (
+                          <div
+                            className="absolute z-50 mt-1 bg-gray-50 border border-gray-200 rounded-lg shadow-xl p-3"
+                            style={{ minWidth: '300px' }}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center justify-between mb-3 gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newDate = new Date(calendarDate);
+                                  newDate.setMonth(newDate.getMonth() - 1);
+                                  setCalendarDate(newDate);
+                                }}
+                                className="p-1 hover:bg-gray-100 rounded transition-colors flex-shrink-0"
+                              >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
+                              </button>
+                              <div className="flex items-center gap-2 flex-1 justify-center">
+                                <span className="font-medium">
+                                  {calendarDate.toLocaleDateString('pt-BR', { month: 'long' }).charAt(0).toUpperCase() +
+                                   calendarDate.toLocaleDateString('pt-BR', { month: 'long' }).slice(1)}
+                                </span>
+                                <select
+                                  value={calendarDate.getFullYear()}
+                                  onChange={(e) => {
+                                    const newDate = new Date(calendarDate);
+                                    newDate.setFullYear(parseInt(e.target.value));
+                                    setCalendarDate(newDate);
+                                  }}
+                                  className="px-2 py-1 border border-gray-200 rounded text-sm focus:outline-none focus:border-krooa-green bg-white"
+                                >
+                                  {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 2 + i).map(year => (
+                                    <option key={year} value={year}>{year}</option>
+                                  ))}
+                                </select>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newDate = new Date(calendarDate);
+                                  newDate.setMonth(newDate.getMonth() + 1);
+                                  setCalendarDate(newDate);
+                                }}
+                                className="p-1 hover:bg-gray-100 rounded transition-colors flex-shrink-0"
+                              >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </button>
+                            </div>
+
+                            <div className="grid grid-cols-7 gap-1 mb-2">
+                              {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'].map(day => (
+                                <div key={day} className="text-center text-xs font-medium text-gray-600 py-1">
+                                  {day}
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="grid grid-cols-7 gap-1">
+                              {(() => {
+                                const firstDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1).getDay();
+                                const daysInMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).getDate();
+                                const days = [];
+
+                                for (let i = 0; i < firstDay; i++) {
+                                  days.push(<div key={`empty-${i}`} className="p-2"></div>);
+                                }
+
+                                for (let day = 1; day <= daysInMonth; day++) {
+                                  const dateStr = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                                  const isToday = new Date().toDateString() === new Date(calendarDate.getFullYear(), calendarDate.getMonth(), day).toDateString();
+                                  const isSelected = selectedDate === dateStr;
+                                  const isAlreadyAdded = editingChair.specificDates?.includes(dateStr);
+
+                                  days.push(
+                                    <button
+                                      key={day}
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedDate(dateStr);
+                                        setShowDatePicker(false);
+                                      }}
+                                      disabled={isAlreadyAdded}
+                                      className={`
+                                        p-2 text-sm rounded transition-colors
+                                        ${isAlreadyAdded ? 'bg-gray-200 text-gray-400 cursor-not-allowed' :
+                                          isSelected ? 'bg-krooa-green text-white font-medium' :
+                                          isToday ? 'bg-gray-200 text-gray-900 font-medium' :
+                                          'hover:bg-gray-100 text-gray-700'}
+                                      `}
+                                    >
+                                      {day}
+                                    </button>
+                                  );
+                                }
+
+                                return days;
+                              })()}
+                            </div>
+                          </div>
+                        )}
                       </div>
                       {editingChair.specificDates?.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-2">
                           {editingChair.specificDates.map((date: string, index: number) => (
                             <span key={index} className="inline-flex items-center gap-1 px-3 py-1.5 bg-krooa-green/10 text-krooa-dark rounded-lg text-sm">
-                              {new Date(date).toLocaleDateString('pt-BR')}
+                              {new Date(date + 'T00:00:00').toLocaleDateString('pt-BR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                              })}
                               <button
                                 onClick={() => {
                                   setEditingChair({
@@ -1455,11 +1640,34 @@ const ConfigClinica: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="relative">
                     <input
-                      type="time"
+                      type="text"
                       value={editingChair.startTime || ''}
-                      onChange={(e) => setEditingChair({ ...editingChair, startTime: e.target.value })}
-                      className="peer w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20 placeholder-transparent"
-                      placeholder="Início"
+                      onChange={(e) => {
+                        let value = e.target.value.replace(/[^\d]/g, '');
+
+                        // Formata automaticamente HH:MM
+                        if (value.length >= 3) {
+                          value = value.slice(0, 2) + ':' + value.slice(2, 4);
+                        }
+
+                        // Valida horas e minutos
+                        const parts = value.split(':');
+                        if (parts[0] && parseInt(parts[0]) > 23) {
+                          value = '23' + (parts[1] ? ':' + parts[1] : '');
+                        }
+                        if (parts[1] && parseInt(parts[1]) > 59) {
+                          value = parts[0] + ':59';
+                        }
+
+                        setEditingChair({ ...editingChair, startTime: value });
+                        setStartTimeSearch(value);
+                        setShowStartTimeDropdown(true);
+                      }}
+                      onFocus={() => setShowStartTimeDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowStartTimeDropdown(false), 200)}
+                      className="peer w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20 placeholder-transparent"
+                      placeholder="__:__"
+                      maxLength={5}
                       id="startTime"
                     />
                     <label
@@ -1468,14 +1676,72 @@ const ConfigClinica: React.FC = () => {
                     >
                       Início
                     </label>
+
+                    {/* Dropdown de sugestões */}
+                    {showStartTimeDropdown && (
+                      <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
+                        {Array.from({ length: 48 }, (_, i) => {
+                          const hour = Math.floor(i / 2);
+                          const minute = i % 2 === 0 ? '00' : '30';
+                          const time = `${hour.toString().padStart(2, '0')}:${minute}`;
+
+                          // Filtra baseado no que foi digitado
+                          if (editingChair.startTime && !time.startsWith(editingChair.startTime.replace(/[^\d]/g, '').substring(0, 4))) {
+                            if (editingChair.startTime.length > 0 && !time.includes(editingChair.startTime)) {
+                              return null;
+                            }
+                          }
+
+                          return (
+                            <button
+                              key={time}
+                              type="button"
+                              onClick={() => {
+                                setEditingChair({ ...editingChair, startTime: time });
+                                setShowStartTimeDropdown(false);
+                              }}
+                              className={`w-full px-3 py-2 text-left hover:bg-krooa-green/10 transition-colors text-sm ${
+                                editingChair.startTime === time ? 'bg-krooa-green/20 font-medium' : ''
+                              }`}
+                            >
+                              {time}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
+
                   <div className="relative">
                     <input
-                      type="time"
+                      type="text"
                       value={editingChair.endTime || ''}
-                      onChange={(e) => setEditingChair({ ...editingChair, endTime: e.target.value })}
-                      className="peer w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20 placeholder-transparent"
-                      placeholder="Fim"
+                      onChange={(e) => {
+                        let value = e.target.value.replace(/[^\d]/g, '');
+
+                        // Formata automaticamente HH:MM
+                        if (value.length >= 3) {
+                          value = value.slice(0, 2) + ':' + value.slice(2, 4);
+                        }
+
+                        // Valida horas e minutos
+                        const parts = value.split(':');
+                        if (parts[0] && parseInt(parts[0]) > 23) {
+                          value = '23' + (parts[1] ? ':' + parts[1] : '');
+                        }
+                        if (parts[1] && parseInt(parts[1]) > 59) {
+                          value = parts[0] + ':59';
+                        }
+
+                        setEditingChair({ ...editingChair, endTime: value });
+                        setEndTimeSearch(value);
+                        setShowEndTimeDropdown(true);
+                      }}
+                      onFocus={() => setShowEndTimeDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowEndTimeDropdown(false), 200)}
+                      className="peer w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20 placeholder-transparent"
+                      placeholder="__:__"
+                      maxLength={5}
                       id="endTime"
                     />
                     <label
@@ -1484,6 +1750,40 @@ const ConfigClinica: React.FC = () => {
                     >
                       Fim
                     </label>
+
+                    {/* Dropdown de sugestões */}
+                    {showEndTimeDropdown && (
+                      <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
+                        {Array.from({ length: 48 }, (_, i) => {
+                          const hour = Math.floor(i / 2);
+                          const minute = i % 2 === 0 ? '00' : '30';
+                          const time = `${hour.toString().padStart(2, '0')}:${minute}`;
+
+                          // Filtra baseado no que foi digitado
+                          if (editingChair.endTime && !time.startsWith(editingChair.endTime.replace(/[^\d]/g, '').substring(0, 4))) {
+                            if (editingChair.endTime.length > 0 && !time.includes(editingChair.endTime)) {
+                              return null;
+                            }
+                          }
+
+                          return (
+                            <button
+                              key={time}
+                              type="button"
+                              onClick={() => {
+                                setEditingChair({ ...editingChair, endTime: time });
+                                setShowEndTimeDropdown(false);
+                              }}
+                              className={`w-full px-3 py-2 text-left hover:bg-krooa-green/10 transition-colors text-sm ${
+                                editingChair.endTime === time ? 'bg-krooa-green/20 font-medium' : ''
+                              }`}
+                            >
+                              {time}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -1492,86 +1792,122 @@ const ConfigClinica: React.FC = () => {
                   <input
                     type="text"
                     value={editingChair.duration || ''}
-                    onChange={(e) => setEditingChair({ ...editingChair, duration: e.target.value })}
-                    className="peer w-full rounded-lg border border-gray-300 px-3 py-2.5 pr-10 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20 placeholder-transparent"
-                    placeholder="Duração"
+                    onChange={(e) => {
+                      let value = e.target.value;
+
+                      // Se o usuário está apagando, permite
+                      if (value.length < (editingChair.duration || '').length) {
+                        setEditingChair({ ...editingChair, duration: value });
+                        setShowDurationDropdown(true);
+                        return;
+                      }
+
+                      // Remove caracteres não numéricos exceto ':'
+                      value = value.replace(/[^\d:]/g, '');
+
+                      // Se já tem ':', não adiciona outro
+                      if (value.includes(':')) {
+                        const parts = value.split(':');
+                        if (parts.length > 2) {
+                          value = parts[0] + ':' + parts[1];
+                        }
+                        // Valida minutos
+                        if (parts[1] && parseInt(parts[1]) > 59) {
+                          value = parts[0] + ':59';
+                        }
+                      } else {
+                        // Adiciona ':' automaticamente após 1 dígito quando continuar digitando
+                        if (value.length === 2 && !editingChair.duration?.includes(':')) {
+                          value = value[0] + ':' + value[1];
+                        } else if (value.length === 3) {
+                          value = value[0] + ':' + value.slice(1);
+                        }
+                      }
+
+                      setEditingChair({ ...editingChair, duration: value });
+                      setShowDurationDropdown(true);
+                    }}
+                    onFocus={() => setShowDurationDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowDurationDropdown(false), 200)}
+                    className="peer w-full rounded-lg border border-gray-300 px-3 py-2 pr-16 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20 placeholder-transparent"
+                    placeholder="_:__"
+                    maxLength={5}
                     id="duration"
                   />
                   <label
                     htmlFor="duration"
-                    className="absolute left-3 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-gray-600"
+                    className="absolute left-3 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-gray-600 pointer-events-none"
                   >
-                    Duração dos Atendimentos (minutos)
+                    Duração dos Atendimentos
                   </label>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 pointer-events-none">h:min</span>
+
+                  {/* Dropdown de sugestões de duração */}
+                  {showDurationDropdown && (
+                    <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
+                      {[15, 20, 30, 45, 60, 75, 90, 120, 150, 180].map((minutes) => {
+                        const hours = Math.floor(minutes / 60);
+                        const mins = minutes % 60;
+                        const timeStr = `${hours}:${mins.toString().padStart(2, '0')}`;
+                        const label = hours > 0
+                          ? `${hours}h${mins > 0 ? ` ${mins}min` : ''}`
+                          : `${mins}min`;
+
+                        // Filtra baseado no que foi digitado
+                        if (editingChair.duration) {
+                          const searchValue = editingChair.duration.replace(/[^\d]/g, '');
+                          if (searchValue && !timeStr.includes(searchValue) && !minutes.toString().includes(searchValue)) {
+                            return null;
+                          }
+                        }
+
+                        return (
+                          <button
+                            key={minutes}
+                            type="button"
+                            onClick={() => {
+                              setEditingChair({ ...editingChair, duration: timeStr });
+                              setShowDurationDropdown(false);
+                            }}
+                            className={`w-full px-3 py-2 text-left hover:bg-krooa-green/10 transition-colors text-sm flex items-center justify-between ${
+                              editingChair.duration === timeStr ? 'bg-krooa-green/20 font-medium' : ''
+                            }`}
+                          >
+                            <span>{timeStr}</span>
+                            <span className="text-xs text-gray-500">{label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 {/* Professionals Multi-Select */}
                 <div className="relative">
-                  <div
-                    onClick={() => setIsProfessionalsDropdownOpen(!isProfessionalsDropdownOpen)}
-                    className="peer w-full min-h-[42px] px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-krooa-green/20 focus:border-krooa-green cursor-pointer bg-white relative"
+                  <MultiSelect
+                    options={professionals.map(prof => ({
+                      value: prof.id,
+                      label: prof.name
+                    }))}
+                    value={editingChair.selectedProfessionals || []}
+                    onChange={(values) => {
+                      setEditingChair({
+                        ...editingChair,
+                        selectedProfessionals: values
+                      });
+                    }}
+                    placeholder="Profissionais"
+                    multiple={true}
+                  />
+                  <label
+                    className={`absolute left-3 bg-white px-1 text-sm text-gray-600 transition-all pointer-events-none ${
+                      editingChair.selectedProfessionals?.length > 0
+                        ? '-top-2.5'
+                        : 'top-2.5 text-base text-gray-400'
+                    }`}
                   >
-                  {editingChair.selectedProfessionals?.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {editingChair.selectedProfessionals.map((profId: string) => {
-                        const prof = professionals.find(p => p.id === profId);
-                        return prof ? (
-                          <span key={profId} className="inline-flex items-center gap-1 px-2 py-1 bg-krooa-green/10 text-krooa-green rounded-md text-sm">
-                            {prof.name}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingChair({
-                                  ...editingChair,
-                                  selectedProfessionals: editingChair.selectedProfessionals.filter((id: string) => id !== profId)
-                                });
-                              }}
-                              className="hover:text-red-600"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </span>
-                        ) : null;
-                      })}
-                    </div>
-                    ) : (
-                      <span className="text-gray-400 text-sm">Selecione os profissionais</span>
-                    )}
-                    <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${isProfessionalsDropdownOpen ? 'rotate-180' : ''}`} />
-                  </div>
-
-                {isProfessionalsDropdownOpen && (
-                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg">
-                    {professionals.map((prof) => (
-                      <div
-                        key={prof.id}
-                        onClick={() => {
-                          const selected = editingChair.selectedProfessionals || [];
-                          if (selected.includes(prof.id)) {
-                            setEditingChair({
-                              ...editingChair,
-                              selectedProfessionals: selected.filter((id: string) => id !== prof.id)
-                            });
-                          } else {
-                            setEditingChair({
-                              ...editingChair,
-                              selectedProfessionals: [...selected, prof.id]
-                            });
-                          }
-                        }}
-                        className="px-3 py-2 hover:bg-gray-50 cursor-pointer flex items-center justify-between"
-                      >
-                        <span className="text-sm">{prof.name}</span>
-                        {editingChair.selectedProfessionals?.includes(prof.id) && (
-                          <div className="w-4 h-4 bg-krooa-green rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs">✓</span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                    Profissionais
+                  </label>
                 </div>
               </div>
             </div>
@@ -1589,40 +1925,51 @@ const ConfigClinica: React.FC = () => {
         <div className="space-y-4">
           {(() => {
             const unit = unidades.find(u => u.id === deleteUnitModal.sourceUnitId);
-            return unit?.registrosVinculados ? (
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                <div className="flex items-start gap-2">
-                  <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                  <div>
-                    <p className="font-semibold text-amber-800">
-                      {unit.registrosVinculados} registros serão afetados
-                    </p>
-                    <p className="text-sm text-amber-700 mt-1">
-                      Todos os dados vinculados a esta unidade precisam ser transferidos para outra unidade.
-                    </p>
+            const registros = unit?.registrosVinculados || 0;
+
+            return (
+              <>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                      <p className="font-semibold text-amber-800">
+                        {registros} registros serão afetados
+                      </p>
+                      <p className="text-sm text-amber-700 mt-1">
+                        Tem certeza que deseja excluir a unidade <strong>{unit?.titulo}</strong>?
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : null;
+
+                <div className="space-y-3">
+                  <p className="text-gray-600 text-sm">
+                    {registros > 0
+                      ? `Você pode transferir os ${registros} registros afetados para outra unidade ou excluir permanentemente.`
+                      : 'Você pode transferir os dados para outra unidade ou excluir permanentemente.'
+                    }
+                  </p>
+
+                  <Select
+                    value={deleteUnitModal.targetUnitId?.toString() || ''}
+                    onChange={(e) => setDeleteUnitModal({ ...deleteUnitModal, targetUnitId: parseInt(e.target.value) || null })}
+                    options={[
+                      { value: '', label: 'Não transferir (excluir permanentemente)' },
+                      ...unidades.filter(u => u.id !== deleteUnitModal.sourceUnitId).map(u => ({
+                        value: u.id.toString(),
+                        label: u.titulo
+                      }))
+                    ]}
+                  />
+                </div>
+              </>
+            );
           })()}
 
-          <p className="text-gray-600">
-            Selecione para onde transferir os dados desta unidade:
-          </p>
-
-          <Select
-            value={deleteUnitModal.targetUnitId?.toString() || ''}
-            onChange={(e) => setDeleteUnitModal({ ...deleteUnitModal, targetUnitId: parseInt(e.target.value) || null })}
-            options={unidades.filter(u => u.id !== deleteUnitModal.sourceUnitId).map(u => ({
-              value: u.id.toString(),
-              label: u.titulo
-            }))}
-            required
-          />
-
-          <div className="flex gap-3 justify-end">
+          <div className="flex justify-between">
             <Button
               variant="outline"
               onClick={() => setDeleteUnitModal({ open: false, targetUnitId: null, sourceUnitId: null })}
@@ -1632,14 +1979,13 @@ const ConfigClinica: React.FC = () => {
             <Button
               variant="danger"
               onClick={() => {
-                if (deleteUnitModal.sourceUnitId && deleteUnitModal.targetUnitId) {
+                if (deleteUnitModal.sourceUnitId) {
                   setUnidades(unidades.filter(u => u.id !== deleteUnitModal.sourceUnitId));
                   setDeleteUnitModal({ open: false, targetUnitId: null, sourceUnitId: null });
                 }
               }}
-              disabled={!deleteUnitModal.targetUnitId}
             >
-              Excluir e Transferir
+              {deleteUnitModal.targetUnitId ? 'Excluir e Transferir' : 'Excluir Permanentemente'}
             </Button>
           </div>
         </div>
@@ -1647,17 +1993,60 @@ const ConfigClinica: React.FC = () => {
 
       <Modal
         isOpen={deleteChairModal.open}
-        onClose={() => setDeleteChairModal({ open: false, targetChairId: null })}
+        onClose={() => setDeleteChairModal({ open: false, targetChairId: null, sourceChairId: null })}
         title="Excluir Cadeira"
       >
         <div className="space-y-4">
-          <p className="text-gray-600">
-            Tem certeza que deseja excluir esta cadeira? Esta ação não pode ser desfeita.
-          </p>
-          <div className="flex gap-3 justify-end">
+          {(() => {
+            const chair = chairs.find((c: any) => c.id === deleteChairModal.sourceChairId);
+            const slots = chair ? Object.values(chair.slots).flat().length : 0;
+
+            return (
+              <>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                      <p className="font-semibold text-amber-800">
+                        {slots} horários serão afetados
+                      </p>
+                      <p className="text-sm text-amber-700 mt-1">
+                        Tem certeza que deseja excluir a cadeira <strong>{chair?.name}</strong>?
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-gray-600 text-sm">
+                    {slots > 0
+                      ? `Você pode transferir os ${slots} horários afetados para outra cadeira ou excluir permanentemente.`
+                      : 'Você pode transferir os dados para outra cadeira ou excluir permanentemente.'
+                    }
+                  </p>
+
+                  <Select
+                    value={deleteChairModal.targetChairId?.toString() || ''}
+                    onChange={(e) => setDeleteChairModal({ ...deleteChairModal, targetChairId: parseInt(e.target.value) || null })}
+                    options={[
+                      { value: '', label: 'Não transferir (excluir permanentemente)' },
+                      ...chairs.filter((c: any) => c.id !== deleteChairModal.sourceChairId).map((c: any) => ({
+                        value: c.id.toString(),
+                        label: c.name
+                      }))
+                    ]}
+                  />
+                </div>
+              </>
+            );
+          })()}
+
+          <div className="flex justify-between">
             <Button
               variant="outline"
-              onClick={() => setDeleteChairModal({ open: false, targetChairId: null })}
+              onClick={() => setDeleteChairModal({ open: false, targetChairId: null, sourceChairId: null })}
             >
               Cancelar
             </Button>
@@ -1665,7 +2054,7 @@ const ConfigClinica: React.FC = () => {
               variant="danger"
               onClick={confirmDeleteChair}
             >
-              Excluir
+              {deleteChairModal.targetChairId ? 'Excluir e Transferir' : 'Excluir Permanentemente'}
             </Button>
           </div>
         </div>
@@ -1677,21 +2066,53 @@ const ConfigClinica: React.FC = () => {
         title="Excluir Centro de Custo"
       >
         <div className="space-y-4">
-          <p className="text-gray-600">
-            Deseja transferir os dados deste centro de custo para outro antes de excluí-lo?
-          </p>
-          <Select
-            value={deleteCostCenterModal.targetCostCenterId?.toString() || ''}
-            onChange={(e) => setDeleteCostCenterModal({ ...deleteCostCenterModal, targetCostCenterId: parseInt(e.target.value) || null })}
-            options={[
-              { value: '', label: 'Não transferir dados' },
-              ...costCenters.filter(cc => cc.id !== deleteCostCenterModal.sourceCostCenterId).map(cc => ({
-                value: cc.id.toString(),
-                label: cc.name
-              }))
-            ]}
-          />
-          <div className="flex gap-3 justify-end">
+          {(() => {
+            const center = costCenters.find(cc => cc.id === deleteCostCenterModal.sourceCostCenterId);
+            const registros = center?.registrosVinculados || 0;
+
+            return (
+              <>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                      <p className="font-semibold text-amber-800">
+                        {registros} registros serão afetados
+                      </p>
+                      <p className="text-sm text-amber-700 mt-1">
+                        Tem certeza que deseja excluir o centro de custo <strong>{center?.name}</strong>?
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-gray-600 text-sm">
+                    {registros > 0
+                      ? `Você pode transferir os ${registros} registros afetados para outro centro de custo ou excluir permanentemente.`
+                      : 'Você pode transferir os dados para outro centro de custo ou excluir permanentemente.'
+                    }
+                  </p>
+
+                  <Select
+                    value={deleteCostCenterModal.targetCostCenterId?.toString() || ''}
+                    onChange={(e) => setDeleteCostCenterModal({ ...deleteCostCenterModal, targetCostCenterId: parseInt(e.target.value) || null })}
+                    options={[
+                      { value: '', label: 'Não transferir (excluir permanentemente)' },
+                      ...costCenters.filter(cc => cc.id !== deleteCostCenterModal.sourceCostCenterId).map(cc => ({
+                        value: cc.id.toString(),
+                        label: cc.name
+                      }))
+                    ]}
+                  />
+                </div>
+              </>
+            );
+          })()}
+
+          <div className="flex justify-between">
             <Button
               variant="outline"
               onClick={() => setDeleteCostCenterModal({ open: false, targetCostCenterId: null, sourceCostCenterId: null })}
@@ -1707,7 +2128,7 @@ const ConfigClinica: React.FC = () => {
                 }
               }}
             >
-              Excluir
+              {deleteCostCenterModal.targetCostCenterId ? 'Excluir e Transferir' : 'Excluir Permanentemente'}
             </Button>
           </div>
         </div>
