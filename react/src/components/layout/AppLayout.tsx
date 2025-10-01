@@ -8,6 +8,7 @@ const AppLayout: React.FC = () => {
   const location = useLocation();
   const pathname = location.pathname;
   const [crmSubmenuOpen, setCrmSubmenuOpen] = useState(false);
+  const [configSubmenuOpen, setConfigSubmenuOpen] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [configMenuOpen, setConfigMenuOpen] = useState(false);
@@ -97,6 +98,21 @@ const AppLayout: React.FC = () => {
         { href: '/crm/whatsapp', label: 'WhatsApp' }
       ]
     },
+    {
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      ),
+      href: '/configuracoes/clinica',
+      title: 'Configurações',
+      hasSubmenu: true,
+      submenu: [
+        { href: '/configuracoes/clinica', label: 'Clínica' },
+        { href: '/configuracoes/colaborador', label: 'Colaborador' }
+      ]
+    },
   ];
 
   const isActive = (href: string) => {
@@ -153,8 +169,14 @@ const AppLayout: React.FC = () => {
                     : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                 }`}
                 title={!sidebarExpanded ? item.title : undefined}
-                onMouseEnter={() => item.hasSubmenu && setCrmSubmenuOpen(true)}
-                onMouseLeave={() => item.hasSubmenu && setCrmSubmenuOpen(false)}
+                onMouseEnter={() => {
+                  if (item.title === 'CRM') setCrmSubmenuOpen(true);
+                  if (item.title === 'Configurações') setConfigSubmenuOpen(true);
+                }}
+                onMouseLeave={() => {
+                  if (item.title === 'CRM') setCrmSubmenuOpen(false);
+                  if (item.title === 'Configurações') setConfigSubmenuOpen(false);
+                }}
               >
                 <div className="relative flex items-center">
                   <div className="relative">
@@ -174,11 +196,32 @@ const AppLayout: React.FC = () => {
               </Link>
 
               {/* Submenu do CRM */}
-              {item.hasSubmenu && crmSubmenuOpen && (
+              {item.title === 'CRM' && item.hasSubmenu && crmSubmenuOpen && (
                 <div
                   className={`absolute ${sidebarExpanded ? 'left-full' : 'left-full'} ml-1 top-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50`}
                   onMouseEnter={() => setCrmSubmenuOpen(true)}
                   onMouseLeave={() => setCrmSubmenuOpen(false)}
+                >
+                  {item.submenu?.map((subitem, subindex) => (
+                    <Link
+                      key={subindex}
+                      to={subitem.href}
+                      className={`block px-4 py-2 text-sm whitespace-nowrap hover:bg-gray-100 first:rounded-t-lg last:rounded-b-lg ${
+                        pathname === subitem.href ? 'bg-krooa-green/10 text-krooa-dark font-semibold' : 'text-gray-700'
+                      }`}
+                    >
+                      {subitem.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {/* Submenu de Configurações */}
+              {item.title === 'Configurações' && item.hasSubmenu && configSubmenuOpen && (
+                <div
+                  className={`absolute ${sidebarExpanded ? 'left-full' : 'left-full'} ml-1 top-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50`}
+                  onMouseEnter={() => setConfigSubmenuOpen(true)}
+                  onMouseLeave={() => setConfigSubmenuOpen(false)}
                 >
                   {item.submenu?.map((subitem, subindex) => (
                     <Link

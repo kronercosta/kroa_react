@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Trash2, Clock, ChevronDown, X, GripVertical, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Trash2, Clock, ChevronDown, X, GripVertical, TrendingUp, TrendingDown, Minus, Plus } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input, EmailInput, PhoneInput, CPFInput } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
@@ -42,7 +42,13 @@ interface Chair {
 const ConfigClinica: React.FC = () => {
   const { multiplasUnidadesEnabled, setMultiplasUnidadesEnabled, centroCustoEnabled, setCentroCustoEnabled } = useClinic();
   const { currentRegion, setRegion, config, formatCurrency } = useRegion();
-  const [activeTab, setActiveTab] = useState('conta');
+
+  // Define a aba inicial baseada na rota
+  const getInitialTab = () => {
+    return 'conta';
+  };
+
+  const [activeTab, setActiveTab] = useState(getInitialTab());
   const [pessoaJuridica, setPessoaJuridica] = useState(true);
   const [editingUnit, setEditingUnit] = useState<number | null>(null);
   const [regionDropdownOpen, setRegionDropdownOpen] = useState(false);
@@ -204,6 +210,7 @@ const ConfigClinica: React.FC = () => {
     }
   ]);
 
+
   const tabItems = [
     { id: 'conta', label: 'Conta' },
     { id: 'cadeiras', label: currentRegion === 'BR' ? 'Cadeiras' : 'Chairs' },
@@ -344,6 +351,7 @@ const ConfigClinica: React.FC = () => {
         setEditingChair({
           id: chair.id,
           name: chair.name,
+          slots: chair.slots || {},
           selectedDays: [],
           startTime: '',
           endTime: '',
@@ -355,6 +363,7 @@ const ConfigClinica: React.FC = () => {
     } else {
       setEditingChair({
         name: '',
+        slots: {},
         selectedDays: [],
         startTime: '',
         endTime: '',
@@ -969,6 +978,7 @@ const ConfigClinica: React.FC = () => {
             )}
           </div>
         )}
+
 
         {/* Parâmetros */}
         {activeTab === 'parametros' && (
@@ -2064,6 +2074,168 @@ const ConfigClinica: React.FC = () => {
                   >
                     Profissionais
                   </label>
+                </div>
+
+                {/* Botão Adicionar Horário */}
+                <div className="flex justify-end">
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      // Adiciona o horário configurado
+                      if (editingChair.startTime && editingChair.endTime && editingChair.duration) {
+                        // Lógica para adicionar horário
+                        const newSlot = {
+                          id: `${editingChair.id || 'new'}-${Date.now()}`,
+                          time: `${editingChair.startTime}-${editingChair.endTime}`,
+                          duration: editingChair.duration,
+                          professionals: editingChair.selectedProfessionals || [],
+                          days: hasSpecificDates ? [] : editingChair.selectedDays,
+                          dates: hasSpecificDates ? editingChair.specificDates : []
+                        };
+
+                        // Limpa os campos após adicionar
+                        setEditingChair({
+                          ...editingChair,
+                          startTime: '',
+                          endTime: '',
+                          duration: '',
+                          selectedProfessionals: [],
+                          selectedDays: [],
+                          specificDates: []
+                        });
+                      }
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Adicionar Horário
+                  </Button>
+                </div>
+
+                {/* Tabela de Horários */}
+                <div className="mt-6">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4">Horários Configurados</h4>
+
+                  {/* Se não houver horários */}
+                  {(!editingChair.slots || Object.keys(editingChair.slots || {}).length === 0) ? (
+                    <div className="bg-gray-50 rounded-lg p-8 text-center">
+                      <Clock className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-sm text-gray-600 mb-1">Nenhum horário configurado</p>
+                      <p className="text-xs text-gray-500">Configure os campos acima e clique em "Adicionar Horário"</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto rounded-lg border border-gray-200">
+                      <table className="min-w-full">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                              Dia/Data
+                            </th>
+                            <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                              Horário
+                            </th>
+                            <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                              Duração
+                            </th>
+                            <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                              Profissionais
+                            </th>
+                            <th className="text-center py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
+                              Ações
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {editingChair.slots && Object.entries(editingChair.slots).map(([day, slots]: [string, any]) =>
+                            slots.map((slot: any) => (
+                              <tr key={slot.id} className="hover:bg-gray-50">
+                                <td className="py-2.5 px-4 text-sm text-gray-900">
+                                  <span className="font-medium">
+                                    {getDayAbbreviation(day)}
+                                  </span>
+                                  {slot.date && (
+                                    <span className="ml-2 text-xs text-gray-500">
+                                      ({Array.isArray(slot.date) ? slot.date.join(', ') : slot.date})
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="py-2.5 px-4 text-sm text-gray-900">
+                                  {slot.time}
+                                </td>
+                                <td className="py-2.5 px-4 text-sm text-gray-900">
+                                  {slot.duration || '30'} min
+                                </td>
+                                <td className="py-2.5 px-4 text-sm text-gray-900">
+                                  <div className="flex flex-wrap gap-1">
+                                    {slot.professionals?.map((prof: any) => (
+                                      <span key={prof.id} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-krooa-green/10 text-krooa-dark">
+                                        {prof.name}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </td>
+                                <td className="py-2.5 px-4 text-center">
+                                  <div className="flex items-center justify-center gap-2">
+                                    <button
+                                      onClick={() => {
+                                        // Carrega os dados do horário para edição
+                                        const [startTime, endTime] = slot.time.split('-');
+                                        setEditingChair({
+                                          ...editingChair,
+                                          startTime: startTime,
+                                          endTime: endTime,
+                                          duration: slot.duration || '30',
+                                          selectedProfessionals: slot.professionals?.map((p: any) => p.id) || [],
+                                          selectedDays: [day],
+                                          specificDates: slot.date ? (Array.isArray(slot.date) ? slot.date : [slot.date]) : []
+                                        });
+
+                                        // Se tiver datas específicas, ativa o modo de datas
+                                        if (slot.date) {
+                                          setHasSpecificDates(true);
+                                        }
+
+                                        // Remove o slot atual para ser substituído pelo editado
+                                        const newSlots = { ...editingChair.slots };
+                                        newSlots[day] = newSlots[day].filter((s: any) => s.id !== slot.id);
+                                        if (newSlots[day].length === 0) {
+                                          delete newSlots[day];
+                                        }
+                                        setEditingChair({ ...editingChair, slots: newSlots });
+                                      }}
+                                      className="p-1.5 rounded-lg transition-all bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                      title="Editar"
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                      </svg>
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        // Remove o horário
+                                        const newSlots = { ...editingChair.slots };
+                                        newSlots[day] = newSlots[day].filter((s: any) => s.id !== slot.id);
+                                        if (newSlots[day].length === 0) {
+                                          delete newSlots[day];
+                                        }
+                                        setEditingChair({ ...editingChair, slots: newSlots });
+                                      }}
+                                      className="p-1.5 rounded-lg transition-all bg-red-100 text-red-600 hover:bg-red-200"
+                                      title="Excluir"
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                      </svg>
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

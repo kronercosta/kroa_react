@@ -11,6 +11,7 @@ const EsqueceuSenha = lazy(() => import('./pages/EsqueceuSenha'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Components = lazy(() => import('./pages/Components'));
 const ConfigClinica = lazy(() => import('./pages/ConfigClinica'));
+const ConfigColaborador = lazy(() => import('./pages/ConfigColaborador'));
 const NovaCadeira = lazy(() => import('./pages/NovaCadeira'));
 
 // Páginas placeholder para as rotas da navegação
@@ -100,6 +101,11 @@ function App() {
             <Route path="/configuracoes/clinica" element={
               <Layout>
                 <ConfigClinica />
+              </Layout>
+            } />
+            <Route path="/configuracoes/colaborador" element={
+              <Layout>
+                <ConfigColaborador />
               </Layout>
             } />
             <Route path="/nova-cadeira" element={
