@@ -58,19 +58,19 @@ export function Layout({ children }: LayoutProps) {
   };
 
   const unidadesOptions = [
-    { id: '1', name: 'Unidade Principal' },
-    { id: '2', name: 'Unidade Setor Oeste' },
-    { id: '3', name: 'Unidade Centro' },
-    { id: '4', name: 'Unidade Norte' },
-    { id: '5', name: 'Unidade Sul' }
+    { value: '1', label: 'Unidade Principal' },
+    { value: '2', label: 'Unidade Setor Oeste' },
+    { value: '3', label: 'Unidade Centro' },
+    { value: '4', label: 'Unidade Norte' },
+    { value: '5', label: 'Unidade Sul' }
   ];
 
   const centrosOptions = [
-    { id: '1', name: 'Ortodontia' },
-    { id: '2', name: 'Endodontia' },
-    { id: '3', name: 'Cirurgia' },
-    { id: '4', name: 'Periodontia' },
-    { id: '5', name: 'Implantodontia' }
+    { value: '1', label: 'Ortodontia' },
+    { value: '2', label: 'Endodontia' },
+    { value: '3', label: 'Cirurgia' },
+    { value: '4', label: 'Periodontia' },
+    { value: '5', label: 'Implantodontia' }
   ];
 
   const configItems = [
@@ -216,7 +216,7 @@ export function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="h-screen bg-gray-50 flex">
+    <div className="h-screen bg-gray-50 flex overflow-hidden">
       {/* Sidebar - Hidden on mobile */}
       <div className={`${sidebarOpen ? 'w-64' : 'w-16'} h-full bg-white border-r border-gray-200 flex flex-col transition-all duration-300 hidden md:flex`}>
         {/* Header da Sidebar */}
@@ -273,12 +273,12 @@ export function Layout({ children }: LayoutProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4 h-16">
+        <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 h-16">
           <div className="flex items-center justify-between h-full">
             {/* Logo Principal */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               {/* Menu Hambúrguer Mobile */}
               <div className="relative md:hidden" ref={menuRef}>
                 <button
@@ -292,34 +292,61 @@ export function Layout({ children }: LayoutProps) {
 
                 {/* Dropdown Menu Mobile */}
                 {mobileMenuOpen && (
-                  <div className="absolute left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                    <div className="px-4 py-2 border-b border-gray-200">
-                      <h3 className="text-sm font-semibold text-gray-700">Menu</h3>
+                  <div className="absolute left-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-[calc(100vh-100px)] overflow-y-auto">
+                    {/* Superfiltros no mobile */}
+                    {(multiplasUnidadesEnabled || centroCustoEnabled) && (
+                      <div className="p-4 border-b border-gray-200 space-y-3">
+                        <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Filtros</h3>
+                        {multiplasUnidadesEnabled && (
+                          <MultiSelect
+                            placeholder="Todas as Unidades"
+                            options={unidadesOptions}
+                            value={selectedUnidades}
+                            onChange={setSelectedUnidades}
+                            multiple={true}
+                          />
+                        )}
+                        {centroCustoEnabled && (
+                          <MultiSelect
+                            placeholder="Todos os Centros"
+                            options={centrosOptions}
+                            value={selectedCentros}
+                            onChange={setSelectedCentros}
+                            multiple={true}
+                          />
+                        )}
+                      </div>
+                    )}
+
+                    <div className="py-2">
+                      <div className="px-4 py-2">
+                        <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Menu Principal</h3>
+                      </div>
+
+                      {menuItems.map((item, index) => (
+                        <Link
+                          key={index}
+                          to={item.href}
+                          className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                            location.pathname === item.href
+                              ? 'bg-krooa-green/10 text-krooa-dark font-semibold border-l-4 border-krooa-green'
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {item.icon}
+                          <span>{item.title}</span>
+                          {item.badge && (
+                            <span className="ml-auto w-2 h-2 bg-krooa-green rounded-full animate-pulse"></span>
+                          )}
+                        </Link>
+                      ))}
                     </div>
 
-                    {menuItems.map((item, index) => (
-                      <Link
-                        key={index}
-                        to={item.href}
-                        className={`flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
-                          location.pathname === item.href
-                            ? 'bg-krooa-green/10 text-krooa-dark font-semibold'
-                            : 'text-gray-700 hover:bg-gray-100'
-                        }`}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {item.icon}
-                        <span>{item.title}</span>
-                        {item.badge && (
-                          <span className="ml-auto w-2 h-2 bg-krooa-green rounded-full animate-pulse"></span>
-                        )}
-                      </Link>
-                    ))}
-
-                    <div className="border-t border-gray-200 mt-2 pt-2">
+                    <div className="border-t border-gray-200 mt-2 p-2">
                       <button
                         onClick={handleLogout}
-                        className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
@@ -331,18 +358,24 @@ export function Layout({ children }: LayoutProps) {
                 )}
               </div>
 
+              {/* Logo - pequena no mobile, completa no desktop */}
+              <img
+                src="/Symboll_Gradient_Light.png"
+                alt="Krooa"
+                className="h-8 sm:hidden object-contain"
+              />
               <img
                 src="/logo_Full_Gradient_Light.png"
                 alt="Krooa"
-                className="h-14 object-contain"
+                className="hidden sm:block h-14 object-contain"
               />
             </div>
 
             {/* Ações do header - Lado direito */}
-            <div className="flex items-center gap-4">
-              {/* 1. Superfiltros */}
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* 1. Superfiltros - Ocultos no mobile */}
               {(multiplasUnidadesEnabled || centroCustoEnabled) && (
-                <div className="flex items-center gap-3">
+                <div className="hidden md:flex items-center gap-3">
                   {/* Seletor de Unidades (Múltipla Seleção) */}
                   {multiplasUnidadesEnabled && (
                     <MultiSelect
@@ -367,24 +400,24 @@ export function Layout({ children }: LayoutProps) {
                 </div>
               )}
 
-              {/* Divisor sutil */}
+              {/* Divisor sutil - Oculto no mobile */}
               {(multiplasUnidadesEnabled || centroCustoEnabled) && (
-                <div className="h-6 w-px bg-gray-300"></div>
+                <div className="hidden md:block h-6 w-px bg-gray-300"></div>
               )}
 
               {/* 2. Busca */}
-              <button className="text-gray-500 hover:text-gray-700 transition-colors">
+              <button className="text-gray-500 hover:text-gray-700 transition-colors p-1">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </button>
 
               {/* 3. Notificações/Alerta */}
-              <button className="relative text-gray-500 hover:text-gray-700 transition-colors">
+              <button className="relative text-gray-500 hover:text-gray-700 transition-colors p-1">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
-                <span className="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full"></span>
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></span>
               </button>
 
               {/* 4. Menu de Configurações */}
@@ -425,8 +458,115 @@ export function Layout({ children }: LayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1">
-          {children}
+        <main className="flex-1 overflow-x-hidden overflow-y-auto relative">
+          <div className="flex h-full">
+            {/* Main Content Area */}
+            <div className="flex-1">
+              {children}
+            </div>
+
+            {/* Aside with Glassmorphism - Only show on specific pages */}
+            {(location.pathname === '/nova-cadeira' || location.pathname.includes('/cadeira')) && (
+              <aside className="w-full lg:w-[600px] xl:w-[700px] 2xl:w-[880px] max-w-[880px] h-full relative transition-all duration-300 ease-in-out">
+                {/* Glassmorphism Background */}
+                <div className="absolute inset-0 bg-white/60 backdrop-blur-xl border-l border-gray-200/50" />
+
+                {/* Content Container */}
+                <div className="relative z-10 p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Nova Cadeira</h3>
+
+                  {/* Form sections */}
+                  <div className="space-y-6">
+                    {/* Informações básicas */}
+                    <div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 border border-gray-200/30 shadow-sm">
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">Informações Básicas</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-xs text-gray-600">Nome da Cadeira</label>
+                          <input
+                            type="text"
+                            className="w-full px-3 py-2 mt-1 text-sm border border-gray-200/50 rounded-lg focus:ring-2 focus:ring-krooa-green focus:border-transparent bg-white/70 backdrop-blur-sm"
+                            placeholder="Ex: Cadeira 01"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-600">Sala</label>
+                          <select className="w-full px-3 py-2 mt-1 text-sm border border-gray-200/50 rounded-lg focus:ring-2 focus:ring-krooa-green focus:border-transparent bg-white/70 backdrop-blur-sm">
+                            <option>Selecione a sala</option>
+                            <option>Sala 1</option>
+                            <option>Sala 2</option>
+                            <option>Sala 3</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status */}
+                    <div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 border border-gray-200/30 shadow-sm">
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">Status</h4>
+                      <div className="space-y-2">
+                        <label className="flex items-center space-x-2">
+                          <input type="radio" name="status" className="text-krooa-green focus:ring-krooa-green" />
+                          <span className="text-sm text-gray-700">Ativa</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input type="radio" name="status" className="text-krooa-green focus:ring-krooa-green" />
+                          <span className="text-sm text-gray-700">Em manutenção</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input type="radio" name="status" className="text-krooa-green focus:ring-krooa-green" />
+                          <span className="text-sm text-gray-700">Inativa</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Equipamentos */}
+                    <div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 border border-gray-200/30 shadow-sm">
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">Equipamentos</h4>
+                      <div className="space-y-2">
+                        <label className="flex items-center space-x-2">
+                          <input type="checkbox" className="rounded text-krooa-green focus:ring-krooa-green" />
+                          <span className="text-sm text-gray-700">Raio-X</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input type="checkbox" className="rounded text-krooa-green focus:ring-krooa-green" />
+                          <span className="text-sm text-gray-700">Scanner Intraoral</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input type="checkbox" className="rounded text-krooa-green focus:ring-krooa-green" />
+                          <span className="text-sm text-gray-700">Ultrassom</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input type="checkbox" className="rounded text-krooa-green focus:ring-krooa-green" />
+                          <span className="text-sm text-gray-700">Laser</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Observações */}
+                    <div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 border border-gray-200/30 shadow-sm">
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">Observações</h4>
+                      <textarea
+                        className="w-full px-3 py-2 text-sm border border-gray-200/50 rounded-lg focus:ring-2 focus:ring-krooa-green focus:border-transparent bg-white/70 backdrop-blur-sm"
+                        rows={4}
+                        placeholder="Adicione observações sobre a cadeira..."
+                      />
+                    </div>
+
+                    {/* Botões de ação */}
+                    <div className="space-y-2 pt-4">
+                      <button className="w-full bg-krooa-green text-white px-4 py-2 rounded-lg hover:bg-krooa-dark transition-colors text-sm font-medium shadow-sm">
+                        Salvar Cadeira
+                      </button>
+                      <button className="w-full bg-white/50 backdrop-blur-sm text-gray-700 px-4 py-2 rounded-lg hover:bg-white/70 transition-colors text-sm font-medium border border-gray-200/50">
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </aside>
+            )}
+          </div>
         </main>
       </div>
     </div>

@@ -35,10 +35,15 @@ export function Select({
               peer w-full h-10 rounded-lg border border-gray-300 px-3 py-2 pr-8
               focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20
               disabled:bg-gray-50 disabled:text-gray-500
-              appearance-none
               ${error ? 'border-red-300' : ''}
               ${className}
             `}
+            style={{
+              WebkitAppearance: 'none',
+              MozAppearance: 'none',
+              appearance: 'none',
+              backgroundImage: 'none'
+            }}
             {...props}
           >
             <option value="" disabled hidden></option>
@@ -85,23 +90,39 @@ export function Select({
           {label}
         </label>
       )}
-      <select
-        value={value}
-        className={`
-          w-full rounded-xl border border-gray-300 px-4 py-2.5
-          focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20
-          disabled:bg-gray-50 disabled:text-gray-500
-          ${error ? 'border-red-300' : ''}
-          ${className}
-        `}
-        {...props}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        <select
+          value={value}
+          className={`
+            w-full rounded-xl border border-gray-300 px-4 py-2.5 pr-10
+            focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20
+            disabled:bg-gray-50 disabled:text-gray-500
+            ${error ? 'border-red-300' : ''}
+            ${className}
+          `}
+          style={{
+            WebkitAppearance: 'none',
+            MozAppearance: 'none',
+            appearance: 'none',
+            backgroundImage: 'none'
+          }}
+          {...props}
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+
+        {/* Seta customizada */}
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+
       {error && (
         <p className="mt-1 text-sm text-red-600">{error}</p>
       )}

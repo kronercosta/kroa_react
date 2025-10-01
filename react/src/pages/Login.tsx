@@ -36,11 +36,10 @@ const Login: React.FC = () => {
           {/* Logo */}
           <div className="mb-10">
             <img
-              src="/krooa-logo.png"
+              src="/logo_Full_Gradient_Light.png"
               alt="Krooa"
-              className="h-16 w-auto mb-4"
+              className="h-20 w-auto"
             />
-            <p className="text-gray-600">Sistema de Gestão Empresarial</p>
           </div>
 
           {/* Título */}
@@ -115,15 +114,8 @@ const Login: React.FC = () => {
               floating
             />
 
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 text-krooa-green rounded border-gray-300 focus:ring-krooa-green accent-krooa-green"
-                />
-                <span className="text-sm text-gray-600">Lembrar de mim</span>
-              </label>
-              <a href="#" className="text-sm text-krooa-blue hover:text-krooa-dark font-medium">
+            <div className="flex justify-end">
+              <a href="/esqueceu-senha" className="text-sm text-krooa-blue hover:text-krooa-dark font-medium">
                 Esqueceu a senha?
               </a>
             </div>

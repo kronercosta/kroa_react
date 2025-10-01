@@ -3,12 +3,15 @@ import { Suspense, lazy } from 'react';
 
 import { Layout } from './components/Layout';
 import { ClinicProvider } from './contexts/ClinicContext';
+import { RegionProvider } from './contexts/RegionContext';
 
 // Páginas - Lazy loading para melhor performance
 const Login = lazy(() => import('./pages/Login'));
+const EsqueceuSenha = lazy(() => import('./pages/EsqueceuSenha'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Components = lazy(() => import('./pages/Components'));
 const ConfigClinica = lazy(() => import('./pages/ConfigClinica'));
+const NovaCadeira = lazy(() => import('./pages/NovaCadeira'));
 
 // Páginas placeholder para as rotas da navegação
 const Agenda = () => (
@@ -77,12 +80,14 @@ const LoadingScreen = () => (
 
 function App() {
   return (
-    <ClinicProvider>
-      <BrowserRouter>
-        <Suspense fallback={<LoadingScreen />}>
-          <Routes>
-            {/* Rota de Login */}
+    <RegionProvider>
+      <ClinicProvider>
+        <BrowserRouter>
+          <Suspense fallback={<LoadingScreen />}>
+            <Routes>
+            {/* Rotas de Autenticação */}
             <Route path="/login" element={<Login />} />
+            <Route path="/esqueceu-senha" element={<EsqueceuSenha />} />
 
             {/* Rotas principais */}
             <Route index element={<Navigate to="/dashboard" replace />} />
@@ -97,6 +102,11 @@ function App() {
                 <ConfigClinica />
               </Layout>
             } />
+            <Route path="/nova-cadeira" element={
+              <Layout>
+                <NovaCadeira />
+              </Layout>
+            } />
 
             {/* Rota 404 */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
@@ -104,6 +114,7 @@ function App() {
         </Suspense>
       </BrowserRouter>
     </ClinicProvider>
+    </RegionProvider>
   );
 }
 

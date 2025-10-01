@@ -171,14 +171,14 @@ export function SubMenu({
   // Default variant
   return (
     <div className={`w-full bg-white ${className}`}>
-      <div className="px-6 py-2 overflow-x-auto">
-        <div className="flex gap-2 min-w-max">
+      <div className="px-3 sm:px-6 py-2 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-1 sm:gap-2 min-w-max">
           {items.map((item) => (
             <button
               key={item.id}
               onClick={() => onItemClick(item.id)}
               className={`
-                relative px-5 py-2.5 text-sm font-semibold transition-all duration-200 rounded-full
+                relative px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 rounded-full whitespace-nowrap
                 ${activeItem === item.id
                   ? 'bg-krooa-green text-krooa-dark shadow-sm'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -188,7 +188,7 @@ export function SubMenu({
               {item.label}
               {item.badge && (
                 <span className={`
-                  ml-1.5 px-1.5 py-0.5 text-xs rounded-full
+                  ml-1 sm:ml-1.5 px-1 sm:px-1.5 py-0.5 text-[10px] sm:text-xs rounded-full
                   ${activeItem === item.id
                     ? 'bg-krooa-dark/10 text-krooa-dark'
                     : 'bg-gray-200 text-gray-600'

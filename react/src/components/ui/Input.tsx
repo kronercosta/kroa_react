@@ -399,11 +399,11 @@ export function PhoneInput({
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-1.5 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 px-3 h-10 hover:bg-gray-100"
+            className="flex items-center gap-1 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 px-2.5 h-10 hover:bg-gray-100"
+            title={`${selectedCountry.name} ${selectedCountry.code}`}
           >
             <span className="text-lg">{selectedCountry.flag}</span>
-            <span className="text-sm text-gray-700">{selectedCountry.code}</span>
-            <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-3.5 w-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
