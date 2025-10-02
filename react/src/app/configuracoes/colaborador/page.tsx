@@ -1,6 +1,5 @@
-'use client';
-
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import {
@@ -14,6 +13,7 @@ import {
 } from 'lucide-react';
 
 export default function ConfigColaborador() {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('todos');
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(20);
@@ -176,14 +176,12 @@ export default function ConfigColaborador() {
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <div className="flex justify-between items-center mb-6">
-          <div>
+    <div className="flex-1 overflow-y-auto p-3 sm:p-6">
+      <div className="space-y-6">
+        <Card>
+          <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-bold text-gray-900">Colaboradores</h2>
-            <p className="text-sm text-gray-600 mt-1">Gerencie os colaboradores e suas permissões</p>
-          </div>
-          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
             {/* Filter Dropdown */}
             <div className="relative" ref={filterRef}>
               <button
@@ -230,6 +228,7 @@ export default function ConfigColaborador() {
             <Button
               variant="primary"
               className="flex items-center gap-2"
+              onClick={() => navigate('/configuracoes/colaborador/dados-pessoais')}
             >
               <Plus className="w-4 h-4" />
               Novo Colaborador
@@ -237,11 +236,11 @@ export default function ConfigColaborador() {
           </div>
         </div>
 
-        {/* Tabela de Colaboradores com scroll infinito */}
-        <div
-          ref={tableRef}
-          className="overflow-auto max-h-[600px] rounded-lg border border-gray-200"
-        >
+          {/* Tabela de Colaboradores com scroll infinito */}
+          <div
+            ref={tableRef}
+            className="overflow-auto max-h-[600px] rounded-lg border border-gray-200 mt-6"
+          >
           <table className="min-w-full">
             <thead className="bg-gray-50 sticky top-0">
               <tr>
@@ -267,7 +266,11 @@ export default function ConfigColaborador() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredColaboradores.slice(0, visibleCount).map((colaborador) => (
-                <tr key={colaborador.id} className="hover:bg-gray-50">
+                <tr
+                  key={colaborador.id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => navigate(`/configuracoes/colaborador/dados-pessoais?id=${colaborador.id}`)}
+                >
                   {/* Coluna Colaborador - Nome e Foto/Inicial */}
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
@@ -336,8 +339,8 @@ export default function ConfigColaborador() {
                   <td className="py-3 px-4 text-center">
                     {colaborador.agendamentoHabilitado ? (
                       <div className="flex justify-center">
-                        <div className="p-1.5 bg-krooa-green/20 rounded-lg">
-                          <Calendar className="w-5 h-5 text-krooa-green" />
+                        <div className="p-1.5 bg-blue-100 rounded-lg">
+                          <Calendar className="w-5 h-5 text-blue-600" />
                         </div>
                       </div>
                     ) : (
@@ -353,22 +356,38 @@ export default function ConfigColaborador() {
                       <button
                         className="group relative p-1.5 rounded-lg transition-all bg-gray-100 text-gray-600 hover:bg-gray-200"
                         title="Mais opções"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <ChevronDown className="w-4 h-4" />
 
                         {/* Dropdown menu */}
                         <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-                          <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-lg">
+                          <button
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-lg"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/configuracoes/colaborador/dados-pessoais?id=${colaborador.id}`);
+                            }}
+                          >
                             Editar
                           </button>
-                          <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50">
+                          <button
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             Visualizar histórico
                           </button>
-                          <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50">
+                          <button
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             Resetar senha
                           </button>
                           <hr className="my-1" />
-                          <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-lg">
+                          <button
+                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-lg"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             Desativar
                           </button>
                         </div>
@@ -380,13 +399,14 @@ export default function ConfigColaborador() {
             </tbody>
           </table>
 
-          {visibleCount < filteredColaboradores.length && (
-            <div className="p-4 text-center text-sm text-gray-500">
-              Carregando mais colaboradores...
-            </div>
-          )}
-        </div>
-      </Card>
+            {visibleCount < filteredColaboradores.length && (
+              <div className="p-4 text-center text-sm text-gray-500">
+                Carregando mais colaboradores...
+              </div>
+            )}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }

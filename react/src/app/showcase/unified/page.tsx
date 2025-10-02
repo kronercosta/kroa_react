@@ -1,0 +1,548 @@
+import { useState } from 'react';
+import { Card } from '../../../components/ui/Card';
+import { UnifiedInput } from '../../../components/ui/UnifiedInput';
+import type { MaskType, ValidationType } from '../../../components/ui/UnifiedInput';
+import { Select } from '../../../components/ui/Select';
+import { Calendar, Clock, CreditCard, DollarSign, Hash, Mail, Globe, Phone, MapPin, FileText, Percent } from 'lucide-react';
+
+export default function UnifiedShowcase() {
+  // Estados para o Input Unificado
+  const [inputValue, setInputValue] = useState('');
+  const [inputData, setInputData] = useState<any>(null);
+  const [inputProps, setInputProps] = useState<any>({
+    label: 'Campo de Teste',
+    required: false,
+    disabled: false,
+    fullWidth: false,
+    mask: 'none' as MaskType,
+    validation: 'none' as ValidationType,
+    icon: false,
+    error: '',
+    showPasswordToggle: true,
+    defaultCountry: 'BR',
+    allowNoNumber: true,
+    noNumberText: 'S/N'
+  });
+
+  // Estados para o Select
+  const [selectValue, setSelectValue] = useState<string | string[]>('');
+  const [selectProps, setSelectProps] = useState({
+    label: 'Select de Teste',
+    required: false,
+    disabled: false,
+    fullWidth: false,
+    multiple: false,
+    searchable: true,
+    editable: false,
+    addable: false,
+    error: ''
+  });
+
+  const [selectOptions, setSelectOptions] = useState([
+    { value: 'SP', label: 'São Paulo' },
+    { value: 'RJ', label: 'Rio de Janeiro' },
+    { value: 'MG', label: 'Minas Gerais' },
+    { value: 'ES', label: 'Espírito Santo' },
+    { value: 'PR', label: 'Paraná' },
+    { value: 'SC', label: 'Santa Catarina' },
+    { value: 'RS', label: 'Rio Grande do Sul' }
+  ]);
+
+  // Ícones disponíveis
+  const iconMap = {
+    none: null,
+    calendar: <Calendar className="w-4 h-4" />,
+    clock: <Clock className="w-4 h-4" />,
+    creditCard: <CreditCard className="w-4 h-4" />,
+    dollar: <DollarSign className="w-4 h-4" />,
+    hash: <Hash className="w-4 h-4" />,
+    mail: <Mail className="w-4 h-4" />,
+    globe: <Globe className="w-4 h-4" />,
+    phone: <Phone className="w-4 h-4" />,
+    mapPin: <MapPin className="w-4 h-4" />,
+    fileText: <FileText className="w-4 h-4" />,
+    percent: <Percent className="w-4 h-4" />
+  };
+
+  const [selectedIcon, setSelectedIcon] = useState<keyof typeof iconMap>('none');
+
+  // Estados para campos avançados
+  const [phoneIntlValue, setPhoneIntlValue] = useState('');
+  const [phoneIntlProps, setPhoneIntlProps] = useState({
+    label: 'Telefone',
+    defaultCountry: 'BR',
+    required: false,
+    disabled: false
+  });
+
+  const [creditCardValue, setCreditCardValue] = useState('');
+  const [creditCardProps, setCreditCardProps] = useState({
+    label: 'Número do Cartão',
+    required: false,
+    disabled: false
+  });
+
+  const [passwordValue, setPasswordValue] = useState('');
+  const [passwordProps, setPasswordProps] = useState({
+    label: 'Senha',
+    showPasswordToggle: true,
+    required: false,
+    disabled: false
+  });
+
+  const [addressNumberValue, setAddressNumberValue] = useState('');
+  const [addressNumberProps, setAddressNumberProps] = useState({
+    label: 'Número',
+    noNumberText: 'S/N',
+    allowNoNumber: true,
+    required: false,
+    disabled: false
+  });
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Componentes Unificados - Teste Interativo</h1>
+
+        {/* Input Unificado */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Controles do Input */}
+          <Card>
+            <h2 className="text-xl font-semibold text-gray-800 mb-6 pb-4 border-b">Configurações do Input</h2>
+
+            <div className="space-y-4">
+              {/* Texto do Label */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Label do Campo</label>
+                <input
+                  type="text"
+                  value={inputProps.label}
+                  onChange={(e) => setInputProps({ ...inputProps, label: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                />
+              </div>
+
+              {/* Máscara */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Máscara</label>
+                <select
+                  value={inputProps.mask}
+                  onChange={(e) => {
+                    const mask = e.target.value as MaskType;
+                    setInputProps({ ...inputProps, mask });
+                    setInputValue('');
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                >
+                  <option value="password">Senha (••••••••)</option>
+                  <option value="internationalPhone">Telefone Internacional (+00 00 0000-0000)</option>
+                  <option value="creditCard">Cartão (0000 0000 0000 0000)</option>
+                  <option value="none">Nenhuma</option>
+                  <option value="cpf">CPF (000.000.000-00)</option>
+                  <option value="cnpj">CNPJ (00.000.000/0000-00)</option>
+                  <option value="phone">Telefone ((00) 00000-0000)</option>
+                  <option value="cep">CEP (00000-000)</option>
+                  <option value="date">Data (DD/MM/AAAA)</option>
+                  <option value="time">Hora (HH:MM)</option>
+                  <option value="currency">Moeda (R$ 0,00)</option>
+                  <option value="percentage">Porcentagem (0%)</option>   
+                  <option value="addressNumber">Número de Endereço</option>
+                </select>
+              </div>
+
+              {/* Validação */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Validação</label>
+                <select
+                  value={inputProps.validation}
+                  onChange={(e) => setInputProps({ ...inputProps, validation: e.target.value as ValidationType })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                >
+                  <option value="none">Nenhuma</option>
+                  <option value="email">E-mail</option>
+                  <option value="url">URL</option>
+                  <option value="number">Número</option>
+                  <option value="cpf">CPF Válido</option>
+                  <option value="cnpj">CNPJ Válido</option>
+                  <option value="phone">Telefone Válido</option>
+                </select>
+              </div>
+
+              {/* Ícone */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ícone</label>
+                <select
+                  value={selectedIcon}
+                  onChange={(e) => {
+                    const icon = e.target.value as keyof typeof iconMap;
+                    setSelectedIcon(icon);
+                    setInputProps({ ...inputProps, icon: icon !== 'none' });
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                >
+                  <option value="none">Nenhum</option>
+                  <option value="calendar">Calendário</option>
+                  <option value="clock">Relógio</option>
+                  <option value="creditCard">Cartão</option>
+                  <option value="dollar">Dinheiro</option>
+                  <option value="hash">Hash</option>
+                  <option value="mail">E-mail</option>
+                  <option value="globe">Globo</option>
+                  <option value="phone">Telefone</option>
+                  <option value="mapPin">Local</option>
+                  <option value="fileText">Documento</option>
+                  <option value="percent">Porcentagem</option>
+                </select>
+              </div>
+
+              {/* Props específicas para máscaras avançadas */}
+              {inputProps.mask === 'password' && (
+                <div>
+                  <label className="flex items-center justify-between p-3 bg-purple-50 rounded-lg cursor-pointer hover:bg-purple-100">
+                    <span className="text-sm font-medium text-purple-700">Mostrar Toggle de Senha</span>
+                    <input
+                      type="checkbox"
+                      checked={inputProps.showPasswordToggle !== false}
+                      onChange={(e) => setInputProps({ ...inputProps, showPasswordToggle: e.target.checked })}
+                      className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                    />
+                  </label>
+                </div>
+              )}
+
+              {inputProps.mask === 'internationalPhone' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">País Padrão</label>
+                  <select
+                    value={inputProps.defaultCountry || 'BR'}
+                    onChange={(e) => setInputProps({ ...inputProps, defaultCountry: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                  >
+                    <option value="BR">Brasil</option>
+                    <option value="US">Estados Unidos</option>
+                    <option value="PT">Portugal</option>
+                    <option value="ES">Espanha</option>
+                    <option value="FR">França</option>
+                    <option value="DE">Alemanha</option>
+                  </select>
+                </div>
+              )}
+
+              {inputProps.mask === 'addressNumber' && (
+                <div className="space-y-3">
+                  <label className="flex items-center justify-between p-3 bg-orange-50 rounded-lg cursor-pointer hover:bg-orange-100">
+                    <span className="text-sm font-medium text-orange-700">Permitir "Sem Número"</span>
+                    <input
+                      type="checkbox"
+                      checked={inputProps.allowNoNumber !== false}
+                      onChange={(e) => setInputProps({ ...inputProps, allowNoNumber: e.target.checked })}
+                      className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                    />
+                  </label>
+                  {inputProps.allowNoNumber && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Texto do Checkbox</label>
+                      <input
+                        type="text"
+                        value={inputProps.noNumberText || 'S/N'}
+                        onChange={(e) => setInputProps({ ...inputProps, noNumberText: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Erro personalizado */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mensagem de Erro</label>
+                <input
+                  type="text"
+                  value={inputProps.error}
+                  onChange={(e) => setInputProps({ ...inputProps, error: e.target.value })}
+                  placeholder="Digite uma mensagem de erro..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                />
+              </div>
+
+              {/* Toggles */}
+              <div className="grid grid-cols-3 gap-4">
+                <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                  <span className="text-sm font-medium text-gray-700">Obrigatório</span>
+                  <input
+                    type="checkbox"
+                    checked={inputProps.required}
+                    onChange={(e) => setInputProps({ ...inputProps, required: e.target.checked })}
+                    className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                  />
+                </label>
+
+
+                <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                  <span className="text-sm font-medium text-gray-700">Desabilitado</span>
+                  <input
+                    type="checkbox"
+                    checked={inputProps.disabled}
+                    onChange={(e) => setInputProps({ ...inputProps, disabled: e.target.checked })}
+                    className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                  <span className="text-sm font-medium text-gray-700">Largura Total</span>
+                  <input
+                    type="checkbox"
+                    checked={inputProps.fullWidth}
+                    onChange={(e) => setInputProps({ ...inputProps, fullWidth: e.target.checked })}
+                    className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                  />
+                </label>
+              </div>
+            </div>
+          </Card>
+
+          {/* Preview do Input */}
+          <Card>
+            <h2 className="text-xl font-semibold text-gray-800 mb-6 pb-4 border-b">Preview do Input</h2>
+
+            <div className="space-y-6">
+              <UnifiedInput
+                {...inputProps}
+                value={inputValue}
+                onChange={(value, isValid, data) => {
+                  setInputValue(value);
+                  setInputData(data);
+                }}
+                icon={inputProps.icon ? iconMap[selectedIcon] : undefined}
+              />
+
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">Estado Atual:</h3>
+                <div className="space-y-1 text-sm">
+                  <div>
+                    <span className="font-medium">Valor:</span>
+                    <span className="ml-2 font-mono text-krooa-blue">{inputValue || '(vazio)'}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium">Máscara:</span>
+                    <span className="ml-2 text-gray-600">{inputProps.mask}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium">Validação:</span>
+                    <span className="ml-2 text-gray-600">{inputProps.validation}</span>
+                  </div>
+                  {inputProps.mask === 'addressNumber' && inputData?.noNumber !== undefined && (
+                    <div>
+                      <span className="font-medium">Sem número:</span>
+                      <span className={`ml-2 font-semibold ${inputData.noNumber ? 'text-green-600' : 'text-gray-600'}`}>
+                        {inputData.noNumber ? '✓ Sim' : '✗ Não'}
+                      </span>
+                    </div>
+                  )}
+                  {inputProps.mask === 'internationalPhone' && inputData?.country && (
+                    <div>
+                      <span className="font-medium">País:</span>
+                      <span className="ml-2">{inputData.country.flag} {inputData.country.name}</span>
+                    </div>
+                  )}
+                  {inputProps.mask === 'creditCard' && inputData?.brand && (
+                    <div>
+                      <span className="font-medium">Bandeira:</span>
+                      <span className="ml-2 text-green-600 font-semibold">{inputData.brand}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <h3 className="text-sm font-semibold text-blue-700 mb-2">Código:</h3>
+                <pre className="text-xs font-mono text-blue-900 overflow-x-auto">
+{`<UnifiedInput
+  label="${inputProps.label}"
+  mask="${inputProps.mask}"
+  validation="${inputProps.validation}"
+  required={${inputProps.required}}
+  disabled={${inputProps.disabled}}
+  fullWidth={${inputProps.fullWidth}}
+  ${inputProps.icon ? 'icon={<Icon />}' : ''}
+  ${inputProps.error ? `error="${inputProps.error}"` : ''}
+  ${inputProps.mask === 'password' && inputProps.showPasswordToggle ? 'showPasswordToggle={true}' : ''}
+  ${inputProps.mask === 'internationalPhone' ? `defaultCountry="${inputProps.defaultCountry}"` : ''}
+  ${inputProps.mask === 'addressNumber' && inputProps.allowNoNumber ? `allowNoNumber={true}
+  noNumberText="${inputProps.noNumberText}"` : ''}
+  value={value}
+  onChange={(value, isValid, data) => setValue(value)}
+/>`}
+                </pre>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Select Configurável */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Controles do Select */}
+          <Card>
+            <h2 className="text-xl font-semibold text-gray-800 mb-6 pb-4 border-b">Configurações do Select</h2>
+
+            <div className="space-y-4">
+              {/* Textos */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Label</label>
+                <input
+                  type="text"
+                  value={selectProps.label}
+                  onChange={(e) => setSelectProps({ ...selectProps, label: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                />
+              </div>
+
+              {/* Erro personalizado */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mensagem de Erro</label>
+                <input
+                  type="text"
+                  value={selectProps.error}
+                  onChange={(e) => setSelectProps({ ...selectProps, error: e.target.value })}
+                  placeholder="Digite uma mensagem de erro..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                />
+              </div>
+
+              {/* Toggles */}
+              <div className="grid grid-cols-3 gap-4">
+                <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                  <span className="text-sm font-medium text-gray-700">Obrigatório</span>
+                  <input
+                    type="checkbox"
+                    checked={selectProps.required}
+                    onChange={(e) => setSelectProps({ ...selectProps, required: e.target.checked })}
+                    className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                  />
+                </label>
+
+
+                <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                  <span className="text-sm font-medium text-gray-700">Desabilitado</span>
+                  <input
+                    type="checkbox"
+                    checked={selectProps.disabled}
+                    onChange={(e) => setSelectProps({ ...selectProps, disabled: e.target.checked })}
+                    className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                  <span className="text-sm font-medium text-gray-700">Largura Total</span>
+                  <input
+                    type="checkbox"
+                    checked={selectProps.fullWidth}
+                    onChange={(e) => setSelectProps({ ...selectProps, fullWidth: e.target.checked })}
+                    className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between p-3 bg-green-50 rounded-lg cursor-pointer hover:bg-green-100">
+                  <span className="text-sm font-medium text-green-700">Múltipla Seleção</span>
+                  <input
+                    type="checkbox"
+                    checked={selectProps.multiple}
+                    onChange={(e) => {
+                      setSelectProps({ ...selectProps, multiple: e.target.checked });
+                      setSelectValue(e.target.checked ? [] : '');
+                    }}
+                    className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between p-3 bg-blue-50 rounded-lg cursor-pointer hover:bg-blue-100">
+                  <span className="text-sm font-medium text-blue-700">Campo de Busca</span>
+                  <input
+                    type="checkbox"
+                    checked={selectProps.searchable}
+                    onChange={(e) => setSelectProps({ ...selectProps, searchable: e.target.checked })}
+                    className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between p-3 bg-purple-50 rounded-lg cursor-pointer hover:bg-purple-100">
+                  <span className="text-sm font-medium text-purple-700">Editável</span>
+                  <input
+                    type="checkbox"
+                    checked={selectProps.editable}
+                    onChange={(e) => setSelectProps({ ...selectProps, editable: e.target.checked })}
+                    className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between p-3 bg-orange-50 rounded-lg cursor-pointer hover:bg-orange-100">
+                  <span className="text-sm font-medium text-orange-700">Adicionar Novas</span>
+                  <input
+                    type="checkbox"
+                    checked={selectProps.addable}
+                    onChange={(e) => setSelectProps({ ...selectProps, addable: e.target.checked })}
+                    className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                  />
+                </label>
+              </div>
+            </div>
+          </Card>
+
+          {/* Preview do Select */}
+          <Card>
+            <h2 className="text-xl font-semibold text-gray-800 mb-6 pb-4 border-b">Preview do Select</h2>
+
+            <div className="space-y-6">
+              <Select
+                {...selectProps}
+                value={selectValue}
+                onChange={(e) => setSelectValue(selectProps.multiple ? e.target.value as string[] : e.target.value)}
+                options={selectOptions}
+                onOptionsChange={selectProps.editable || selectProps.addable ? setSelectOptions : undefined}
+              />
+
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">Estado Atual:</h3>
+                <div className="space-y-1 text-sm">
+                  <div>
+                    <span className="font-medium">Valor Selecionado:</span>
+                    <span className="ml-2 font-mono text-krooa-blue">
+                      {Array.isArray(selectValue)
+                        ? selectValue.join(', ') || '(vazio)'
+                        : selectValue || '(vazio)'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-medium">Total de Opções:</span>
+                    <span className="ml-2 text-gray-600">{selectOptions.length}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <h3 className="text-sm font-semibold text-blue-700 mb-2">Código:</h3>
+                <pre className="text-xs font-mono text-blue-900 overflow-x-auto">
+{`<Select
+  label="${selectProps.label}"
+  required={${selectProps.required}}
+  disabled={${selectProps.disabled}}
+  fullWidth={${selectProps.fullWidth}}
+  multiple={${selectProps.multiple}}
+  searchable={${selectProps.searchable}}
+  editable={${selectProps.editable}}
+  addable={${selectProps.addable}}
+  ${selectProps.error ? `error="${selectProps.error}"` : ''}
+  value={value}
+  onChange={(e) => setValue(e.target.value)}
+  options={options}
+  ${selectProps.editable || selectProps.addable ? 'onOptionsChange={setOptions}' : ''}
+/>`}
+                </pre>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

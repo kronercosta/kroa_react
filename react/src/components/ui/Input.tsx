@@ -6,6 +6,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   fullWidth?: boolean;
   icon?: React.ReactNode;
   floating?: boolean;
+  required?: boolean;
 }
 
 export function Input({
@@ -19,6 +20,7 @@ export function Input({
   onBlur,
   value,
   placeholder,
+  required = false,
   ...props
 }: InputProps) {
   const [isFocused, setIsFocused] = useState(false);
@@ -67,12 +69,13 @@ export function Input({
                 ? 'top-0 -translate-y-1/2 text-xs bg-white px-1 text-gray-600'
                 : 'top-1/2 -translate-y-1/2 text-sm text-gray-500'
               }
-              peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-gray-600
+              peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-blue-900
               peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm
               ${error ? 'text-red-500' : ''}
             `}
           >
             {label}
+            {required && <span className="text-red-500 ml-0.5">*</span>}
           </label>
         </div>
         {error && (
@@ -88,6 +91,7 @@ export function Input({
       {label && !floating && (
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           {label}
+          {required && <span className="text-red-500 ml-0.5">*</span>}
         </label>
       )}
       <div className="relative">
@@ -98,7 +102,7 @@ export function Input({
         )}
         <input
           className={`
-            w-full rounded-xl border border-gray-300 px-4 py-2.5
+            w-full h-10 rounded-lg border border-gray-300 px-3 py-2
             focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20
             disabled:bg-gray-50 disabled:text-gray-500
             ${icon ? 'pl-10' : ''}
@@ -301,6 +305,142 @@ export function CPFInput({
   );
 }
 
+// Componente de Input com máscara de CNPJ
+interface CNPJInputProps extends Omit<InputProps, 'type' | 'onChange'> {
+  onChange?: (value: string) => void;
+}
+
+export function CNPJInput({
+  label = 'CNPJ',
+  error: externalError,
+  onBlur,
+  onChange,
+  value,
+  ...props
+}: CNPJInputProps) {
+  const [cnpjError, setCnpjError] = useState<string | undefined>();
+
+  // Função para validar CNPJ
+  const validateCNPJ = (cnpj: string): boolean => {
+    cnpj = cnpj.replace(/[^\d]+/g, '');
+
+    if (cnpj === '') return false;
+    if (cnpj.length !== 14) return false;
+
+    // Elimina CNPJs conhecidos como inválidos
+    if (/^(\d)\1+$/.test(cnpj)) return false;
+
+    // Valida DVs
+    let tamanho = cnpj.length - 2;
+    let numeros = cnpj.substring(0, tamanho);
+    const digitos = cnpj.substring(tamanho);
+    let soma = 0;
+    let pos = tamanho - 7;
+
+    for (let i = tamanho; i >= 1; i--) {
+      soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
+      if (pos < 2) pos = 9;
+    }
+
+    let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado !== parseInt(digitos.charAt(0))) return false;
+
+    tamanho = tamanho + 1;
+    numeros = cnpj.substring(0, tamanho);
+    soma = 0;
+    pos = tamanho - 7;
+
+    for (let i = tamanho; i >= 1; i--) {
+      soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
+      if (pos < 2) pos = 9;
+    }
+
+    resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+    if (resultado !== parseInt(digitos.charAt(1))) return false;
+
+    return true;
+  };
+
+  // Aplicar máscara de CNPJ
+  const applyCNPJMask = (value: string): string => {
+    // Remove tudo que não é número
+    let cleaned = value.replace(/\D/g, '');
+
+    // Limita a 14 dígitos
+    if (cleaned.length > 14) {
+      cleaned = cleaned.substring(0, 14);
+    }
+
+    // Aplica a máscara 00.000.000/0000-00
+    if (cleaned.length > 12) {
+      return cleaned.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+    } else if (cleaned.length > 8) {
+      return cleaned.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})/, '$1.$2.$3/$4');
+    } else if (cleaned.length > 5) {
+      return cleaned.replace(/^(\d{2})(\d{3})(\d{3})/, '$1.$2.$3');
+    } else if (cleaned.length > 2) {
+      return cleaned.replace(/^(\d{2})(\d{3})/, '$1.$2');
+    }
+    return cleaned;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const maskedValue = applyCNPJMask(e.target.value);
+
+    if (onChange) {
+      onChange(maskedValue);
+    } else {
+      // Se não houver onChange customizado, usa o padrão
+      const event = {
+        ...e,
+        target: {
+          ...e.target,
+          value: maskedValue
+        }
+      };
+      props.onChange?.(event as React.ChangeEvent<HTMLInputElement>);
+    }
+
+    // Valida se o CNPJ está completo
+    const cleaned = maskedValue.replace(/\D/g, '');
+    if (cleaned.length === 14) {
+      if (!validateCNPJ(maskedValue)) {
+        setCnpjError('CNPJ inválido');
+      } else {
+        setCnpjError(undefined);
+      }
+    }
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const cnpj = e.target.value;
+    const cleaned = cnpj.replace(/\D/g, '');
+
+    if (cleaned.length > 0 && cleaned.length < 14) {
+      setCnpjError('CNPJ incompleto');
+    } else if (cleaned.length === 14 && !validateCNPJ(cnpj)) {
+      setCnpjError('CNPJ inválido');
+    } else {
+      setCnpjError(undefined);
+    }
+
+    onBlur?.(e);
+  };
+
+  return (
+    <Input
+      label={label}
+      error={externalError || cnpjError}
+      value={value}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      placeholder="00.000.000/0000-00"
+      maxLength={18}
+      {...props}
+    />
+  );
+}
+
 // Lista de códigos de país
 const countryCodes = [
   { code: '+55', country: 'BR', flag: '🇧🇷', name: 'Brasil' },
@@ -451,7 +591,7 @@ export function PhoneInput({
                   ? 'top-0 -translate-y-1/2 text-xs bg-white px-1 text-gray-600'
                   : 'top-1/2 -translate-y-1/2 text-sm text-gray-500'
                 }
-                peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-gray-600
+                peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-blue-900
                 ${error ? 'text-red-500' : ''}
               `}
             >
@@ -552,6 +692,7 @@ export function Select({
       {label && !floating && (
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           {label}
+          {required && <span className="text-red-500 ml-0.5">*</span>}
         </label>
       )}
       <select
@@ -668,6 +809,7 @@ export function Textarea({
       {label && !floating && (
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           {label}
+          {required && <span className="text-red-500 ml-0.5">*</span>}
         </label>
       )}
       <textarea
