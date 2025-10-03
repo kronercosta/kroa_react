@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '../../../components/ui/Card';
 import { UnifiedInput } from '../../../components/ui/UnifiedInput';
 import type { MaskType, ValidationType } from '../../../components/ui/UnifiedInput';
 import { Select } from '../../../components/ui/Select';
-import { Calendar, Clock, CreditCard, DollarSign, Hash, Mail, Globe, Phone, MapPin, FileText, Percent } from 'lucide-react';
+import { Button } from '../../../components/ui/Button';
+import { Calendar, Clock, CreditCard, DollarSign, Hash, Mail, Globe, Phone, MapPin, FileText, Percent, Palette, Camera, Navigation } from 'lucide-react';
 
 export default function UnifiedShowcase() {
   // Estados para o Input Unificado
@@ -34,11 +35,14 @@ export default function UnifiedShowcase() {
     multiple: false,
     searchable: true,
     editable: false,
-    addable: false,
+    advancedEdit: false,
+    hierarchical: false,
+    confirmDelete: false,
     error: ''
   });
 
-  const [selectOptions, setSelectOptions] = useState([
+  // Options básicas para select normal
+  const basicOptions = [
     { value: 'SP', label: 'São Paulo' },
     { value: 'RJ', label: 'Rio de Janeiro' },
     { value: 'MG', label: 'Minas Gerais' },
@@ -46,7 +50,50 @@ export default function UnifiedShowcase() {
     { value: 'PR', label: 'Paraná' },
     { value: 'SC', label: 'Santa Catarina' },
     { value: 'RS', label: 'Rio Grande do Sul' }
-  ]);
+  ];
+
+  // Options hierárquicas para quando o checkbox hierárquico estiver marcado
+  const hierarchicalOptions = [
+    // Categorias principais
+    { value: 'eletronicos', label: 'Eletrônicos' },
+    { value: 'roupas', label: 'Roupas' },
+    { value: 'alimentos', label: 'Alimentos' },
+    { value: 'moveis', label: 'Móveis' },
+
+    // Subcategorias de Eletrônicos
+    { value: 'smartphones', label: 'Smartphones', parentValue: 'eletronicos' },
+    { value: 'notebooks', label: 'Notebooks', parentValue: 'eletronicos' },
+    { value: 'tablets', label: 'Tablets', parentValue: 'eletronicos' },
+
+    // Subcategorias de Roupas
+    { value: 'masculino', label: 'Masculino', parentValue: 'roupas' },
+    { value: 'feminino', label: 'Feminino', parentValue: 'roupas' },
+    { value: 'infantil', label: 'Infantil', parentValue: 'roupas' },
+
+    // Subcategorias de Alimentos
+    { value: 'bebidas', label: 'Bebidas', parentValue: 'alimentos' },
+    { value: 'carnes', label: 'Carnes', parentValue: 'alimentos' },
+    { value: 'laticinios', label: 'Laticínios', parentValue: 'alimentos' },
+
+    // Subcategorias de Móveis
+    { value: 'sala', label: 'Sala', parentValue: 'moveis' },
+    { value: 'quarto', label: 'Quarto', parentValue: 'moveis' },
+    { value: 'cozinha', label: 'Cozinha', parentValue: 'moveis' },
+  ];
+
+  const [selectOptions, setSelectOptions] = useState(basicOptions);
+
+  // Atualiza as options quando o checkbox hierárquico muda
+  useEffect(() => {
+    if (selectProps.hierarchical) {
+      setSelectOptions(hierarchicalOptions);
+      setSelectValue(''); // Limpa a seleção ao mudar para hierárquico
+    } else {
+      setSelectOptions(basicOptions);
+      setSelectValue(''); // Limpa a seleção ao mudar para normal
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectProps.hierarchical]);
 
   // Ícones disponíveis
   const iconMap = {
@@ -61,43 +108,14 @@ export default function UnifiedShowcase() {
     phone: <Phone className="w-4 h-4" />,
     mapPin: <MapPin className="w-4 h-4" />,
     fileText: <FileText className="w-4 h-4" />,
-    percent: <Percent className="w-4 h-4" />
+    percent: <Percent className="w-4 h-4" />,
+    palette: <Palette className="w-4 h-4" />,
+    camera: <Camera className="w-4 h-4" />,
+    navigation: <Navigation className="w-4 h-4" />
   };
 
   const [selectedIcon, setSelectedIcon] = useState<keyof typeof iconMap>('none');
 
-  // Estados para campos avançados
-  const [phoneIntlValue, setPhoneIntlValue] = useState('');
-  const [phoneIntlProps, setPhoneIntlProps] = useState({
-    label: 'Telefone',
-    defaultCountry: 'BR',
-    required: false,
-    disabled: false
-  });
-
-  const [creditCardValue, setCreditCardValue] = useState('');
-  const [creditCardProps, setCreditCardProps] = useState({
-    label: 'Número do Cartão',
-    required: false,
-    disabled: false
-  });
-
-  const [passwordValue, setPasswordValue] = useState('');
-  const [passwordProps, setPasswordProps] = useState({
-    label: 'Senha',
-    showPasswordToggle: true,
-    required: false,
-    disabled: false
-  });
-
-  const [addressNumberValue, setAddressNumberValue] = useState('');
-  const [addressNumberProps, setAddressNumberProps] = useState({
-    label: 'Número',
-    noNumberText: 'S/N',
-    allowNoNumber: true,
-    required: false,
-    disabled: false
-  });
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -129,24 +147,34 @@ export default function UnifiedShowcase() {
                   value={inputProps.mask}
                   onChange={(e) => {
                     const mask = e.target.value as MaskType;
-                    setInputProps({ ...inputProps, mask });
+                    // Auto-selecionar validação quando máscara é selecionada
+                    let validation = inputProps.validation;
+                    if (mask === 'cpf') validation = 'cpf';
+                    if (mask === 'cnpj') validation = 'cnpj';
+                    if (mask === 'creditCard') validation = 'creditCard';
+                    if (mask === 'cep') validation = 'cep';
+
+                    setInputProps({ ...inputProps, mask, validation });
                     setInputValue('');
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
                 >
-                  <option value="password">Senha (••••••••)</option>
-                  <option value="internationalPhone">Telefone Internacional (+00 00 0000-0000)</option>
-                  <option value="creditCard">Cartão (0000 0000 0000 0000)</option>
                   <option value="none">Nenhuma</option>
                   <option value="cpf">CPF (000.000.000-00)</option>
                   <option value="cnpj">CNPJ (00.000.000/0000-00)</option>
-                  <option value="phone">Telefone ((00) 00000-0000)</option>
+                  <option value="instagram">Instagram (@usuario)</option>
+                  <option value="photo">Foto (Upload de imagem)</option>
+                  <option value="password">Senha (••••••••)</option>
+                  <option value="internationalPhone">Telefone Internacional (+00 00 0000-0000)</option>
                   <option value="cep">CEP (00000-000)</option>
+                  <option value="address">Endereço (Com busca)</option>
+                  <option value="addressNumber">Número de Endereço</option>
                   <option value="date">Data (DD/MM/AAAA)</option>
                   <option value="time">Hora (HH:MM)</option>
                   <option value="currency">Moeda (R$ 0,00)</option>
-                  <option value="percentage">Porcentagem (0%)</option>   
-                  <option value="addressNumber">Número de Endereço</option>
+                  <option value="percentage">Porcentagem (0%)</option>
+                  <option value="creditCard">Cartão (0000 0000 0000 0000)</option>
+                  <option value="color">Cor (#000000)</option>
                 </select>
               </div>
 
@@ -159,12 +187,12 @@ export default function UnifiedShowcase() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
                 >
                   <option value="none">Nenhuma</option>
+                  <option value="cpf">CPF Válido</option>
+                  <option value="cnpj">CNPJ Válido</option>
+                  <option value="cep">CEP Válido</option>
                   <option value="email">E-mail</option>
                   <option value="url">URL</option>
                   <option value="number">Número</option>
-                  <option value="cpf">CPF Válido</option>
-                  <option value="cnpj">CNPJ Válido</option>
-                  <option value="phone">Telefone Válido</option>
                 </select>
               </div>
 
@@ -188,10 +216,12 @@ export default function UnifiedShowcase() {
                   <option value="hash">Hash</option>
                   <option value="mail">E-mail</option>
                   <option value="globe">Globo</option>
-                  <option value="phone">Telefone</option>
                   <option value="mapPin">Local</option>
                   <option value="fileText">Documento</option>
                   <option value="percent">Porcentagem</option>
+                  <option value="palette">Paleta</option>
+                  <option value="camera">Câmera</option>
+                  <option value="navigation">Navegação</option>
                 </select>
               </div>
 
@@ -351,6 +381,30 @@ export default function UnifiedShowcase() {
                       <span className="ml-2 text-green-600 font-semibold">{inputData.brand}</span>
                     </div>
                   )}
+                  {inputProps.mask === 'color' && inputValue && (
+                    <div>
+                      <span className="font-medium">Cor selecionada:</span>
+                      <span className="ml-2 inline-flex items-center gap-2">
+                        <span
+                          className="w-6 h-6 rounded border border-gray-300"
+                          style={{ backgroundColor: inputValue }}
+                        />
+                        <span className="font-mono text-krooa-blue">{inputValue}</span>
+                      </span>
+                    </div>
+                  )}
+                  {inputProps.mask === 'photo' && inputData?.file && (
+                    <div>
+                      <span className="font-medium">Arquivo:</span>
+                      <span className="ml-2 text-krooa-blue">{inputValue}</span>
+                    </div>
+                  )}
+                  {inputProps.mask === 'address' && inputValue && (
+                    <div>
+                      <span className="font-medium">Endereço:</span>
+                      <span className="ml-2 text-krooa-blue text-sm">{inputValue}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -466,21 +520,52 @@ export default function UnifiedShowcase() {
                 </label>
 
                 <label className="flex items-center justify-between p-3 bg-purple-50 rounded-lg cursor-pointer hover:bg-purple-100">
-                  <span className="text-sm font-medium text-purple-700">Editável</span>
+                  <span className="text-sm font-medium text-purple-700">Editável (Permite editar e adicionar)</span>
                   <input
                     type="checkbox"
                     checked={selectProps.editable}
-                    onChange={(e) => setSelectProps({ ...selectProps, editable: e.target.checked })}
+                    onChange={(e) => setSelectProps({
+                      ...selectProps,
+                      editable: e.target.checked,
+                      advancedEdit: e.target.checked ? selectProps.advancedEdit : false
+                    })}
                     className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
                   />
                 </label>
 
-                <label className="flex items-center justify-between p-3 bg-orange-50 rounded-lg cursor-pointer hover:bg-orange-100">
-                  <span className="text-sm font-medium text-orange-700">Adicionar Novas</span>
+                <label className={`flex items-center justify-between p-3 rounded-lg ${
+                  selectProps.editable
+                    ? 'bg-indigo-50 cursor-pointer hover:bg-indigo-100'
+                    : 'bg-gray-50 cursor-not-allowed opacity-60'
+                }`}>
+                  <span className={`text-sm font-medium ${
+                    selectProps.editable ? 'text-indigo-700' : 'text-gray-500'
+                  }`}>Edição Avançada (Modal customizado)</span>
                   <input
                     type="checkbox"
-                    checked={selectProps.addable}
-                    onChange={(e) => setSelectProps({ ...selectProps, addable: e.target.checked })}
+                    checked={selectProps.advancedEdit}
+                    onChange={(e) => setSelectProps({ ...selectProps, advancedEdit: e.target.checked })}
+                    disabled={!selectProps.editable}
+                    className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green disabled:opacity-50"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between p-3 bg-teal-50 rounded-lg cursor-pointer hover:bg-teal-100">
+                  <span className="text-sm font-medium text-teal-700">Hierárquico</span>
+                  <input
+                    type="checkbox"
+                    checked={selectProps.hierarchical}
+                    onChange={(e) => setSelectProps({ ...selectProps, hierarchical: e.target.checked })}
+                    className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between p-3 bg-red-50 rounded-lg cursor-pointer hover:bg-red-100">
+                  <span className="text-sm font-medium text-red-700">Confirmar Exclusão</span>
+                  <input
+                    type="checkbox"
+                    checked={selectProps.confirmDelete}
+                    onChange={(e) => setSelectProps({ ...selectProps, confirmDelete: e.target.checked })}
                     className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
                   />
                 </label>
@@ -498,7 +583,69 @@ export default function UnifiedShowcase() {
                 value={selectValue}
                 onChange={(e) => setSelectValue(selectProps.multiple ? e.target.value as string[] : e.target.value)}
                 options={selectOptions}
-                onOptionsChange={selectProps.editable || selectProps.addable ? setSelectOptions : undefined}
+                onOptionsChange={selectProps.editable ? setSelectOptions : undefined}
+                hierarchical={selectProps.hierarchical}
+                confirmDelete={selectProps.confirmDelete}
+                advancedEdit={selectProps.advancedEdit}
+                onEdit={selectProps.advancedEdit ? (option) => {
+                  console.log('Opção editada:', option);
+                  alert(`Editando: ${option.label}`);
+                } : undefined}
+                editModalContent={selectProps.advancedEdit ? (option, onSave, onCancel) => (
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold mb-4">Editar Item</h3>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                        <input
+                          type="text"
+                          defaultValue={option.label}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                          id="edit-name"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Código</label>
+                        <input
+                          type="text"
+                          defaultValue={option.value}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                          id="edit-value"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                        <textarea
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                          rows={3}
+                          placeholder="Descrição adicional..."
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 justify-end mt-6">
+                      <Button variant="ghost" onClick={onCancel}>
+                        Cancelar
+                      </Button>
+                      <Button
+                        variant="primary"
+                        onClick={() => {
+                          const nameInput = document.getElementById('edit-name') as HTMLInputElement;
+                          const valueInput = document.getElementById('edit-value') as HTMLInputElement;
+                          onSave({
+                            value: valueInput?.value || option.value,
+                            label: nameInput?.value || option.label
+                          });
+                        }}
+                      >
+                        Salvar
+                      </Button>
+                    </div>
+                  </div>
+                ) : undefined}
               />
 
               <div className="p-4 bg-gray-50 rounded-lg">
@@ -530,18 +677,23 @@ export default function UnifiedShowcase() {
   multiple={${selectProps.multiple}}
   searchable={${selectProps.searchable}}
   editable={${selectProps.editable}}
-  addable={${selectProps.addable}}
+  ${selectProps.advancedEdit ? `advancedEdit={${selectProps.advancedEdit}}` : ''}
+  ${selectProps.hierarchical ? `hierarchical={${selectProps.hierarchical}}` : ''}
+  ${selectProps.confirmDelete ? `confirmDelete={${selectProps.confirmDelete}}` : ''}
   ${selectProps.error ? `error="${selectProps.error}"` : ''}
   value={value}
   onChange={(e) => setValue(e.target.value)}
   options={options}
-  ${selectProps.editable || selectProps.addable ? 'onOptionsChange={setOptions}' : ''}
+  ${selectProps.editable ? 'onOptionsChange={setOptions}' : ''}
+  ${selectProps.advancedEdit ? 'onEdit={handleEdit}' : ''}
+  ${selectProps.advancedEdit ? 'editModalContent={customModalContent}' : ''}
 />`}
                 </pre>
               </div>
             </div>
           </Card>
         </div>
+
       </div>
     </div>
   );

@@ -1,36 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
+import { UnifiedInput } from '../components/ui/UnifiedInput';
+import { ArrowLeft, Mail, Shield } from 'lucide-react';
 
-const Login: React.FC = () => {
+const EsqueceuSenha: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [verificationStep, setVerificationStep] = useState(false);
+  const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
+  const [verificationError, setVerificationError] = useState('');
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simular login
+    // Simular envio de email
     setTimeout(() => {
-      navigate('/dashboard');
+      setLoading(false);
+      setEmailSent(true);
+    }, 1500);
+  };
+
+  const handleVerificationChange = (index: number, value: string) => {
+    if (value.length <= 1 && /^\d*$/.test(value)) {
+      const newCode = [...verificationCode];
+      newCode[index] = value;
+      setVerificationCode(newCode);
+      setVerificationError('');
+
+      // Auto avançar para o próximo campo
+      if (value && index < 5) {
+        inputRefs.current[index + 1]?.focus();
+      }
+
+      // Verificar se todos os campos estão preenchidos
+      if (newCode.every(digit => digit !== '')) {
+        handleVerifyCode(newCode.join(''));
+      }
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !verificationCode[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').slice(0, 6);
+    if (/^\d+$/.test(pastedData)) {
+      const newCode = pastedData.split('').concat(Array(6).fill('')).slice(0, 6);
+      setVerificationCode(newCode);
+      if (pastedData.length === 6) {
+        handleVerifyCode(pastedData);
+      }
+    }
+  };
+
+  const handleVerifyCode = (code: string) => {
+    setLoading(true);
+    // Simular verificação do código
+    setTimeout(() => {
+      if (code === '123456') { // Código de exemplo
+        navigate('/redefinir-senha'); // Redirecionar para página de redefinir senha
+      } else {
+        setVerificationError('Código inválido. Por favor, tente novamente.');
+        setVerificationCode(['', '', '', '', '', '']);
+        inputRefs.current[0]?.focus();
+      }
+      setLoading(false);
     }, 1000);
   };
 
-  const handleGoogleLogin = () => {
-    setGoogleLoading(true);
-    // Simular login com Google
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 1500);
+  const handleResendCode = () => {
+    setVerificationCode(['', '', '', '', '', '']);
+    setVerificationError('');
+    // Simular reenvio do código
+    alert('Código reenviado para seu email!');
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* Lado Esquerdo - Formulário de Login */}
+      {/* Lado Esquerdo - Formulário */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
           {/* Logo */}
@@ -42,103 +98,180 @@ const Login: React.FC = () => {
             />
           </div>
 
-          {/* Título */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-krooa-dark">Bem-vindo de volta</h2>
-            <p className="text-gray-600 mt-2">Entre com sua conta para continuar</p>
-          </div>
+          {!emailSent ? (
+            <>
+              {/* Título */}
+              <div className="mb-8">
+                <h2 className="text-3xl font-bold text-krooa-dark">Esqueceu sua senha?</h2>
+                <p className="text-gray-600 mt-2">
+                  Não se preocupe, enviaremos instruções para redefinir sua senha.
+                </p>
+              </div>
 
-          {/* Botão Google */}
-          <button
-            onClick={handleGoogleLogin}
-            disabled={googleLoading}
-            className="w-full flex items-center justify-center gap-3 border-2 border-gray-300 rounded-xl py-3 px-4 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-6"
-          >
-            {googleLoading ? (
-              <span className="text-gray-700">Conectando...</span>
-            ) : (
-              <>
-                {/* Ícone do Google */}
-                <svg width="20" height="20" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  />
-                </svg>
-                <span className="text-gray-700 font-medium">Entrar com Google</span>
-              </>
-            )}
-          </button>
+              {/* Formulário */}
+              <form onSubmit={handleResetPassword} className="space-y-6">
+                <UnifiedInput
+                  label="E-mail"
+                  value={email}
+                  onChange={(value) => setEmail(value)}
+                  validation="email"
+                  required
+                  fullWidth
+                  icon={<Mail className="w-4 h-4" />}
+                />
 
-          {/* Divisor */}
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">ou continue com email</span>
-            </div>
-          </div>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  fullWidth
+                  disabled={loading}
+                  loading={loading}
+                >
+                  {loading ? 'Enviando...' : 'Enviar instruções'}
+                </Button>
+              </form>
 
-          {/* Formulário */}
-          <form onSubmit={handleLogin} className="space-y-4">
-            <Input
-              type="email"
-              label="E-mail"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              fullWidth
-              floating
-            />
+              {/* Link para voltar ao login */}
+              <div className="mt-8 text-center">
+                <button
+                  onClick={() => navigate('/login')}
+                  className="inline-flex items-center gap-2 text-sm text-krooa-blue hover:text-krooa-dark font-medium transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Voltar para o login
+                </button>
+              </div>
+            </>
+          ) : !verificationStep ? (
+            <>
+              {/* Mensagem de sucesso do email */}
+              <div className="text-center">
+                <div className="mb-6">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                    <Mail className="w-8 h-8 text-green-500" />
+                  </div>
+                </div>
 
-            <Input
-              type="password"
-              label="Senha"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              fullWidth
-              floating
-            />
+                <h2 className="text-2xl font-bold text-krooa-dark mb-4">E-mail enviado!</h2>
+                <p className="text-gray-600 mb-8">
+                  Enviamos um código de verificação para:
+                  <br />
+                  <span className="font-medium text-krooa-dark">{email}</span>
+                </p>
 
-            <div className="flex justify-end">
-              <a href="/esqueceu-senha" className="text-sm text-krooa-blue hover:text-krooa-dark font-medium">
-                Esqueceu a senha?
-              </a>
-            </div>
+                <Button
+                  variant="primary"
+                  fullWidth
+                  onClick={() => setVerificationStep(true)}
+                >
+                  Inserir código de verificação
+                </Button>
 
-            <Button
-              type="submit"
-              variant="primary"
-              fullWidth
-              disabled={loading}
-            >
-              {loading ? 'Entrando...' : 'Entrar'}
-            </Button>
-          </form>
+                <p className="text-sm text-gray-500 mt-6">
+                  Não recebeu o e-mail? Verifique sua pasta de spam ou
+                  <button
+                    onClick={() => {
+                      setEmailSent(false);
+                      setEmail('');
+                    }}
+                    className="text-krooa-blue hover:text-krooa-dark font-medium ml-1"
+                  >
+                    tente novamente
+                  </button>
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Etapa de verificação 2FA */}
+              <div>
+                <div className="mb-6">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4 mx-auto">
+                    <Shield className="w-8 h-8 text-blue-500" />
+                  </div>
+                </div>
 
-          {/* Link de cadastro */}
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600">
-              Não tem uma conta?{' '}
-              <a href="#" className="text-krooa-blue hover:text-krooa-dark font-semibold">
-                Fale conosco
-              </a>
-            </p>
-          </div>
+                <h2 className="text-2xl font-bold text-krooa-dark mb-2 text-center">Verificação de segurança</h2>
+                <p className="text-gray-600 mb-8 text-center">
+                  Digite o código de 6 dígitos enviado para
+                  <br />
+                  <span className="font-medium text-krooa-dark">{email}</span>
+                </p>
+
+                {/* Campos de código */}
+                <div className="flex justify-center gap-2 mb-6">
+                  {verificationCode.map((digit, index) => (
+                    <input
+                      key={index}
+                      ref={(el) => (inputRefs.current[index] = el)}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleVerificationChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(index, e)}
+                      onPaste={index === 0 ? handlePaste : undefined}
+                      className={`
+                        w-12 h-14 text-center text-xl font-semibold
+                        border-2 rounded-lg transition-all
+                        ${verificationError
+                          ? 'border-red-500 bg-red-50'
+                          : digit
+                            ? 'border-krooa-green bg-green-50'
+                            : 'border-gray-300 hover:border-krooa-blue focus:border-krooa-blue'
+                        }
+                        focus:outline-none focus:ring-2 focus:ring-krooa-blue/20
+                      `}
+                      disabled={loading}
+                    />
+                  ))}
+                </div>
+
+                {/* Mensagem de erro */}
+                {verificationError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600 text-center">{verificationError}</p>
+                  </div>
+                )}
+
+                {/* Botões */}
+                <div className="space-y-3">
+                  <Button
+                    variant="primary"
+                    fullWidth
+                    onClick={() => handleVerifyCode(verificationCode.join(''))}
+                    disabled={verificationCode.some(digit => !digit) || loading}
+                    loading={loading}
+                  >
+                    {loading ? 'Verificando...' : 'Verificar código'}
+                  </Button>
+
+                  <button
+                    onClick={handleResendCode}
+                    className="w-full text-sm text-krooa-blue hover:text-krooa-dark font-medium transition-colors"
+                    disabled={loading}
+                  >
+                    Reenviar código
+                  </button>
+                </div>
+
+                {/* Link para voltar */}
+                <div className="mt-8 text-center">
+                  <button
+                    onClick={() => {
+                      setVerificationStep(false);
+                      setVerificationCode(['', '', '', '', '', '']);
+                      setVerificationError('');
+                    }}
+                    className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-krooa-dark font-medium transition-colors"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Voltar
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Footer Mobile */}
           <div className="mt-8 text-center lg:hidden">
@@ -159,59 +292,59 @@ const Login: React.FC = () => {
 
         {/* Conteúdo */}
         <div className="relative z-10 text-center max-w-lg">
-          {/* Ícone ou Ilustração */}
+          {/* Ícone */}
           <div className="mb-8">
             <div className="inline-flex items-center justify-center w-24 h-24 bg-krooa-green/20 rounded-3xl mb-6">
               <svg className="w-12 h-12 text-krooa-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
               </svg>
             </div>
           </div>
 
           {/* Texto de destaque */}
           <h3 className="text-3xl lg:text-4xl font-bold text-white mb-6">
-            Gerencie seu negócio com eficiência
+            Segurança em primeiro lugar
           </h3>
           <p className="text-white/80 text-lg mb-8">
-            Simplifique seus processos, aumente sua produtividade e tome decisões baseadas em dados reais.
+            Protegemos seus dados com os mais altos padrões de segurança do mercado.
           </p>
 
-          {/* Features */}
+          {/* Features de segurança */}
           <div className="space-y-4 text-left">
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 bg-krooa-green rounded-full"></div>
-              <span className="text-white/90">Gestão completa de vendas e CRM</span>
+              <span className="text-white/90">Criptografia de ponta a ponta</span>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 bg-krooa-green rounded-full"></div>
-              <span className="text-white/90">Controle financeiro integrado</span>
+              <span className="text-white/90">Autenticação em dois fatores</span>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 bg-krooa-green rounded-full"></div>
-              <span className="text-white/90">Relatórios e análises em tempo real</span>
+              <span className="text-white/90">Backups automáticos diários</span>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 bg-krooa-green rounded-full"></div>
-              <span className="text-white/90">Automação de processos</span>
+              <span className="text-white/90">Conformidade com LGPD</span>
             </div>
           </div>
 
-          {/* Depoimento ou estatística */}
+          {/* Estatística */}
           <div className="mt-12 p-6 bg-white/10 backdrop-blur-sm rounded-2xl">
-            <p className="text-white/90 italic mb-4">
-              "O Krooa transformou completamente a gestão da nossa empresa. Agora temos controle total sobre todos os processos."
-            </p>
-            <div className="flex items-center gap-3 justify-center">
-              <div className="w-10 h-10 bg-krooa-green rounded-full"></div>
-              <div className="text-left">
-                <p className="text-white font-semibold text-sm">João Silva</p>
-                <p className="text-white/60 text-xs">CEO, TechCorp</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-krooa-green text-3xl font-bold">99.9%</p>
+                <p className="text-white/70 text-sm">Uptime garantido</p>
+              </div>
+              <div>
+                <p className="text-krooa-green text-3xl font-bold">256-bit</p>
+                <p className="text-white/70 text-sm">Criptografia SSL</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Footer Desktop - Movido para fora do container de conteúdo */}
+        {/* Footer Desktop */}
         <div className="absolute bottom-6 left-12 right-12 text-center">
           <p className="text-white/40 text-xs">
             © 2024 Krooa. Todos os direitos reservados.
@@ -222,4 +355,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default EsqueceuSenha;

@@ -1,12 +1,12 @@
 import React, { forwardRef, useState, useRef, useEffect } from 'react';
-import { Eye, EyeOff, ChevronDown } from 'lucide-react';
+import { Eye, EyeOff, ChevronDown, Upload, X, MapPin, Search } from 'lucide-react';
 
 // Tipos expandidos de máscara
 export type MaskType =
-  | 'cpf' | 'cnpj' | 'phone' | 'internationalPhone' | 'cep' | 'date' | 'time'
-  | 'currency' | 'percentage' | 'creditCard' | 'password' | 'addressNumber' | 'none';
+  | 'cpf' | 'cnpj' | 'internationalPhone' | 'cep' | 'date' | 'time'
+  | 'currency' | 'percentage' | 'creditCard' | 'password' | 'addressNumber' | 'instagram' | 'color' | 'photo' | 'address' | 'none';
 
-export type ValidationType = 'email' | 'url' | 'number' | 'cpf' | 'cnpj' | 'phone' | 'creditCard' | 'none';
+export type ValidationType = 'email' | 'url' | 'number' | 'cpf' | 'cnpj' | 'creditCard' | 'cep' | 'none';
 
 // Países com códigos e máscaras de telefone
 const countries = [
@@ -71,6 +71,62 @@ const detectCardBrand = (number: string) => {
 // Aplicar máscara de telefone internacional
 const applyInternationalPhoneMask = (value: string, country: typeof countries[0]) => {
   const cleaned = value.replace(/\D/g, '');
+
+  // Tratamento especial para Brasil
+  if (country.code === 'BR') {
+    if (cleaned.length <= 2) {
+      // Apenas DDD
+      return cleaned.replace(/^(\d{0,2})/, '($1');
+    } else if (cleaned.length <= 6) {
+      // DDD + início do número
+      const ddd = cleaned.substring(0, 2);
+      const rest = cleaned.substring(2);
+
+      // Se o 3º dígito é 9, é celular
+      if (rest[0] === '9') {
+        // Formato celular: (XX) 9XXXX
+        return `(${ddd}) ${rest}`;
+      } else {
+        // Formato fixo: (XX) XXXX
+        return `(${ddd}) ${rest}`;
+      }
+    } else if (cleaned.length <= 10) {
+      const ddd = cleaned.substring(0, 2);
+      const rest = cleaned.substring(2);
+
+      // Se o 3º dígito é 9, é celular
+      if (rest[0] === '9') {
+        // Celular com até 10 dígitos: (XX) 9XXXX-XXX
+        const firstPart = rest.substring(0, 5);
+        const secondPart = rest.substring(5);
+        return `(${ddd}) ${firstPart}${secondPart ? '-' + secondPart : ''}`;
+      } else {
+        // Fixo: (XX) XXXX-XXXX (máximo 10 dígitos total)
+        const firstPart = rest.substring(0, 4);
+        const secondPart = rest.substring(4, 8);
+        return `(${ddd}) ${firstPart}${secondPart ? '-' + secondPart : ''}`;
+      }
+    } else {
+      // Celular completo (11 dígitos)
+      const ddd = cleaned.substring(0, 2);
+      const rest = cleaned.substring(2, 11); // Máximo 9 dígitos após DDD
+
+      if (rest[0] === '9') {
+        // Celular: (XX) 9XXXX-XXXX
+        const firstPart = rest.substring(0, 5);
+        const secondPart = rest.substring(5, 9);
+        return `(${ddd}) ${firstPart}${secondPart ? '-' + secondPart : ''}`;
+      } else {
+        // Fixo não pode ter 11 dígitos, limitar a 10
+        const restFixed = cleaned.substring(2, 10);
+        const firstPart = restFixed.substring(0, 4);
+        const secondPart = restFixed.substring(4, 8);
+        return `(${ddd}) ${firstPart}${secondPart ? '-' + secondPart : ''}`;
+      }
+    }
+  }
+
+  // Para outros países, usar a máscara padrão
   let masked = '';
   let digitIndex = 0;
 
@@ -108,16 +164,6 @@ const applyMask = (value: string, mask: MaskType, extraData?: any): string => {
         .replace(/\.(\d{3})(\d)/, '.$1/$2')
         .replace(/(\d{4})(\d)/, '$1-$2');
 
-    case 'phone':
-      if (cleaned.length <= 10) {
-        return cleaned
-          .replace(/^(\d{2})(\d)/, '($1) $2')
-          .replace(/(\d{4})(\d)/, '$1-$2');
-      }
-      return cleaned
-        .slice(0, 11)
-        .replace(/^(\d{2})(\d)/, '($1) $2')
-        .replace(/(\d{5})(\d)/, '$1-$2');
 
     case 'internationalPhone':
       if (extraData?.country) {
@@ -165,12 +211,51 @@ const applyMask = (value: string, mask: MaskType, extraData?: any): string => {
       if (extraData?.noNumber) return 'S/N';
       return value.replace(/\D/g, '');
 
+    case 'instagram':
+      // Remove o @ se já existir e caracteres especiais
+      const instagramValue = value.replace(/[@\s]/g, '').toLowerCase();
+      // Retorna vazio se não tem valor, senão adiciona @
+      return instagramValue ? `@${instagramValue}` : '';
+
+    case 'color':
+      // Valida e formata cores hex
+      if (value.startsWith('#')) {
+        return value.slice(0, 7).toUpperCase();
+      }
+      return value;
+
+    case 'photo':
+      // Retorna o nome do arquivo ou vazio
+      return value;
+
+    case 'address':
+      // Retorna o endereço formatado
+      return value;
+
     default:
       return value;
   }
 };
 
 // Funções de validação
+const checkIfIncomplete = (value: string, type: ValidationType): boolean => {
+  if (!value) return false;
+  const cleaned = value.replace(/\D/g, '');
+
+  switch (type) {
+    case 'cpf':
+      return cleaned.length > 0 && cleaned.length < 11;
+    case 'cnpj':
+      return cleaned.length > 0 && cleaned.length < 14;
+    case 'creditCard':
+      return cleaned.length > 0 && cleaned.length < 13;
+    case 'cep':
+      return cleaned.length > 0 && cleaned.length < 8;
+    default:
+      return false;
+  }
+};
+
 const validateValue = (value: string, validation: ValidationType): boolean => {
   const cleaned = value.replace(/\D/g, '');
 
@@ -192,6 +277,10 @@ const validateValue = (value: string, validation: ValidationType): boolean => {
 
     case 'cpf':
       if (cleaned.length !== 11) return false;
+
+      // Elimina CPFs invalidos conhecidos (todos os dígitos iguais)
+      if (/^(\d)\1{10}$/.test(cleaned)) return false;
+
       let sum = 0;
       for (let i = 0; i < 9; i++) {
         sum += parseInt(cleaned[i]) * (10 - i);
@@ -209,13 +298,46 @@ const validateValue = (value: string, validation: ValidationType): boolean => {
       return parseInt(cleaned[10]) === digit;
 
     case 'cnpj':
-      return cleaned.length === 14;
+      if (cleaned.length !== 14) return false;
 
-    case 'phone':
-      return cleaned.length === 10 || cleaned.length === 11;
+      // Validação do CNPJ
+      // Elimina CNPJs invalidos conhecidos
+      if (/^(\d)\1{13}$/.test(cleaned)) return false;
+
+      // Valida DVs
+      let tamanho = cleaned.length - 2;
+      let numeros = cleaned.substring(0, tamanho);
+      let digitos = cleaned.substring(tamanho);
+      let soma = 0;
+      let pos = tamanho - 7;
+
+      for (let i = tamanho; i >= 1; i--) {
+        soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
+        if (pos < 2) pos = 9;
+      }
+
+      let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+      if (resultado !== parseInt(digitos.charAt(0))) return false;
+
+      tamanho = tamanho + 1;
+      numeros = cleaned.substring(0, tamanho);
+      soma = 0;
+      pos = tamanho - 7;
+
+      for (let i = tamanho; i >= 1; i--) {
+        soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
+        if (pos < 2) pos = 9;
+      }
+
+      resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+      return resultado === parseInt(digitos.charAt(1));
+
 
     case 'creditCard':
       return cleaned.length >= 13 && cleaned.length <= 19;
+
+    case 'cep':
+      return cleaned.length === 8;
 
     default:
       return true;
@@ -247,6 +369,7 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
   const [internalValue, setInternalValue] = React.useState(value || '');
   const [isFocused, setIsFocused] = React.useState(false);
   const [isValid, setIsValid] = React.useState(true);
+  const [isIncomplete, setIsIncomplete] = React.useState(false);
 
   // Estados específicos para funcionalidades avançadas
   const [showPassword, setShowPassword] = useState(false);
@@ -256,6 +379,25 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [cardBrand, setCardBrand] = useState<any>(null);
   const [isNoNumber, setIsNoNumber] = useState(false);
+
+  // Estados para endereço com busca
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [addressCoords, setAddressCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [mapZoom, setMapZoom] = useState(15);
+
+  // Estados para localValue do endereço
+  const [localValue, setLocalValue] = useState('');
+
+  // Estados para upload de foto
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [photoPosition, setPhotoPosition] = useState({ x: 50, y: 50 });
+  const [photoScale, setPhotoScale] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isEditingPhoto, setIsEditingPhoto] = useState(false);
+  const [tempPhotoPosition, setTempPhotoPosition] = useState({ x: 50, y: 50 });
+  const [tempPhotoScale, setTempPhotoScale] = useState(1);
 
   const countryDropdownRef = useRef<HTMLDivElement>(null);
   const displayValue = typeof value !== 'undefined' ? value : internalValue;
@@ -296,11 +438,37 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
       newValue = applyMask(newValue, mask, extraData);
     }
 
-    // Validar
-    let valid = true;
-    if (validation !== 'none' && newValue) {
-      valid = validateValue(newValue, validation);
-      setIsValid(valid);
+    // Validar em tempo real durante digitação
+    let currentIsValid = true;
+
+    if (validation !== 'none') {
+      if (newValue) {
+        // Primeiro verifica se está incompleto
+        const incomplete = checkIfIncomplete(newValue, validation);
+        setIsIncomplete(incomplete);
+
+        if (!incomplete) {
+          // Se não está incompleto, valida se é válido (para CPF e CNPJ)
+          if (validation === 'cpf' || validation === 'cnpj') {
+            const valid = validateValue(newValue, validation);
+            setIsValid(valid);
+            currentIsValid = valid;
+          } else {
+            // Para CEP e outros, se tem a quantidade certa de dígitos, está válido
+            setIsValid(true);
+            currentIsValid = true;
+          }
+        } else {
+          // Se está incompleto, reseta a validação
+          setIsValid(true);
+          currentIsValid = true;
+        }
+      } else {
+        // Campo vazio
+        setIsIncomplete(false);
+        setIsValid(true);
+        currentIsValid = true;
+      }
     }
 
     setInternalValue(newValue);
@@ -330,7 +498,7 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
       onChangeEvent(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
     }
 
-    onChange?.(newValue, valid, extraData);
+    onChange?.(newValue, currentIsValid, extraData);
   };
 
   const handleNoNumberToggle = () => {
@@ -347,11 +515,644 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
     }
   };
 
-  const showError = error || (!isValid && !isFocused && hasValue);
-  const errorMessage = error || (!isValid ? `${label || 'Campo'} inválido` : '');
+  const showError = error || (!isValid && hasValue);
+  const showWarning = isIncomplete && hasValue;
+
+  // Mensagens de erro personalizadas por tipo de validação
+  const getValidationErrorMessage = () => {
+    if (isIncomplete && validation !== 'none') {
+      switch (validation) {
+        case 'cpf':
+          return 'CPF incompleto';
+        case 'cnpj':
+          return 'CNPJ incompleto';
+        case 'creditCard':
+          return 'Número do cartão incompleto';
+        case 'cep':
+          return 'CEP incompleto';
+        default:
+          return `${label || 'Campo'} incompleto`;
+      }
+    }
+    if (!isValid && validation !== 'none') {
+      switch (validation) {
+        case 'cpf':
+          return 'CPF inválido';
+        case 'cnpj':
+          return 'CNPJ inválido';
+        case 'email':
+          return 'E-mail inválido';
+        case 'creditCard':
+          return 'Número do cartão inválido';
+        case 'url':
+          return 'URL inválida';
+        case 'number':
+          return 'Deve ser um número válido';
+        case 'cep':
+          return 'CEP inválido';
+        default:
+          return `${label || 'Campo'} inválido`;
+      }
+    }
+    return '';
+  };
+
+  const errorMessage = error || getValidationErrorMessage();
 
   // Determinar o tipo de input
-  const inputType = mask === 'password' && !showPassword ? 'password' : 'text';
+  const inputType = mask === 'password' && !showPassword ? 'password' :
+                   mask === 'color' ? 'color' : 'text';
+
+  // Renderização especial para cor
+  if (mask === 'color') {
+    return (
+      <div className={`relative ${fullWidth ? 'w-full' : ''}`}>
+        {label && !floating && (
+          <label className="block mb-1 text-sm font-medium text-gray-700">
+            {label} {required && <span className="text-red-500">*</span>}
+          </label>
+        )}
+
+        <div className="relative">
+          <div className="flex items-center gap-2">
+            {/* Preview da cor */}
+            <div
+              className="w-10 h-10 rounded-lg border-2 border-gray-300 shadow-sm"
+              style={{ backgroundColor: localValue || '#000000' }}
+            />
+
+            {/* Input de cor */}
+            <input
+              ref={ref}
+              type="color"
+              value={localValue || '#000000'}
+              onChange={handleChange}
+              onBlur={() => setIsFocused(false)}
+              onFocus={() => setIsFocused(true)}
+              disabled={disabled}
+              className={`
+                h-10 rounded-lg border border-gray-300 cursor-pointer
+                hover:border-krooa-blue focus:border-krooa-blue focus:ring-2 focus:ring-krooa-blue/20
+                disabled:opacity-50 disabled:cursor-not-allowed
+                ${showError ? 'border-red-500' : ''}
+                ${fullWidth ? 'flex-1' : 'w-32'}
+              `}
+              {...props}
+            />
+
+            {/* Display do valor hex */}
+            <input
+              type="text"
+              value={localValue || '#000000'}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^#[0-9A-Fa-f]{0,6}$/.test(value)) {
+                  setLocalValue(value.toUpperCase());
+                  onChange?.(value.toUpperCase(), true);
+                }
+              }}
+              placeholder="#000000"
+              disabled={disabled}
+              className={`
+                px-3 py-2 h-10 rounded-lg border border-gray-300 text-sm font-mono
+                hover:border-krooa-blue focus:border-krooa-blue focus:ring-2 focus:ring-krooa-blue/20
+                focus:outline-none transition-colors
+                disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50
+                ${showError ? 'border-red-500' : ''}
+                ${fullWidth ? 'flex-1' : 'w-28'}
+              `}
+            />
+          </div>
+
+          {/* Label flutuante */}
+          {label && floating && (
+            <label className={`
+              absolute left-3 transition-all duration-200 pointer-events-none
+              ${(isFocused || hasValue)
+                ? `-top-2 text-xs ${disabled ? 'bg-gray-50' : 'bg-white'} px-1 text-blue-900`
+                : 'top-2.5 text-sm text-gray-500'
+              }
+            `}>
+              {label} {required && <span className="text-red-500">*</span>}
+            </label>
+          )}
+        </div>
+
+        {/* Mensagem de erro */}
+        {(showError || showWarning) && (
+          <p className={`mt-1 text-sm ${showError ? 'text-red-600' : 'text-orange-600'}`}>{errorMessage}</p>
+        )}
+      </div>
+    );
+  }
+
+  // Renderização especial para foto
+  if (mask === 'photo') {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        // Validar tipo de arquivo
+        if (!file.type.startsWith('image/')) {
+          onChange?.('', false, { error: 'Por favor, selecione uma imagem válida' });
+          return;
+        }
+
+        // Criar preview
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreview(reader.result as string);
+          setPhotoPosition({ x: 50, y: 50 }); // Reset position
+          setPhotoScale(1); // Reset scale
+          onChange?.(file.name, true, {
+            file,
+            preview: reader.result,
+            position: { x: 50, y: 50 },
+            scale: 1
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    const handleRemove = () => {
+      setPreview(null);
+      setLocalValue('');
+      setPhotoPosition({ x: 50, y: 50 });
+      setPhotoScale(1);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      onChange?.('', true);
+    };
+
+    const handleMouseDown = (e: React.MouseEvent) => {
+      if (preview && isEditingPhoto) {
+        setIsDragging(true);
+        e.preventDefault();
+      }
+    };
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+      if (isDragging && preview && isEditingPhoto) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+        const newPosition = {
+          x: Math.max(0, Math.min(100, x)),
+          y: Math.max(0, Math.min(100, y))
+        };
+
+        setTempPhotoPosition(newPosition);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    const handleScaleChange = (newScale: number) => {
+      setTempPhotoScale(newScale);
+    };
+
+    const handleStartEdit = () => {
+      setIsEditingPhoto(true);
+      setTempPhotoPosition(photoPosition);
+      setTempPhotoScale(photoScale);
+    };
+
+    const handleSaveEdit = () => {
+      setPhotoPosition(tempPhotoPosition);
+      setPhotoScale(tempPhotoScale);
+      setIsEditingPhoto(false);
+      onChange?.(localValue || '', true, {
+        position: tempPhotoPosition,
+        scale: tempPhotoScale
+      });
+    };
+
+    const handleCancelEdit = () => {
+      setTempPhotoPosition(photoPosition);
+      setTempPhotoScale(photoScale);
+      setIsEditingPhoto(false);
+    };
+
+    return (
+      <div className={`relative ${fullWidth ? 'w-full' : ''}`}>
+        {label && !floating && (
+          <label className="block mb-1 text-sm font-medium text-gray-700">
+            {label} {required && <span className="text-red-500">*</span>}
+          </label>
+        )}
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          disabled={disabled}
+          className="hidden"
+          id={`photo-input-${Math.random()}`}
+        />
+
+        {!preview ? (
+          <label
+            htmlFor={fileInputRef.current?.id || `photo-input-${Math.random()}`}
+            className={`
+              flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg
+              cursor-pointer transition-all
+              ${disabled ? 'bg-gray-50 cursor-not-allowed' : 'hover:bg-gray-50 hover:border-krooa-blue'}
+              ${showError ? 'border-red-500 bg-red-50' :
+                showWarning ? 'border-orange-400 bg-orange-50' : 'border-gray-300'}
+            `}
+            onClick={(e) => {
+              if (!disabled) {
+                e.preventDefault();
+                fileInputRef.current?.click();
+              }
+            }}
+          >
+            <Upload className="w-8 h-8 text-gray-400 mb-2" />
+            <p className="text-sm text-gray-600">Clique ou arraste para fazer upload</p>
+            <p className="text-xs text-gray-400 mt-1">PNG, JPG, GIF até 10MB</p>
+          </label>
+        ) : (
+          <div className="space-y-4">
+            {/* Modo de visualização normal */}
+            {!isEditingPhoto ? (
+              <div className="flex gap-4 items-center">
+                {/* Preview circular */}
+                <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-gray-300">
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `url(${preview})`,
+                      backgroundPosition: `${photoPosition.x}% ${photoPosition.y}%`,
+                      backgroundSize: `${100 * photoScale}%`,
+                      backgroundRepeat: 'no-repeat'
+                    }}
+                  />
+                </div>
+
+                {/* Botões de ação */}
+                <div className="flex-1 space-y-2">
+                  <p className="text-sm text-gray-600 font-medium">Foto carregada</p>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={handleStartEdit}
+                      className="px-3 py-2 text-sm text-krooa-blue border border-krooa-blue rounded-lg hover:bg-krooa-blue hover:text-white transition-colors"
+                      disabled={disabled}
+                    >
+                      Editar posição
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                      disabled={disabled}
+                    >
+                      Trocar foto
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRemove}
+                      className="px-3 py-2 text-sm text-red-500 border border-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
+                      disabled={disabled}
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Modo de edição */
+              <div className="space-y-4">
+                <div className="flex gap-4 items-center">
+                  {/* Preview circular editável */}
+                  <div
+                    className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-krooa-blue cursor-move"
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                  >
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        backgroundImage: `url(${preview})`,
+                        backgroundPosition: `${tempPhotoPosition.x}% ${tempPhotoPosition.y}%`,
+                        backgroundSize: `${100 * tempPhotoScale}%`,
+                        backgroundRepeat: 'no-repeat'
+                      }}
+                    />
+                    {isDragging && (
+                      <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+                        <div className="text-white text-xs bg-black bg-opacity-50 px-2 py-1 rounded">
+                          Arraste para posicionar
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Controles de edição */}
+                  <div className="flex-1 space-y-3">
+                    {/* Slider de zoom */}
+                    <div>
+                      <label className="text-xs text-gray-600 mb-1 block">Zoom</label>
+                      <input
+                        type="range"
+                        min="1"
+                        max="3"
+                        step="0.1"
+                        value={tempPhotoScale}
+                        onChange={(e) => handleScaleChange(parseFloat(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-krooa-blue"
+                      />
+                      <div className="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>100%</span>
+                        <span>{Math.round(tempPhotoScale * 100)}%</span>
+                        <span>300%</span>
+                      </div>
+                    </div>
+
+                    {/* Botões de salvar/cancelar */}
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handleSaveEdit}
+                        className="flex-1 px-3 py-2 text-sm text-white bg-krooa-green rounded-lg hover:bg-green-600 transition-colors"
+                      >
+                        Salvar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleCancelEdit}
+                        className="flex-1 px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Instruções */}
+                <p className="text-xs text-gray-500 bg-blue-50 p-2 rounded">
+                  💡 Arraste a imagem para ajustar a posição • Use o controle de zoom para ajustar o tamanho
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Label flutuante */}
+        {label && floating && (
+          <label className={`
+            absolute left-3 transition-all duration-200 pointer-events-none z-10
+            ${(preview || isFocused)
+              ? `-top-2 text-xs ${disabled ? 'bg-gray-50' : 'bg-white'} px-1 text-blue-900`
+              : 'top-6 text-sm text-gray-500'
+            }
+          `}>
+            {label} {required && <span className="text-red-500">*</span>}
+          </label>
+        )}
+
+        {/* Mensagem de erro */}
+        {(showError || showWarning) && (
+          <p className={`mt-1 text-sm ${showError ? 'text-red-600' : 'text-orange-600'}`}>{errorMessage}</p>
+        )}
+      </div>
+    );
+  }
+
+  // Renderização especial para endereço com mapa circular
+  if (mask === 'address') {
+    // Simular busca de endereços (em produção, integraria com Google Places API)
+    const searchAddress = (query: string) => {
+      if (query.length > 2) {
+        // Simulação de sugestões
+        setSuggestions([
+          `${query} - São Paulo, SP`,
+          `${query} - Rio de Janeiro, RJ`,
+          `${query} - Belo Horizonte, MG`,
+          `${query} - Curitiba, PR`,
+          `${query} - Porto Alegre, RS`
+        ]);
+        setShowSuggestions(true);
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    };
+
+    const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setLocalValue(value);
+      searchAddress(value);
+      onChange?.(value, true);
+    };
+
+    const selectSuggestion = (suggestion: string) => {
+      setLocalValue(suggestion);
+      // Simular obtenção de coordenadas (em produção viria da API)
+      const mockCoords = {
+        lat: -23.550520 + (Math.random() - 0.5) * 0.1,
+        lng: -46.633308 + (Math.random() - 0.5) * 0.1
+      };
+      setAddressCoords(mockCoords);
+      onChange?.(suggestion, true, {
+        formatted: suggestion,
+        coordinates: mockCoords
+      });
+      setShowSuggestions(false);
+    };
+
+
+    return (
+      <div className={`${fullWidth ? 'w-full' : ''}`}>
+        {label && !floating && (
+          <label className="block mb-1 text-sm font-medium text-gray-700">
+            {label} {required && <span className="text-red-500">*</span>}
+          </label>
+        )}
+
+        {/* Container integrado do mapa e input */}
+        <div className="space-y-2">
+          {/* Área do mapa com input integrado */}
+          <div
+            className={`relative w-full h-56 rounded-lg overflow-hidden border-2 bg-gradient-to-br from-blue-50 via-blue-100 to-green-100 transition-colors ${
+              addressCoords
+                ? 'border-gray-300 hover:border-krooa-blue'
+                : 'border-gray-200'
+            }`}
+            onClick={addressCoords ? (e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = (e.clientX - rect.left) / rect.width;
+              const y = (e.clientY - rect.top) / rect.height;
+
+              // Atualizar coordenadas baseado no clique
+              const newCoords = {
+                lat: addressCoords.lat + (0.5 - y) * 0.02,
+                lng: addressCoords.lng + (x - 0.5) * 0.02
+              };
+
+              setAddressCoords(newCoords);
+              onChange?.(localValue, true, {
+                formatted: localValue,
+                coordinates: newCoords,
+                zoom: mapZoom
+              });
+            } : undefined}
+          >
+              {/* Fundo do mapa sempre presente */}
+              {addressCoords && (
+                <div className="absolute inset-0 opacity-30">
+                  <div className="w-full h-full" style={{
+                    backgroundImage: 'repeating-linear-gradient(0deg, #e5e7eb 0, #e5e7eb 1px, transparent 1px, transparent 20px), repeating-linear-gradient(90deg, #e5e7eb 0, #e5e7eb 1px, transparent 1px, transparent 20px)',
+                    backgroundSize: '100% 100%'
+                  }}></div>
+                </div>
+              )}
+
+              {/* Marcador central quando tem coordenadas */}
+              {addressCoords && (
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-full">
+                  <MapPin className="w-8 h-8 text-red-500 drop-shadow-lg" />
+                </div>
+              )}
+
+              {/* Estado vazio - ícone central */}
+              {!addressCoords && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <MapPin className="w-16 h-16 text-gray-200" />
+                </div>
+              )}
+
+              {/* Input de endereço integrado no topo */}
+              <div className="absolute top-0 left-0 right-0 p-3">
+                <div className="relative">
+                  <input
+                    ref={ref}
+                    type="text"
+                    value={localValue}
+                    onChange={handleAddressChange}
+                    onFocus={() => {
+                      setIsFocused(true);
+                      if (suggestions.length > 0) setShowSuggestions(true);
+                    }}
+                    onBlur={() => {
+                      setIsFocused(false);
+                      setTimeout(() => setShowSuggestions(false), 200);
+                      if (validation !== 'none' && localValue) {
+                        const incomplete = checkIfIncomplete(localValue, validation);
+                        setIsIncomplete(incomplete);
+                        if (!incomplete) {
+                          const valid = validateValue(localValue, validation);
+                          setIsValid(valid);
+                        } else {
+                          setIsValid(true);
+                        }
+                      }
+                    }}
+                    placeholder="Digite o endereço..."
+                    disabled={disabled}
+                    className={`
+                      w-full pl-10 pr-10 py-2 rounded-lg bg-white/95 backdrop-blur
+                      border transition-all shadow-sm
+                      ${showError ? 'border-red-500' :
+                        showWarning ? 'border-orange-400' :
+                        isFocused ? 'border-krooa-blue' : 'border-gray-300'}
+                      focus:outline-none focus:ring-2 focus:ring-krooa-blue/20
+                      disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50
+                    `}
+                    {...props}
+                  />
+
+                  {/* Ícones do input */}
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+
+                  {/* Sugestões */}
+                  {showSuggestions && suggestions.length > 0 && (
+                    <div className="absolute z-20 w-full top-full mt-1 bg-white rounded-lg border border-gray-200 shadow-lg max-h-60 overflow-auto">
+                      {suggestions.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => selectSuggestion(suggestion)}
+                          className="w-full px-3 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-sm"
+                        >
+                          <MapPin className="w-4 h-4 text-gray-400" />
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Informações e controles quando tem coordenadas */}
+              {addressCoords && (
+                <>
+                  {/* Card de informações */}
+                  <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-2 rounded-lg shadow-md">
+                    <p className="text-xs text-gray-500">Coordenadas</p>
+                    <p className="text-xs font-medium text-gray-700">
+                      {addressCoords.lat.toFixed(6)}, {addressCoords.lng.toFixed(6)}
+                    </p>
+                  </div>
+
+                  {/* Controles de zoom */}
+                  <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-white/90 backdrop-blur rounded-lg shadow-md p-1">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const newZoom = Math.max(10, mapZoom - 1);
+                        setMapZoom(newZoom);
+                        onChange?.(localValue, true, {
+                          formatted: localValue,
+                          coordinates: addressCoords,
+                          zoom: newZoom
+                        });
+                      }}
+                      className="p-1 hover:bg-gray-100 rounded transition-colors"
+                      disabled={disabled || mapZoom <= 10}
+                    >
+                      <span className="text-lg leading-none">−</span>
+                    </button>
+                    <span className="px-2 text-xs min-w-[30px] text-center">{mapZoom}</span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const newZoom = Math.min(18, mapZoom + 1);
+                        setMapZoom(newZoom);
+                        onChange?.(localValue, true, {
+                          formatted: localValue,
+                          coordinates: addressCoords,
+                          zoom: newZoom
+                        });
+                      }}
+                      className="p-1 hover:bg-gray-100 rounded transition-colors"
+                      disabled={disabled || mapZoom >= 18}
+                    >
+                      <span className="text-lg leading-none">+</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
+          {/* Mensagem de erro */}
+          {(showError || showWarning) && (
+            <p className={`mt-1 text-sm ${showError ? 'text-red-600' : 'text-orange-600'}`}>{errorMessage}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   // Renderização especial para telefone internacional
   if (mask === 'internationalPhone') {
@@ -401,14 +1202,28 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
               value={displayValue}
               onChange={handleChange}
               onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
+              onBlur={() => {
+                setIsFocused(false);
+                  // Validar no blur para telefone internacional
+                if (validation !== 'none' && displayValue) {
+                  const incomplete = checkIfIncomplete(displayValue as string, validation);
+                  setIsIncomplete(incomplete);
+                  if (!incomplete) {
+                    const valid = validateValue(displayValue as string, validation);
+                    setIsValid(valid);
+                  } else {
+                    setIsValid(true);
+                  }
+                }
+              }}
               disabled={disabled}
               placeholder=" "
               className={`
                 peer w-full rounded-r-lg border border-gray-300 px-3 py-2 h-10
                 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20
                 disabled:bg-gray-50 disabled:text-gray-500
-                ${showError ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : ''}
+                ${showError ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' :
+                  showWarning ? 'border-orange-400 focus:border-orange-500 focus:ring-orange-500/20' : ''}
               `}
               {...props}
             />
@@ -423,7 +1238,9 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
                   ? 'text-blue-900'
                   : showError
                     ? 'text-red-500'
-                    : 'text-gray-500'
+                    : showWarning
+                      ? 'text-orange-500'
+                      : 'text-gray-500'
                 }
                 peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-blue-900
               `}
@@ -435,8 +1252,8 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
         </div>
 
         {/* Mensagem de erro */}
-        {showError && (
-          <p className="mt-1 text-xs text-red-500">{errorMessage}</p>
+        {(showError || showWarning) && (
+          <p className={`mt-1 text-xs ${showError ? 'text-red-500' : 'text-orange-500'}`}>{errorMessage}</p>
         )}
       </div>
     );
@@ -452,14 +1269,34 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
             value={displayValue}
             onChange={handleChange}
             onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
+            onBlur={() => {
+              setIsFocused(false);
+              // Validar no blur
+              if (validation !== 'none' && displayValue) {
+                const incomplete = checkIfIncomplete(displayValue as string, validation);
+                setIsIncomplete(incomplete);
+                if (!incomplete && displayValue) {
+                  const valid = validateValue(displayValue as string, validation);
+                  setIsValid(valid);
+                } else {
+                  // Se está incompleto, considerar válido para não mostrar erro vermelho
+                  setIsValid(true);
+                }
+              } else {
+                // Campo vazio
+                setIsIncomplete(false);
+                setIsValid(true);
+              }
+            }}
             disabled={disabled || (mask === 'addressNumber' && isNoNumber)}
             placeholder=" "
             type={inputType}
             className={`
               peer w-full h-10 rounded-lg border px-3 py-2 text-gray-900
               placeholder-transparent
-              ${showError ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-krooa-green focus:ring-krooa-green/20'}
+              ${showError ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' :
+                showWarning ? 'border-orange-400 focus:border-orange-500 focus:ring-orange-500/20' :
+                'border-gray-300 focus:border-krooa-green focus:ring-krooa-green/20'}
               focus:outline-none focus:ring-2
               disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
               ${icon ? 'pr-10' : ''}
@@ -507,7 +1344,7 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
                   checked={isNoNumber}
                   onChange={handleNoNumberToggle}
                   disabled={disabled}
-                  className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                  className="w-4 h-4 text-krooa-dark rounded focus:ring-krooa-dark"
                 />
                 <span className="text-gray-600">{noNumberText}</span>
               </label>
@@ -516,7 +1353,8 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
 
           <label
             className={`
-              absolute left-3 transition-all duration-200 pointer-events-none bg-white px-1
+              absolute left-3 transition-all duration-200 pointer-events-none px-1
+              ${(disabled || (mask === 'addressNumber' && isNoNumber)) ? 'bg-gray-50' : 'bg-white'}
               ${hasValue || isFocused
                 ? 'top-0 -translate-y-1/2 text-xs'
                 : 'top-1/2 -translate-y-1/2 text-sm'
@@ -525,7 +1363,9 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
                 ? 'text-blue-900'
                 : showError
                   ? 'text-red-500'
-                  : 'text-gray-500'
+                  : showWarning
+                    ? 'text-orange-500'
+                    : 'text-gray-500'
               }
               peer-disabled:text-gray-400
             `}
@@ -535,8 +1375,8 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
           </label>
         </div>
 
-        {showError && (
-          <p className="mt-1 text-xs text-red-500">{errorMessage}</p>
+        {(showError || showWarning) && (
+          <p className={`mt-1 text-xs ${showError ? 'text-red-500' : 'text-orange-500'}`}>{errorMessage}</p>
         )}
       </div>
     );
@@ -558,7 +1398,14 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
           value={displayValue}
           onChange={handleChange}
           onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onBlur={() => {
+            setIsFocused(false);
+            // Validar no blur
+            if (validation !== 'none' && localValue) {
+              const valid = validateValue(localValue, validation);
+              setIsValid(valid);
+            }
+          }}
           disabled={disabled || (mask === 'addressNumber' && isNoNumber)}
           placeholder=" "
           type={inputType}
@@ -609,7 +1456,7 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
                 checked={isNoNumber}
                 onChange={handleNoNumberToggle}
                 disabled={disabled}
-                className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                className="w-4 h-4 text-krooa-dark rounded focus:ring-krooa-dark"
               />
               <span className="text-gray-600">{noNumberText}</span>
             </label>
