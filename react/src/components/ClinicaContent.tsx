@@ -8,7 +8,6 @@ import { Card } from '../../../components/ui/Card';
 import { Modal } from '../../../components/ui/Modal';
 import { SubMenu } from '../../../components/ui/SubMenu';
 import { useClinic } from '../../../contexts/ClinicContext';
-import { MultiSelect } from '../../../components/ui/MultiSelect';
 import { useRegion } from '../../../contexts/RegionContext';
 
 interface Professional {
@@ -873,10 +872,11 @@ const ConfigClinica: React.FC = () => {
                           </td>
                           <td className="py-2.5 px-4 text-sm text-gray-900">
                             {editingUnit === unidade.id ? (
-                              <MultiSelect
+                              <Select
                                 options={centralOptions}
                                 value={unidade.centralComunicacao}
-                                onChange={(values) => {
+                                onChange={(e) => {
+                                  const values = Array.isArray(e.target.value) ? e.target.value : [];
                                   const newUnidades = unidades.map((u: any) =>
                                     u.id === unidade.id ? {...u, centralComunicacao: values} : u
                                   );
@@ -894,10 +894,11 @@ const ConfigClinica: React.FC = () => {
                           {config.features.centroCusto && (
                             <td className="py-2.5 px-4 text-sm text-gray-900">
                               {editingUnit === unidade.id ? (
-                                <MultiSelect
+                                <Select
                                   options={centroCustoOptions}
                                   value={unidade.centroCusto}
-                                  onChange={(values) => {
+                                  onChange={(e) => {
+                                    const values = Array.isArray(e.target.value) ? e.target.value : [];
                                     const newUnidades = unidades.map((u: any) =>
                                       u.id === unidade.id ? {...u, centroCusto: values} : u
                                     );
@@ -915,10 +916,11 @@ const ConfigClinica: React.FC = () => {
                           )}
                           <td className="py-2.5 px-4 text-sm text-gray-900">
                             {editingUnit === unidade.id ? (
-                              <MultiSelect
+                              <Select
                                 options={colaboradoresOptions}
                                 value={unidade.colaboradores}
-                                onChange={(values) => {
+                                onChange={(e) => {
+                                  const values = Array.isArray(e.target.value) ? e.target.value : [];
                                   const newUnidades = unidades.map((u: any) =>
                                     u.id === unidade.id ? {...u, colaboradores: values} : u
                                   );
@@ -2065,13 +2067,14 @@ const ConfigClinica: React.FC = () => {
 
                 {/* Professionals Multi-Select */}
                 <div className="relative">
-                  <MultiSelect
+                  <Select
                     options={professionals.map(prof => ({
                       value: prof.id,
                       label: prof.name
                     }))}
                     value={editingChair.selectedProfessionals || []}
-                    onChange={(values) => {
+                    onChange={(e) => {
+                      const values = Array.isArray(e.target.value) ? e.target.value : [];
                       setEditingChair({
                         ...editingChair,
                         selectedProfessionals: values

@@ -4,7 +4,6 @@ import { Button, IconButton } from '../../../../components/ui/Button';
 import { Input } from '../../../../components/ui/Input';
 import { Card } from '../../../../components/ui/Card';
 import { Switch } from '../../../../components/ui/Switch';
-import { MultiSelect } from '../../../../components/ui/MultiSelect';
 import { Table } from '../../../../components/ui/Table';
 import { ConfiguracoesLayout } from '../../../../layouts/ConfiguracoesLayout';
 import { Aside } from '../../../../components/ui/Aside';
@@ -961,33 +960,28 @@ const CadeirasClinica: React.FC = () => {
             suffix="h:min"
           />
 
-          {/* Professionals Multi-Select */}
-          <div className="relative">
-            <MultiSelect
-              options={professionals.map(prof => ({
+          {/* Professionals Select */}
+          <Select
+            label="Profissionais"
+            options={[
+              { value: '', label: 'Selecione os profissionais' },
+              ...professionals.map(prof => ({
                 value: prof.id,
                 label: prof.name
-              }))}
-              value={editingChair.selectedProfessionals || []}
-              onChange={(values) => {
+              }))
+            ]}
+            value={editingChair.selectedProfessionals?.[0] || ''}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value) {
                 setEditingChair({
                   ...editingChair,
-                  selectedProfessionals: values
+                  selectedProfessionals: [value]
                 });
-              }}
-              placeholder="Profissionais"
-              multiple={true}
-            />
-            <label
-              className={`absolute left-3 bg-white px-1 text-sm text-gray-600 transition-all pointer-events-none ${
-                editingChair.selectedProfessionals?.length > 0
-                  ? '-top-2.5'
-                  : 'top-2.5 text-base text-gray-400'
-              }`}
-            >
-              Profissionais
-            </label>
-          </div>
+              }
+            }}
+            fullWidth
+          />
 
           {/* Botão Adicionar Horário */}
           <div className="flex justify-end">

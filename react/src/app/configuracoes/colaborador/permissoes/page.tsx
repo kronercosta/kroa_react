@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card } from '../../../../components/ui/Card';
 import { Switch } from '../../../../components/ui/Switch';
-import { MultiSelect } from '../../../../components/ui/MultiSelect';
+import { Select } from '../../../../components/ui/Select';
 import { ColaboradorLayout } from '../../../../layouts/ColaboradorLayout';
 
 export default function PermissoesColaborador() {
@@ -155,12 +155,13 @@ export default function PermissoesColaborador() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <MultiSelect
+              <Select
                 label="Unidades Permitidas"
                 placeholder="Selecione as unidades"
                 options={unidadeOptions}
                 value={formData.unidadesPermitidas}
-                onChange={(value) => handleInputChange('unidadesPermitidas', value)}
+                onChange={(e) => handleInputChange('unidadesPermitidas', Array.isArray(e.target.value) ? e.target.value : [])}
+                multiple={true}
               />
               <p className="text-xs text-gray-500 mt-1">
                 Deixe vazio para permitir acesso a todas as unidades
@@ -168,12 +169,13 @@ export default function PermissoesColaborador() {
             </div>
 
             <div>
-              <MultiSelect
+              <Select
                 label="Centros de Custo Permitidos"
                 placeholder="Selecione os centros de custo"
                 options={centroCustoOptions}
                 value={formData.centrosCustoPermitidos}
-                onChange={(value) => handleInputChange('centrosCustoPermitidos', value)}
+                onChange={(e) => handleInputChange('centrosCustoPermitidos', Array.isArray(e.target.value) ? e.target.value : [])}
+                multiple={true}
               />
               <p className="text-xs text-gray-500 mt-1">
                 Deixe vazio para permitir acesso a todos os centros de custo

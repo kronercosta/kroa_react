@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { Logo } from './Logo';
 import { Navigation } from './Navigation';
-import { MultiSelect } from './ui/MultiSelect';
+import { Select } from './ui/Select';
 import { useClinic } from '../contexts/ClinicContext';
 
 interface LayoutProps {
@@ -235,20 +235,20 @@ export function Layout({ children }: LayoutProps) {
                       <div className="p-4 border-b border-gray-200 space-y-3">
                         <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Filtros</h3>
                         {multiplasUnidadesEnabled && (
-                          <MultiSelect
+                          <Select
                             placeholder="Todas as Unidades"
                             options={unidadesOptions}
                             value={selectedUnidades}
-                            onChange={setSelectedUnidades}
+                            onChange={(e) => setSelectedUnidades(Array.isArray(e.target.value) ? e.target.value : [])}
                             multiple={true}
                           />
                         )}
                         {centroCustoEnabled && (
-                          <MultiSelect
+                          <Select
                             placeholder="Todos os Centros"
                             options={centrosOptions}
                             value={selectedCentros}
-                            onChange={setSelectedCentros}
+                            onChange={(e) => setSelectedCentros(Array.isArray(e.target.value) ? e.target.value : [])}
                             multiple={true}
                           />
                         )}
@@ -313,22 +313,22 @@ export function Layout({ children }: LayoutProps) {
                 <div className="hidden md:flex items-center gap-3">
                   {/* Seletor de Unidades (Múltipla Seleção) */}
                   {multiplasUnidadesEnabled && (
-                    <MultiSelect
+                    <Select
                       placeholder="Todas as Unidades2"
                       options={unidadesOptions}
                       value={selectedUnidades}
-                      onChange={setSelectedUnidades}
+                      onChange={(e) => setSelectedUnidades(Array.isArray(e.target.value) ? e.target.value : [])}
                       multiple={true}
                     />
                   )}
 
                   {/* Seletor de Centro de Custo (Seleção Múltipla) */}
                   {centroCustoEnabled && (
-                    <MultiSelect
+                    <Select
                       placeholder="Todos os Centros"
                       options={centrosOptions}
                       value={selectedCentros}
-                      onChange={setSelectedCentros}
+                      onChange={(e) => setSelectedCentros(Array.isArray(e.target.value) ? e.target.value : [])}
                       multiple={true}
                     />
                   )}
