@@ -57,6 +57,11 @@ interface UnifiedInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   showPasswordToggle?: boolean; // Para campo de senha
   allowNoNumber?: boolean; // Para número de endereço
   noNumberText?: string; // Texto para "sem número"
+
+  // Props para timepicker
+  timeIntervals?: number; // Intervalo em minutos (5, 15, 30, etc)
+  timeStart?: string; // Hora de início (ex: "08:00")
+  timeEnd?: string; // Hora de fim (ex: "18:00")
 }
 
 // Detectar bandeira do cartão
@@ -464,6 +469,10 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
   showPasswordToggle = true,
   allowNoNumber = false,
   noNumberText = 'Sem número',
+  // Props do timepicker
+  timeIntervals = 15,
+  timeStart = '00:00',
+  timeEnd = '23:59',
   ...props
 }, ref) => {
   const [internalValue, setInternalValue] = React.useState(value || '');
@@ -948,9 +957,11 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
           disabled={disabled}
           error={showError}
           warning={showWarning}
+          timeIntervals={timeIntervals}
+          timeStart={timeStart}
+          timeEnd={timeEnd}
           className={className}
           showTime={true}
-          timeIntervals={30}
         />
 
         {/* Mensagem de erro */}
@@ -1094,24 +1105,41 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
           {/* Dropdown de sugestões de horário */}
           {showTimeDropdown && (
             <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-              {Array.from({ length: 48 }, (_, i) => {
-                const hours = Math.floor(i / 2);
-                const minutes = (i % 2) * 30;
-                const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-                return (
-                  <button
-                    key={timeString}
-                    type="button"
-                    onClick={() => {
-                      handleTimeChange(timeString);
-                      setShowTimeDropdown(false);
-                    }}
-                    className="w-full px-3 py-2 text-left hover:bg-krooa-green/10 transition-colors text-sm"
-                  >
-                    {timeString}
-                  </button>
-                );
-              })}
+              {(() => {
+                const options = [];
+
+                // Converter timeStart e timeEnd para minutos
+                const [startHour, startMinute] = timeStart.split(':').map(Number);
+                const [endHour, endMinute] = timeEnd.split(':').map(Number);
+                const startMinutes = startHour * 60 + startMinute;
+                const endMinutes = endHour * 60 + endMinute;
+
+                // Gerar opções baseadas no intervalo
+                for (let totalMinutes = startMinutes; totalMinutes <= endMinutes; totalMinutes += timeIntervals) {
+                  const hours = Math.floor(totalMinutes / 60);
+                  const minutes = totalMinutes % 60;
+
+                  // Garantir que não ultrapasse 23:59
+                  if (hours > 23) break;
+
+                  const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                  options.push(
+                    <button
+                      key={timeString}
+                      type="button"
+                      onClick={() => {
+                        handleTimeChange(timeString);
+                        setShowTimeDropdown(false);
+                      }}
+                      className="w-full px-3 py-2 text-left hover:bg-krooa-green/10 transition-colors text-sm"
+                    >
+                      {timeString}
+                    </button>
+                  );
+                }
+
+                return options;
+              })()}
             </div>
           )}
 

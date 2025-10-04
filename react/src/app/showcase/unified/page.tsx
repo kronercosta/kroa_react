@@ -22,7 +22,11 @@ export default function UnifiedShowcase() {
     showPasswordToggle: true,
     defaultCountry: 'BR',
     allowNoNumber: true,
-    noNumberText: 'S/N'
+    noNumberText: 'S/N',
+    // Props do timepicker
+    timeIntervals: 30,
+    timeStart: '00:00',
+    timeEnd: '23:59'
   });
 
   // Estados para o Select
@@ -226,6 +230,43 @@ export default function UnifiedShowcase() {
               </div>
 
               {/* Props específicas para máscaras avançadas */}
+              {inputProps.mask === 'timepicker' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Intervalo de Tempo (minutos)</label>
+                    <select
+                      value={inputProps.timeIntervals || 15}
+                      onChange={(e) => setInputProps({ ...inputProps, timeIntervals: parseInt(e.target.value) })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                    >
+                      <option value={5}>5 minutos</option>
+                      <option value={10}>10 minutos</option>
+                      <option value={15}>15 minutos</option>
+                      <option value={30}>30 minutos</option>
+                      <option value={60}>60 minutos</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Horário de Início</label>
+                    <input
+                      type="time"
+                      value={inputProps.timeStart || '00:00'}
+                      onChange={(e) => setInputProps({ ...inputProps, timeStart: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Horário de Fim</label>
+                    <input
+                      type="time"
+                      value={inputProps.timeEnd || '23:59'}
+                      onChange={(e) => setInputProps({ ...inputProps, timeEnd: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green"
+                    />
+                  </div>
+                </div>
+              )}
+
               {inputProps.mask === 'password' && (
                 <div>
                   <label className="flex items-center justify-between p-3 bg-purple-50 rounded-lg cursor-pointer hover:bg-purple-100">
@@ -424,6 +465,9 @@ export default function UnifiedShowcase() {
   ${inputProps.mask === 'internationalPhone' ? `defaultCountry="${inputProps.defaultCountry}"` : ''}
   ${inputProps.mask === 'addressNumber' && inputProps.allowNoNumber ? `allowNoNumber={true}
   noNumberText="${inputProps.noNumberText}"` : ''}
+  ${inputProps.mask === 'timepicker' ? `timeIntervals={${inputProps.timeIntervals}}
+  timeStart="${inputProps.timeStart}"
+  timeEnd="${inputProps.timeEnd}"` : ''}
   value={value}
   onChange={(value, isValid, data) => setValue(value)}
 />`}

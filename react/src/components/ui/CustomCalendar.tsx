@@ -9,6 +9,8 @@ interface CustomCalendarProps {
   className?: string;
   showTime?: boolean;
   timeIntervals?: number;
+  timeStart?: string;
+  timeEnd?: string;
   label?: string;
   required?: boolean;
   floating?: boolean;
@@ -32,14 +34,27 @@ const generateYears = () => {
   return years;
 };
 
-const generateTimeOptions = (intervals: number = 15) => {
+const generateTimeOptions = (intervals: number = 15, startTime: string = '00:00', endTime: string = '23:59') => {
   const times = [];
-  for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute += intervals) {
-      const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-      times.push(timeString);
-    }
+
+  // Converter timeStart e timeEnd para minutos
+  const [startHour, startMinute] = startTime.split(':').map(Number);
+  const [endHour, endMinute] = endTime.split(':').map(Number);
+  const startMinutes = startHour * 60 + startMinute;
+  const endMinutes = endHour * 60 + endMinute;
+
+  // Gerar opções baseadas no intervalo
+  for (let totalMinutes = startMinutes; totalMinutes <= endMinutes; totalMinutes += intervals) {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    // Garantir que não ultrapasse 23:59
+    if (hours > 23) break;
+
+    const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    times.push(timeString);
   }
+
   return times;
 };
 
@@ -51,6 +66,8 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
   className = "",
   showTime = false,
   timeIntervals = 15,
+  timeStart = '00:00',
+  timeEnd = '23:59',
   label,
   required = false,
   floating = true,
@@ -194,7 +211,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
     return days;
   };
 
-  const timeOptions = showTime ? generateTimeOptions(timeIntervals) : [];
+  const timeOptions = showTime ? generateTimeOptions(timeIntervals, timeStart, timeEnd) : [];
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -212,39 +229,137 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
           placeholder={placeholder}
           disabled={disabled}
           onChange={(e) => {
-            const newInputValue = e.target.value;
+            let newInputValue = e.target.value;
+
+            // Aplicar máscara de data/datetime conforme o usuário digita
+            if (showTime) {
+              // Máscara para datetime: DD/MM/AAAA HH:MM (máximo 12 dígitos)
+              const cleaned = newInputValue.replace(/\D/g, '').slice(0, 12);
+
+              if (cleaned.length <= 2) {
+                newInputValue = cleaned;
+              } else if (cleaned.length <= 4) {
+                newInputValue = cleaned.replace(/^(\d{2})(\d{0,2})/, '$1/$2');
+              } else if (cleaned.length <= 8) {
+                newInputValue = cleaned.replace(/^(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
+              } else if (cleaned.length === 9) {
+                // Primeiro dígito da hora
+                const firstHour = parseInt(cleaned.substring(8, 9));
+                if (firstHour > 2) {
+                  newInputValue = cleaned.replace(/^(\d{2})(\d{2})(\d{4})(\d)/, '$1/$2/$3 0$4:');
+                } else {
+                  newInputValue = cleaned.replace(/^(\d{2})(\d{2})(\d{4})(\d)/, '$1/$2/$3 $4');
+                }
+              } else if (cleaned.length === 10) {
+                // Dois dígitos da hora
+                const hours = parseInt(cleaned.substring(8, 10));
+                if (hours > 23) {
+                  newInputValue = cleaned.replace(/^(\d{2})(\d{2})(\d{4})(\d{2})/, '$1/$2/$3 23:');
+                } else {
+                  newInputValue = cleaned.replace(/^(\d{2})(\d{2})(\d{4})(\d{2})/, '$1/$2/$3 $4');
+                }
+              } else if (cleaned.length === 11) {
+                // Primeiro dígito dos minutos
+                const hours = cleaned.substring(8, 10);
+                const firstMinute = parseInt(cleaned.substring(10, 11));
+
+                let validHours = Math.min(parseInt(hours) || 0, 23).toString().padStart(2, '0');
+                let validFirstMinute = firstMinute;
+                if (firstMinute > 5) validFirstMinute = 5;
+
+                newInputValue = `${cleaned.substring(0, 2)}/${cleaned.substring(2, 4)}/${cleaned.substring(4, 8)} ${validHours}:${validFirstMinute}`;
+              } else {
+                // Hora e minutos completos
+                const hours = cleaned.substring(8, 10);
+                const minutes = cleaned.substring(10, 12);
+
+                const validHours = Math.min(parseInt(hours) || 0, 23).toString().padStart(2, '0');
+                const validMinutes = Math.min(parseInt(minutes) || 0, 59).toString().padStart(2, '0');
+
+                newInputValue = `${cleaned.substring(0, 2)}/${cleaned.substring(2, 4)}/${cleaned.substring(4, 8)} ${validHours}:${validMinutes}`;
+              }
+            } else {
+              // Máscara para date: DD/MM/AAAA (máximo 8 dígitos)
+              const cleaned = newInputValue.replace(/\D/g, '').slice(0, 8);
+
+              if (cleaned.length === 1) {
+                // Primeiro dígito do dia
+                const firstDay = parseInt(cleaned);
+                if (firstDay > 3) {
+                  newInputValue = '0' + cleaned + '/';
+                } else {
+                  newInputValue = cleaned;
+                }
+              } else if (cleaned.length === 2) {
+                // Dois dígitos do dia
+                const day = parseInt(cleaned);
+                if (day > 31) {
+                  newInputValue = '31/';
+                } else if (day === 0) {
+                  newInputValue = '01/';
+                } else {
+                  newInputValue = cleaned;
+                }
+              } else if (cleaned.length === 3) {
+                // Primeiro dígito do mês
+                const day = cleaned.substring(0, 2);
+                const firstMonth = parseInt(cleaned.substring(2, 3));
+
+                let validDay = Math.min(Math.max(parseInt(day), 1), 31).toString().padStart(2, '0');
+
+                if (firstMonth > 1) {
+                  newInputValue = `${validDay}/0${firstMonth}/`;
+                } else {
+                  newInputValue = `${validDay}/${firstMonth}`;
+                }
+              } else if (cleaned.length === 4) {
+                // Dois dígitos do mês
+                const day = cleaned.substring(0, 2);
+                const month = cleaned.substring(2, 4);
+
+                let validDay = Math.min(Math.max(parseInt(day), 1), 31).toString().padStart(2, '0');
+                let validMonth = Math.min(Math.max(parseInt(month), 1), 12).toString().padStart(2, '0');
+
+                newInputValue = `${validDay}/${validMonth}`;
+              } else {
+                // Com ano
+                const day = cleaned.substring(0, 2);
+                const month = cleaned.substring(2, 4);
+                const year = cleaned.substring(4, 8);
+
+                let validDay = Math.min(Math.max(parseInt(day), 1), 31).toString().padStart(2, '0');
+                let validMonth = Math.min(Math.max(parseInt(month), 1), 12).toString().padStart(2, '0');
+
+                newInputValue = `${validDay}/${validMonth}/${year}`;
+              }
+            }
+
             setInputValue(newInputValue);
 
-            // Tentar parsear a data digitada
+            // Tentar parsear a data digitada apenas quando estiver completa
             if (showTime) {
-              // Para datetime: DD/MM/AAAA HH:MM ou DD/MM/AAAA, HH:MM (toLocaleString pode usar vírgula)
-              const match = newInputValue.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})[,\s]+(\d{1,2}):(\d{2})$/);
+              // Para datetime: DD/MM/AAAA HH:MM
+              const match = newInputValue.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})$/);
               if (match) {
                 const [, day, month, year, hour, minute] = match;
                 const newDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
-                if (!isNaN(newDate.getTime())) {
+                if (!isNaN(newDate.getTime()) &&
+                    parseInt(day) >= 1 && parseInt(day) <= 31 &&
+                    parseInt(month) >= 1 && parseInt(month) <= 12 &&
+                    parseInt(hour) >= 0 && parseInt(hour) <= 23 &&
+                    parseInt(minute) >= 0 && parseInt(minute) <= 59) {
                   onChange?.(newDate);
-                  return;
-                }
-              }
-
-              // Tenta também o formato mais simples sem segundos
-              const match2 = newInputValue.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/);
-              if (match2) {
-                const [, day, month, year, hour, minute] = match2;
-                const newDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
-                if (!isNaN(newDate.getTime())) {
-                  onChange?.(newDate);
-                  return;
                 }
               }
             } else {
               // Para date: DD/MM/AAAA
-              const match = newInputValue.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+              const match = newInputValue.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
               if (match) {
                 const [, day, month, year] = match;
                 const newDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                if (!isNaN(newDate.getTime())) {
+                if (!isNaN(newDate.getTime()) &&
+                    parseInt(day) >= 1 && parseInt(day) <= 31 &&
+                    parseInt(month) >= 1 && parseInt(month) <= 12) {
                   onChange?.(newDate);
                 }
               }
