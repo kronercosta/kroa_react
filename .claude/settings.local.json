@@ -8,7 +8,8 @@
       "Bash(curl:*)",
       "Bash(find:*)",
       "Bash(git add:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nrefactor: Substituir tabelas HTML pelo componente Table padronizado\n\nConversão de tabelas HTML nativas para o componente Table unificado em:\n- cadeiras/page.tsx: 2 tabelas (principal de cadeiras e horários configurados)\n- centro-custo/page.tsx: 1 tabela (centros de custo com edição inline)\n- colaborador/page.tsx: 1 tabela (colaboradores com avatars e ações)\n\nBenefícios:\n- Código mais limpo e manutenível\n- Estilo consistente em todas as tabelas\n- Funcionalidades padronizadas (hover, sticky header)\n- Remoção de arquivo obsoleto _old_page.tsx\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git commit -m \"$(cat <<''EOF''\nrefactor: Substituir tabelas HTML pelo componente Table padronizado\n\nConversão de tabelas HTML nativas para o componente Table unificado em:\n- cadeiras/page.tsx: 2 tabelas (principal de cadeiras e horários configurados)\n- centro-custo/page.tsx: 1 tabela (centros de custo com edição inline)\n- colaborador/page.tsx: 1 tabela (colaboradores com avatars e ações)\n\nBenefícios:\n- Código mais limpo e manutenível\n- Estilo consistente em todas as tabelas\n- Funcionalidades padronizadas (hover, sticky header)\n- Remoção de arquivo obsoleto _old_page.tsx\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
