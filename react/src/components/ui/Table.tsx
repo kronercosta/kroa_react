@@ -15,7 +15,6 @@ interface TableProps {
   hoverable?: boolean;
   striped?: boolean;
   sticky?: boolean;
-  loading?: boolean;
   emptyMessage?: string;
 }
 
@@ -26,7 +25,6 @@ export const Table: React.FC<TableProps> = ({
   hoverable = true,
   striped = false,
   sticky = false,
-  loading = false,
   emptyMessage = 'Nenhum dado encontrado'
 }) => {
   const getAlignmentClass = (align: 'left' | 'center' | 'right' = 'left') => {
@@ -36,17 +34,6 @@ export const Table: React.FC<TableProps> = ({
       default: return 'text-left';
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-w-full bg-white rounded-lg border border-gray-200">
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-krooa-green"></div>
-          <span className="ml-3 text-gray-600">Carregando...</span>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={`overflow-hidden bg-white rounded-lg border border-gray-200 ${className}`}>
@@ -110,33 +97,6 @@ export const Table: React.FC<TableProps> = ({
           </tbody>
         </table>
       </div>
-    </div>
-  );
-};
-
-// Componentes auxiliares para melhor organização
-export const TableActions: React.FC<{ children: React.ReactNode; className?: string }> = ({
-  children,
-  className = ''
-}) => (
-  <div className={`flex items-center justify-end gap-1 ${className}`}>
-    {children}
-  </div>
-);
-
-export const TableCell: React.FC<{
-  children: React.ReactNode;
-  align?: 'left' | 'center' | 'right';
-  className?: string;
-}> = ({
-  children,
-  align = 'left',
-  className = ''
-}) => {
-  const alignClass = align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left';
-  return (
-    <div className={`${alignClass} ${className}`}>
-      {children}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../../../../components/ui/Button';
-import { UnifiedInput } from '../../../../components/ui/UnifiedInput';
+import { Input } from '../../../../components/ui/Input';
 import { Switch } from '../../../../components/ui/Switch';
 import { Card } from '../../../../components/ui/Card';
 import { ConfiguracoesLayout } from '../../../../layouts/ConfiguracoesLayout';
@@ -78,7 +78,7 @@ const CentroCustoClinica: React.FC = () => {
                     <tr key={center.id} className="hover:bg-gray-50">
                       <td className="py-2.5 px-4 text-sm text-gray-900">
                         {editingCostCenter === center.id ? (
-                          <UnifiedInput
+                          <Input
                             value={center.name}
                             onChange={(value) => {
                               const newCenters = costCenters.map((c: any) =>
@@ -95,7 +95,7 @@ const CentroCustoClinica: React.FC = () => {
                       </td>
                       <td className="py-2.5 px-4 text-sm text-gray-900">
                         {editingCostCenter === center.id ? (
-                          <UnifiedInput
+                          <Input
                             value={center.description}
                             onChange={(value) => {
                               const newCenters = costCenters.map((c: any) =>

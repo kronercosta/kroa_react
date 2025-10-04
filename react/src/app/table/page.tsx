@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, TableActions } from '../../components/ui/Table';
+import { Table } from '../../components/ui/Table';
 import { Button, IconButton } from '../../components/ui/Button';
 import { Badge, StatusPill } from '../../components/ui/Badge';
 import { Avatar } from '../../components/ui/Avatar';
@@ -135,7 +135,7 @@ const TableShowcase: React.FC = () => {
                   title: 'Ações',
                   align: 'right',
                   render: (_, row) => (
-                    <TableActions>
+                    <div className="flex items-center justify-end gap-1">
                       <IconButton variant="ghost" size="sm" title="Visualizar">
                         <Eye className="w-4 h-4" />
                       </IconButton>
@@ -145,7 +145,7 @@ const TableShowcase: React.FC = () => {
                       <IconButton variant="ghost" size="sm" title="Excluir" className="text-red-600 hover:text-red-700">
                         <Trash2 className="w-4 h-4" />
                       </IconButton>
-                    </TableActions>
+                    </div>
                   )
                 }
               ]}
@@ -208,7 +208,7 @@ const TableShowcase: React.FC = () => {
                   title: 'Ações',
                   align: 'right',
                   render: (_, row) => (
-                    <TableActions>
+                    <div className="flex items-center justify-end gap-1">
                       <IconButton variant="ghost" size="sm" title="E-mail">
                         <Mail className="w-4 h-4" />
                       </IconButton>
@@ -224,7 +224,7 @@ const TableShowcase: React.FC = () => {
                       >
                         <Trash2 className="w-4 h-4" />
                       </IconButton>
-                    </TableActions>
+                    </div>
                   )
                 }
               ]}
@@ -274,7 +274,7 @@ const TableShowcase: React.FC = () => {
                   title: 'Ações',
                   align: 'right',
                   render: (_, row) => (
-                    <TableActions>
+                    <div className="flex items-center justify-end gap-1">
                       <IconButton variant="ghost" size="sm" title="Visualizar">
                         <Eye className="w-4 h-4" />
                       </IconButton>
@@ -284,7 +284,7 @@ const TableShowcase: React.FC = () => {
                       <IconButton variant="ghost" size="sm" title="Baixar relatório">
                         <Download className="w-4 h-4" />
                       </IconButton>
-                    </TableActions>
+                    </div>
                   )
                 }
               ]}

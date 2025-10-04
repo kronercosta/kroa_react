@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card } from '../../../components/ui/Card';
-import { UnifiedInput } from '../../../components/ui/UnifiedInput';
-import type { MaskType, ValidationType } from '../../../components/ui/UnifiedInput';
+import { Input } from '../../../components/ui/Input';
+import type { MaskType, ValidationType } from '../../../components/ui/Input';
 import { Select } from '../../../components/ui/Select';
 import { Button } from '../../../components/ui/Button';
 import { Calendar, Clock, CreditCard, DollarSign, Hash, Mail, Globe, Phone, MapPin, FileText, Percent, Palette, Camera, Navigation } from 'lucide-react';
@@ -377,7 +377,7 @@ export default function UnifiedShowcase() {
             <h2 className="text-xl font-semibold text-gray-800 mb-6 pb-4 border-b">Preview do Input</h2>
 
             <div className="space-y-6">
-              <UnifiedInput
+              <Input
                 {...inputProps}
                 value={inputValue}
                 onChange={(value, isValid, data) => {
@@ -452,7 +452,7 @@ export default function UnifiedShowcase() {
               <div className="p-4 bg-blue-50 rounded-lg">
                 <h3 className="text-sm font-semibold text-blue-700 mb-2">Código:</h3>
                 <pre className="text-xs font-mono text-blue-900 overflow-x-auto">
-{`<UnifiedInput
+{`<Input
   label="${inputProps.label}"
   mask="${inputProps.mask}"
   validation="${inputProps.validation}"

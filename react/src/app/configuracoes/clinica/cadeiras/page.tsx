@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GripVertical, TrendingUp, TrendingDown, Minus, Trash2, Clock, X, Plus } from 'lucide-react';
 import { Button, IconButton } from '../../../../components/ui/Button';
-import { UnifiedInput } from '../../../../components/ui/UnifiedInput';
+import { Input } from '../../../../components/ui/Input';
 import { Card } from '../../../../components/ui/Card';
 import { Switch } from '../../../../components/ui/Switch';
 import { MultiSelect } from '../../../../components/ui/MultiSelect';
@@ -493,7 +493,7 @@ const CadeirasClinica: React.FC = () => {
 
           {/* Nome da Cadeira */}
           <div>
-            <UnifiedInput
+            <Input
               label="Nome da Cadeira"
               value={editingChair.name || ''}
               onChange={(value) => setEditingChair({ ...editingChair, name: value })}
@@ -735,7 +735,7 @@ const CadeirasClinica: React.FC = () => {
           {/* Time Range */}
           <div className="grid grid-cols-2 gap-4">
             <div className="relative">
-              <UnifiedInput
+              <Input
                 mask="timepicker"
                 label="Início"
                 value={editingChair.startTime || ''}
@@ -750,7 +750,7 @@ const CadeirasClinica: React.FC = () => {
 
             </div>
 
-            <UnifiedInput
+            <Input
               mask="timepicker"
               label="Fim"
               value={editingChair.endTime || ''}
@@ -765,7 +765,7 @@ const CadeirasClinica: React.FC = () => {
           </div>
 
           {/* Duração dos Atendimentos */}
-          <UnifiedInput
+          <Input
             label="Duração dos Atendimentos"
             value={editingChair.duration || ''}
             onChange={(value) => setEditingChair({ ...editingChair, duration: value })}

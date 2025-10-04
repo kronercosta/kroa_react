@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card } from '../../../../components/ui/Card';
-import { UnifiedInput } from '../../../../components/ui/UnifiedInput';
+import { Input } from '../../../../components/ui/Input';
 import { Select } from '../../../../components/ui/Select';
 import { Button } from '../../../../components/ui/Button';
 import { ColaboradorLayout } from '../../../../layouts/ColaboradorLayout';
@@ -33,7 +33,7 @@ export default function DadosPessoaisColaborador() {
           <h2 className="text-lg font-bold text-gray-900 mb-4">Informações Pessoais</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <UnifiedInput
+            <Input
               label="Nome Completo"
               value={formData.nome}
               onChange={(value) => handleInputChange('nome', value)}
@@ -42,7 +42,7 @@ export default function DadosPessoaisColaborador() {
               fullWidth
             />
 
-            <UnifiedInput
+            <Input
               label="CPF"
               value={formData.cpf}
               onChange={(value) => handleInputChange('cpf', value)}
@@ -50,7 +50,7 @@ export default function DadosPessoaisColaborador() {
               fullWidth
             />
 
-            <UnifiedInput
+            <Input
               label="Data de Nascimento"
               value={formData.dataNascimento}
               onChange={(value) => handleInputChange('dataNascimento', value)}
@@ -58,7 +58,7 @@ export default function DadosPessoaisColaborador() {
               fullWidth
             />
 
-            <UnifiedInput
+            <Input
               label="E-mail"
               value={formData.email}
               onChange={(value) => handleInputChange('email', value)}
@@ -66,7 +66,7 @@ export default function DadosPessoaisColaborador() {
               fullWidth
             />
 
-            <UnifiedInput
+            <Input
               label="Telefone"
               value={formData.telefone}
               onChange={(value) => handleInputChange('telefone', value)}
@@ -74,7 +74,7 @@ export default function DadosPessoaisColaborador() {
               fullWidth
             />
 
-            <UnifiedInput
+            <Input
               label="WhatsApp"
               value={formData.whatsapp}
               onChange={(value) => handleInputChange('whatsapp', value)}
@@ -86,7 +86,7 @@ export default function DadosPessoaisColaborador() {
           <div className="mt-6 pt-6 border-t border-gray-200">
             <h3 className="text-base font-medium text-gray-900 mb-4">Dados Profissionais</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <UnifiedInput
+            <Input
               label="Cargo/Função"
               value={formData.cargo}
               onChange={(value) => handleInputChange('cargo', value)}
@@ -94,7 +94,7 @@ export default function DadosPessoaisColaborador() {
               placeholder="Digite ou selecione um cargo"
             />
 
-            <UnifiedInput
+            <Input
               label="Especialidade"
               value={formData.especialidade}
               onChange={(value) => handleInputChange('especialidade', value)}
@@ -158,7 +158,7 @@ export default function DadosPessoaisColaborador() {
                   ]}
                 />
 
-                <UnifiedInput
+                <Input
                   label={`Número ${formData.conselho}-${formData.estadoConselho || 'UF'}`}
                   value={formData.numeroConselho}
                   onChange={(value) => handleInputChange('numeroConselho', value)}

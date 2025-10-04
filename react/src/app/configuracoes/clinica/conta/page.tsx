@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Button, IconButton } from '../../../../components/ui/Button';
 import { Check, Edit, Trash2 } from 'lucide-react';
-import { UnifiedInput } from '../../../../components/ui/UnifiedInput';
-import { Table, TableActions } from '../../../../components/ui/Table';
+import { Input } from '../../../../components/ui/Input';
+import { Table } from '../../../../components/ui/Table';
 import { Select } from '../../../../components/ui/Select';
 import { Switch } from '../../../../components/ui/Switch';
 import { Card } from '../../../../components/ui/Card';
@@ -94,7 +94,7 @@ const ContaClinica: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <UnifiedInput
+            <Input
               label="Nome Empresa"
               value={formData.companyName}
               onChange={(value) => setFormData({ ...formData, companyName: value })}
@@ -103,7 +103,7 @@ const ContaClinica: React.FC = () => {
               required
             />
 
-            <UnifiedInput
+            <Input
               label="E-mail"
               value={formData.email}
               onChange={(value) => setFormData({ ...formData, email: value })}
@@ -112,7 +112,7 @@ const ContaClinica: React.FC = () => {
               required
             />
 
-            <UnifiedInput
+            <Input
               label="Nome do Responsável"
               value={formData.responsibleName}
               onChange={(value) => setFormData({ ...formData, responsibleName: value })}
@@ -122,7 +122,7 @@ const ContaClinica: React.FC = () => {
             />
 
             {currentRegion === 'BR' ? (
-              <UnifiedInput
+              <Input
                 label="CPF do Responsável"
                 value={formData.responsibleDocument}
                 onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
@@ -132,7 +132,7 @@ const ContaClinica: React.FC = () => {
                 required
               />
             ) : (
-              <UnifiedInput
+              <Input
                 label="SSN"
                 value={formData.responsibleDocument}
                 onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
@@ -141,7 +141,7 @@ const ContaClinica: React.FC = () => {
               />
             )}
 
-            <UnifiedInput
+            <Input
               label="Telefone"
               value={formData.phone}
               onChange={(value) => setFormData({ ...formData, phone: value })}
@@ -183,7 +183,7 @@ const ContaClinica: React.FC = () => {
 
             {pessoaJuridica && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <UnifiedInput
+                <Input
                   label="Razão Social"
                   value={formData.legalName}
                   onChange={(value) => setFormData({ ...formData, legalName: value })}
@@ -191,7 +191,7 @@ const ContaClinica: React.FC = () => {
                   fullWidth
                 />
 
-                <UnifiedInput
+                <Input
                   label="CNPJ"
                   value={formData.taxId}
                   onChange={(value) => setFormData({ ...formData, taxId: value })}
@@ -269,7 +269,7 @@ const ContaClinica: React.FC = () => {
                     <tr key={unidade.id} className="hover:bg-gray-50">
                       <td className="py-2.5 px-4 text-sm text-gray-900">
                         {editingUnit === unidade.id ? (
-                          <UnifiedInput
+                          <Input
                             value={unidade.titulo}
                             onChange={(value) => {
                               const newUnidades = unidades.map((u: any) =>

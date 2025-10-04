@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { UnifiedInput } from '../components/ui/UnifiedInput';
+import { Input } from '../components/ui/Input';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -91,7 +91,7 @@ const Login: React.FC = () => {
 
           {/* Formulário */}
           <form onSubmit={handleLogin} className="space-y-4">
-            <UnifiedInput
+            <Input
               validation="email"
               label="E-mail"
               value={email}
@@ -101,7 +101,7 @@ const Login: React.FC = () => {
               floating
             />
 
-            <UnifiedInput
+            <Input
               mask="password"
               label="Senha"
               value={password}

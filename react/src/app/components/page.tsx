@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { Button, IconButton } from '../../components/ui/Button';
-import { Input, EmailInput, PhoneInput, CPFInput, CNPJInput } from '../../components/ui/Input';
+import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { TextArea } from '../../components/ui/TextArea';
 import { Checkbox } from '../../components/ui/Checkbox';
 import { Radio } from '../../components/ui/Radio';
-import { DateInput } from '../../components/ui/DateInput';
-import { TimeInput } from '../../components/ui/TimeInput';
 import { Modal } from '../../components/ui/Modal';
 import { Card } from '../../components/ui/Card';
 import { Switch } from '../../components/ui/Switch';
@@ -14,7 +12,7 @@ import { Badge, StatusPill, Tag } from '../../components/ui/Badge';
 import { Avatar, AvatarGroup } from '../../components/ui/Avatar';
 import { DropdownMenu, ActionMenu } from '../../components/ui/DropdownMenu';
 import { FilterDropdown, MultiFilterDropdown } from '../../components/ui/FilterDropdown';
-import { Table, TableActions } from '../../components/ui/Table';
+import { Table } from '../../components/ui/Table';
 import { Camera, Edit, Trash, Download, Eye } from 'lucide-react';
 
 const Components: React.FC = () => {
@@ -72,40 +70,51 @@ const Components: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-500 mb-2">CPF - Máscara: 000.000.000-00</p>
-                  <CPFInput
+                  <Input
                     label="CPF"
                     value={cpfValue}
                     onChange={(value) => setCpfValue(value)}
+                    mask="cpf"
+                    validation="cpf"
+                    fullWidth
                   />
                   <p className="text-xs text-gray-400 mt-1">Validação automática de CPF</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500 mb-2">CPF Responsável - Mesma máscara e validação</p>
-                  <CPFInput
+                  <Input
                     label="CPF do Responsável"
                     value={cpfResponsavelValue}
                     onChange={(value) => setCpfResponsavelValue(value)}
+                    mask="cpf"
+                    validation="cpf"
+                    fullWidth
                   />
-                  <p className="text-xs text-gray-400 mt-1">Mesmo componente CPFInput, apenas label diferente</p>
+                  <p className="text-xs text-gray-400 mt-1">Mesmo componente Input, apenas label diferente</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500 mb-2">CNPJ - Máscara: 00.000.000/0000-00</p>
-                  <CNPJInput
+                  <Input
                     label="CNPJ"
                     value={cnpjValue}
                     onChange={(value) => setCnpjValue(value)}
+                    mask="cnpj"
+                    validation="cnpj"
+                    fullWidth
                   />
                   <p className="text-xs text-gray-400 mt-1">Validação automática de CNPJ</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500 mb-2">Telefone - Máscara: (00) 00000-0000</p>
-                  <PhoneInput
+                  <Input
                     label="Telefone/WhatsApp"
                     value={phoneValue}
                     onChange={(value) => setPhoneValue(value)}
+                    mask="internationalPhone"
+                    fullWidth
                   />
                   <p className="text-xs text-gray-400 mt-1">Suporta telefone fixo e celular</p>
                 </div>
@@ -114,31 +123,35 @@ const Components: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-500 mb-2">Email - Validação de formato</p>
-                  <EmailInput
+                  <Input
                     label="E-mail"
                     value={emailValue}
                     onChange={(value) => setEmailValue(value)}
+                    validation="email"
+                    fullWidth
                   />
                   <p className="text-xs text-gray-400 mt-1">Valida formato de e-mail</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500 mb-2">Data - DD/MM/AAAA (digitável + calendário)</p>
-                  <DateInput
+                  <Input
                     label="Data de Nascimento"
                     value={dateValue}
-                    onChange={(e) => setDateValue(e.target.value)}
+                    onChange={(value) => setDateValue(value)}
+                    mask="datepicker"
+                    fullWidth
                   />
                   <p className="text-xs text-gray-400 mt-1">Digite ou clique no ícone para abrir calendário</p>
                 </div>
 
                 <div>
                   <p className="text-sm text-gray-500 mb-2">Horário - HH:MM com dropdown</p>
-                  <TimeInput
+                  <Input
                     label="Horário"
                     value={timeValue}
-                    onChange={setTimeValue}
-                    floating
+                    onChange={(value) => setTimeValue(value)}
+                    mask="timepicker"
                     fullWidth
                   />
                   <p className="text-xs text-gray-400 mt-1">Dropdown com intervalos de 30min</p>
@@ -153,23 +166,22 @@ const Components: React.FC = () => {
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-gray-500 mb-2">Input Tradicional (rounded-xl)</p>
+                  <p className="text-sm text-gray-500 mb-2">Input Tradicional</p>
                   <Input
                     label="Input Padrão"
                     value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
+                    onChange={(value) => setInputValue(value)}
                     placeholder="Digite algo..."
-                    floating={false}
+                    fullWidth
                   />
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-500 mb-2">Input com Floating Label (rounded-lg)</p>
+                  <p className="text-sm text-gray-500 mb-2">Input Nome Completo</p>
                   <Input
                     label="Nome Completo"
                     value={inputValue2}
-                    onChange={(e) => setInputValue2(e.target.value)}
-                    floating
+                    onChange={(value) => setInputValue2(value)}
                     fullWidth
                   />
                 </div>
@@ -179,9 +191,8 @@ const Components: React.FC = () => {
                   <Input
                     label="Campo Obrigatório"
                     value={inputValue3}
-                    onChange={(e) => setInputValue3(e.target.value)}
+                    onChange={(value) => setInputValue3(value)}
                     error="Este campo é obrigatório"
-                    floating
                     fullWidth
                   />
                 </div>
@@ -193,7 +204,6 @@ const Components: React.FC = () => {
                     value="Texto desabilitado"
                     disabled
                     onChange={() => {}}
-                    floating
                     fullWidth
                   />
                 </div>
@@ -201,11 +211,10 @@ const Components: React.FC = () => {
                 <div>
                   <p className="text-sm text-gray-500 mb-2">Input de Senha</p>
                   <Input
-                    type="password"
                     label="Senha"
                     value={passwordValue}
-                    onChange={(e) => setPasswordValue(e.target.value)}
-                    floating
+                    onChange={(value) => setPasswordValue(value)}
+                    mask="password"
                     fullWidth
                   />
                 </div>
@@ -240,18 +249,15 @@ const Components: React.FC = () => {
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-500 mb-2">Input com Prefixo/Sufixo</p>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 z-10">R$</span>
-                    <Input
-                      value={inputValue4}
-                      onChange={(e) => setInputValue4(e.target.value)}
-                      className="pl-10 pr-10"
-                      placeholder="0,00"
-                      floating={false}
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">%</span>
-                  </div>
+                  <p className="text-sm text-gray-500 mb-2">Input de Moeda</p>
+                  <Input
+                    label="Valor"
+                    value={inputValue4}
+                    onChange={(value) => setInputValue4(value)}
+                    mask="currency"
+                    placeholder="0,00"
+                    fullWidth
+                  />
                 </div>
               </div>
             </div>
@@ -627,7 +633,7 @@ const Components: React.FC = () => {
                   title: 'Ações',
                   align: 'right',
                   render: (_, row) => (
-                    <TableActions>
+                    <div className="flex items-center justify-end gap-1">
                       <IconButton variant="ghost" size="sm" title="Visualizar">
                         <Eye className="w-4 h-4" />
                       </IconButton>
@@ -637,7 +643,7 @@ const Components: React.FC = () => {
                       <IconButton variant="ghost" size="sm" title="Excluir" className="text-red-600 hover:text-red-700">
                         <Trash className="w-4 h-4" />
                       </IconButton>
-                    </TableActions>
+                    </div>
                   )
                 }
               ]}

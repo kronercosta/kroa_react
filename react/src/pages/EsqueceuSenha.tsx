@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { UnifiedInput } from '../components/ui/UnifiedInput';
+import { Input } from '../components/ui/Input';
 import { ArrowLeft, Mail, Shield } from 'lucide-react';
 
 const EsqueceuSenha: React.FC = () => {
@@ -110,7 +110,7 @@ const EsqueceuSenha: React.FC = () => {
 
               {/* Formulário */}
               <form onSubmit={handleResetPassword} className="space-y-6">
-                <UnifiedInput
+                <Input
                   label="E-mail"
                   value={email}
                   onChange={(value) => setEmail(value)}
