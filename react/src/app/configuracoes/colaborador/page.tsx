@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
+import { Table } from '../../../components/ui/Table';
 import {
   Plus,
   Calendar,
@@ -239,69 +240,46 @@ export default function ConfigColaborador() {
           {/* Tabela de Colaboradores com scroll infinito */}
           <div
             ref={tableRef}
-            className="overflow-auto max-h-[600px] rounded-lg border border-gray-200 mt-6"
+            className="overflow-auto max-h-[600px] mt-6"
           >
-          <table className="min-w-full">
-            <thead className="bg-gray-50 sticky top-0">
-              <tr>
-                <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
-                  Colaborador
-                </th>
-                <th className="text-center py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
-                  Acesso
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
-                  Permissões
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
-                  Unidade
-                </th>
-                <th className="text-center py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
-                  Agenda
-                </th>
-                <th className="text-center py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
-                  Ações
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredColaboradores.slice(0, visibleCount).map((colaborador) => (
-                <tr
-                  key={colaborador.id}
-                  className="hover:bg-gray-50 cursor-pointer"
-                  onClick={() => navigate(`/configuracoes/colaborador/dados-pessoais?id=${colaborador.id}`)}
-                >
-                  {/* Coluna Colaborador - Nome e Foto/Inicial */}
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-3">
-                      {colaborador.foto ? (
+            <Table
+              columns={[
+                {
+                  key: 'colaborador',
+                  title: 'Colaborador',
+                  render: (_, row) => (
+                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/configuracoes/colaborador/dados-pessoais?id=${row.id}`)}>
+                      {row.foto ? (
                         <img
-                          src={colaborador.foto}
-                          alt={colaborador.nome}
+                          src={row.foto}
+                          alt={row.nome}
                           className="w-10 h-10 rounded-full object-cover"
                         />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-krooa-green/20 flex items-center justify-center">
                           <span className="text-krooa-dark font-semibold text-sm">
-                            {colaborador.nome.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase()}
+                            {row.nome.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase()}
                           </span>
                         </div>
                       )}
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{colaborador.nome}</p>
-                        <p className="text-xs text-gray-500">{colaborador.especialidade}</p>
-                        {colaborador.status === 'inativo' && (
+                        <p className="text-sm font-medium text-gray-900">{row.nome}</p>
+                        <p className="text-xs text-gray-500">{row.especialidade}</p>
+                        {row.status === 'inativo' && (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-1">
                             Inativo
                           </span>
                         )}
                       </div>
                     </div>
-                  </td>
-
-                  {/* Coluna Acesso ao Sistema */}
-                  <td className="py-3 px-4 text-center">
-                    {colaborador.acessoSistema ? (
+                  )
+                },
+                {
+                  key: 'acesso',
+                  title: 'Acesso',
+                  align: 'center',
+                  render: (_, row) => (
+                    row.acessoSistema ? (
                       <div className="flex justify-center">
                         <Check className="w-5 h-5 text-green-500" />
                       </div>
@@ -309,14 +287,16 @@ export default function ConfigColaborador() {
                       <div className="flex justify-center">
                         <XCircle className="w-5 h-5 text-gray-400" />
                       </div>
-                    )}
-                  </td>
-
-                  {/* Coluna Permissões */}
-                  <td className="py-3 px-4">
+                    )
+                  )
+                },
+                {
+                  key: 'permissoes',
+                  title: 'Permissões',
+                  render: (_, row) => (
                     <div className="flex flex-wrap gap-1 max-w-xs">
-                      {colaborador.permissoes.length > 0 ? (
-                        colaborador.permissoes.map((permissao: string) => (
+                      {row.permissoes.length > 0 ? (
+                        row.permissoes.map((permissao: string) => (
                           <span
                             key={permissao}
                             className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800 capitalize"
@@ -328,16 +308,18 @@ export default function ConfigColaborador() {
                         <span className="text-sm text-gray-400">Sem permissões</span>
                       )}
                     </div>
-                  </td>
-
-                  {/* Coluna Unidade */}
-                  <td className="py-3 px-4">
-                    <span className="text-sm text-gray-900">{colaborador.unidadePadrao}</span>
-                  </td>
-
-                  {/* Coluna Agendamento */}
-                  <td className="py-3 px-4 text-center">
-                    {colaborador.agendamentoHabilitado ? (
+                  )
+                },
+                {
+                  key: 'unidadePadrao',
+                  title: 'Unidade'
+                },
+                {
+                  key: 'agenda',
+                  title: 'Agenda',
+                  align: 'center',
+                  render: (_, row) => (
+                    row.agendamentoHabilitado ? (
                       <div className="flex justify-center">
                         <div className="p-1.5 bg-blue-100 rounded-lg">
                           <Calendar className="w-5 h-5 text-blue-600" />
@@ -347,11 +329,14 @@ export default function ConfigColaborador() {
                       <div className="flex justify-center">
                         <Calendar className="w-5 h-5 text-gray-300" />
                       </div>
-                    )}
-                  </td>
-
-                  {/* Coluna Ações */}
-                  <td className="py-3 px-4">
+                    )
+                  )
+                },
+                {
+                  key: 'actions',
+                  title: 'Ações',
+                  align: 'center',
+                  render: (_, row) => (
                     <div className="flex items-center justify-center">
                       <button
                         className="group relative p-1.5 rounded-lg transition-all bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -359,14 +344,12 @@ export default function ConfigColaborador() {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <ChevronDown className="w-4 h-4" />
-
-                        {/* Dropdown menu */}
                         <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
                           <button
                             className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-lg"
                             onClick={(e) => {
                               e.stopPropagation();
-                              navigate(`/configuracoes/colaborador/dados-pessoais?id=${colaborador.id}`);
+                              navigate(`/configuracoes/colaborador/dados-pessoais?id=${row.id}`);
                             }}
                           >
                             Editar
@@ -393,11 +376,13 @@ export default function ConfigColaborador() {
                         </div>
                       </button>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  )
+                }
+              ]}
+              data={filteredColaboradores.slice(0, visibleCount)}
+              hoverable
+              sticky
+            />
 
             {visibleCount < filteredColaboradores.length && (
               <div className="p-4 text-center text-sm text-gray-500">

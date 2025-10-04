@@ -5,6 +5,7 @@ import { Input } from '../../../../components/ui/Input';
 import { Card } from '../../../../components/ui/Card';
 import { Switch } from '../../../../components/ui/Switch';
 import { MultiSelect } from '../../../../components/ui/MultiSelect';
+import { Table } from '../../../../components/ui/Table';
 import { ConfiguracoesLayout } from '../../../../layouts/ConfiguracoesLayout';
 import { Aside } from '../../../../components/ui/Aside';
 
@@ -359,108 +360,293 @@ const CadeirasClinica: React.FC = () => {
           </Button>
         </div>
 
-        <div className="overflow-x-auto rounded-lg border border-gray-200">
-          <table className="min-w-full">
-            <thead className="bg-gray-50 sticky top-0 z-10">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider first:rounded-tl-lg bg-gray-50">
-                  Ordem
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50">
-                  Nome
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50">
-                  Seg
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50">
-                  Ter
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50">
-                  Qua
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50">
-                  Qui
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50">
-                  Sex
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50">
-                  Sáb
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50 last:rounded-tr-lg">
-                  Dom
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {chairs.map((chair, index) => {
-                const days = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'];
-                return (
-                  <tr
-                    key={chair.id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, index)}
-                    onDragOver={(e) => handleDragOver(e, index)}
-                    onDragLeave={handleDragLeave}
-                    onDrop={(e) => handleDrop(e, index)}
-                    className={`hover:bg-gray-50 transition-all ${
-                      dragOverIndex === index ? 'bg-green-50 border-l-4 border-krooa-green' : ''
-                    }`}
-                  >
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      <div className="flex items-center gap-2">
-                        <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
-                        <span className="font-medium">{chair.order}</span>
+        <Table
+          columns={[
+            {
+              key: 'order',
+              title: 'Ordem',
+              width: '100px',
+              render: (_, row, index) => (
+                <div
+                  className="flex items-center gap-2"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e as any, index)}
+                  onDragOver={(e) => handleDragOver(e as any, index)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e as any, index)}
+                >
+                  <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
+                  <span className="font-medium">{row.order}</span>
+                </div>
+              )
+            },
+            {
+              key: 'name',
+              title: 'Nome',
+              render: (_, row) => (
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-gray-900">{row.name}</span>
+                  {getStatusIndicator(row.metrics.status)}
+                </div>
+              )
+            },
+            {
+              key: 'seg',
+              title: 'Seg',
+              align: 'center',
+              render: (_, row) => (
+                <div className="space-y-1.5 flex flex-col items-center">
+                  {row.slots['seg']?.map((slot: any) => {
+                    const professionalCount = slot.professionals?.length || 1;
+                    const hasDate = slot.date && !Array.isArray(slot.date);
+                    return (
+                      <div
+                        key={slot.id}
+                        onClick={() => editSlot(row.id)}
+                        className={`relative inline-flex flex-col items-start justify-center min-w-[70px] px-2 py-1.5 rounded-md cursor-pointer transition-all border hover:shadow-sm ${
+                          hasDate
+                            ? 'bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-300'
+                            : 'bg-krooa-green/10 border-krooa-green/30 hover:bg-krooa-green/20 hover:border-krooa-green/50'
+                        }`}
+                      >
+                        {professionalCount > 1 && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-krooa-green rounded-full flex items-center justify-center">
+                            <span className="text-[10px] text-krooa-dark font-bold">{professionalCount}</span>
+                          </div>
+                        )}
+                        <div className="text-xs font-semibold text-krooa-dark">{slot.time}</div>
+                        {hasDate && (
+                          <div className="text-xs font-semibold text-krooa-dark">
+                            {slot.date}/2024
+                          </div>
+                        )}
                       </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-900">{chair.name}</span>
-                        {getStatusIndicator(chair.metrics.status)}
+                    );
+                  })}
+                </div>
+              )
+            },
+            {
+              key: 'ter',
+              title: 'Ter',
+              align: 'center',
+              render: (_, row) => (
+                <div className="space-y-1.5 flex flex-col items-center">
+                  {row.slots['ter']?.map((slot: any) => {
+                    const professionalCount = slot.professionals?.length || 1;
+                    const hasDate = slot.date && !Array.isArray(slot.date);
+                    return (
+                      <div
+                        key={slot.id}
+                        onClick={() => editSlot(row.id)}
+                        className={`relative inline-flex flex-col items-start justify-center min-w-[70px] px-2 py-1.5 rounded-md cursor-pointer transition-all border hover:shadow-sm ${
+                          hasDate
+                            ? 'bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-300'
+                            : 'bg-krooa-green/10 border-krooa-green/30 hover:bg-krooa-green/20 hover:border-krooa-green/50'
+                        }`}
+                      >
+                        {professionalCount > 1 && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-krooa-green rounded-full flex items-center justify-center">
+                            <span className="text-[10px] text-krooa-dark font-bold">{professionalCount}</span>
+                          </div>
+                        )}
+                        <div className="text-xs font-semibold text-krooa-dark">{slot.time}</div>
+                        {hasDate && (
+                          <div className="text-xs font-semibold text-krooa-dark">
+                            {slot.date}/2024
+                          </div>
+                        )}
                       </div>
-                    </td>
-                    {days.map((day) => (
-                      <td key={day} className="px-2 py-3 text-center">
-                        <div className="space-y-1.5 flex flex-col items-center">
-                          {chair.slots[day]?.map((slot) => {
-                            const professionalCount = slot.professionals?.length || 1;
-                            const hasDate = slot.date && !Array.isArray(slot.date);
-
-                            return (
-                              <div
-                                key={slot.id}
-                                onClick={() => editSlot(chair.id)}
-                                className={`relative inline-flex flex-col items-start justify-center min-w-[70px] px-2 py-1.5 rounded-md cursor-pointer transition-all border hover:shadow-sm ${
-                                  hasDate
-                                    ? 'bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-300'
-                                    : 'bg-krooa-green/10 border-krooa-green/30 hover:bg-krooa-green/20 hover:border-krooa-green/50'
-                                }`}
-                              >
-                                {/* Professional count indicator */}
-                                {professionalCount > 1 && (
-                                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-krooa-green rounded-full flex items-center justify-center">
-                                    <span className="text-[10px] text-krooa-dark font-bold">{professionalCount}</span>
-                                  </div>
-                                )}
-
-                                <div className="text-xs font-semibold text-krooa-dark">{slot.time}</div>
-                                {hasDate && (
-                                  <div className="text-xs font-semibold text-krooa-dark">
-                                    {slot.date}/2024
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                    );
+                  })}
+                </div>
+              )
+            },
+            {
+              key: 'qua',
+              title: 'Qua',
+              align: 'center',
+              render: (_, row) => (
+                <div className="space-y-1.5 flex flex-col items-center">
+                  {row.slots['qua']?.map((slot: any) => {
+                    const professionalCount = slot.professionals?.length || 1;
+                    const hasDate = slot.date && !Array.isArray(slot.date);
+                    return (
+                      <div
+                        key={slot.id}
+                        onClick={() => editSlot(row.id)}
+                        className={`relative inline-flex flex-col items-start justify-center min-w-[70px] px-2 py-1.5 rounded-md cursor-pointer transition-all border hover:shadow-sm ${
+                          hasDate
+                            ? 'bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-300'
+                            : 'bg-krooa-green/10 border-krooa-green/30 hover:bg-krooa-green/20 hover:border-krooa-green/50'
+                        }`}
+                      >
+                        {professionalCount > 1 && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-krooa-green rounded-full flex items-center justify-center">
+                            <span className="text-[10px] text-krooa-dark font-bold">{professionalCount}</span>
+                          </div>
+                        )}
+                        <div className="text-xs font-semibold text-krooa-dark">{slot.time}</div>
+                        {hasDate && (
+                          <div className="text-xs font-semibold text-krooa-dark">
+                            {slot.date}/2024
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )
+            },
+            {
+              key: 'qui',
+              title: 'Qui',
+              align: 'center',
+              render: (_, row) => (
+                <div className="space-y-1.5 flex flex-col items-center">
+                  {row.slots['qui']?.map((slot: any) => {
+                    const professionalCount = slot.professionals?.length || 1;
+                    const hasDate = slot.date && !Array.isArray(slot.date);
+                    return (
+                      <div
+                        key={slot.id}
+                        onClick={() => editSlot(row.id)}
+                        className={`relative inline-flex flex-col items-start justify-center min-w-[70px] px-2 py-1.5 rounded-md cursor-pointer transition-all border hover:shadow-sm ${
+                          hasDate
+                            ? 'bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-300'
+                            : 'bg-krooa-green/10 border-krooa-green/30 hover:bg-krooa-green/20 hover:border-krooa-green/50'
+                        }`}
+                      >
+                        {professionalCount > 1 && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-krooa-green rounded-full flex items-center justify-center">
+                            <span className="text-[10px] text-krooa-dark font-bold">{professionalCount}</span>
+                          </div>
+                        )}
+                        <div className="text-xs font-semibold text-krooa-dark">{slot.time}</div>
+                        {hasDate && (
+                          <div className="text-xs font-semibold text-krooa-dark">
+                            {slot.date}/2024
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )
+            },
+            {
+              key: 'sex',
+              title: 'Sex',
+              align: 'center',
+              render: (_, row) => (
+                <div className="space-y-1.5 flex flex-col items-center">
+                  {row.slots['sex']?.map((slot: any) => {
+                    const professionalCount = slot.professionals?.length || 1;
+                    const hasDate = slot.date && !Array.isArray(slot.date);
+                    return (
+                      <div
+                        key={slot.id}
+                        onClick={() => editSlot(row.id)}
+                        className={`relative inline-flex flex-col items-start justify-center min-w-[70px] px-2 py-1.5 rounded-md cursor-pointer transition-all border hover:shadow-sm ${
+                          hasDate
+                            ? 'bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-300'
+                            : 'bg-krooa-green/10 border-krooa-green/30 hover:bg-krooa-green/20 hover:border-krooa-green/50'
+                        }`}
+                      >
+                        {professionalCount > 1 && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-krooa-green rounded-full flex items-center justify-center">
+                            <span className="text-[10px] text-krooa-dark font-bold">{professionalCount}</span>
+                          </div>
+                        )}
+                        <div className="text-xs font-semibold text-krooa-dark">{slot.time}</div>
+                        {hasDate && (
+                          <div className="text-xs font-semibold text-krooa-dark">
+                            {slot.date}/2024
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )
+            },
+            {
+              key: 'sab',
+              title: 'Sáb',
+              align: 'center',
+              render: (_, row) => (
+                <div className="space-y-1.5 flex flex-col items-center">
+                  {row.slots['sab']?.map((slot: any) => {
+                    const professionalCount = slot.professionals?.length || 1;
+                    const hasDate = slot.date && !Array.isArray(slot.date);
+                    return (
+                      <div
+                        key={slot.id}
+                        onClick={() => editSlot(row.id)}
+                        className={`relative inline-flex flex-col items-start justify-center min-w-[70px] px-2 py-1.5 rounded-md cursor-pointer transition-all border hover:shadow-sm ${
+                          hasDate
+                            ? 'bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-300'
+                            : 'bg-krooa-green/10 border-krooa-green/30 hover:bg-krooa-green/20 hover:border-krooa-green/50'
+                        }`}
+                      >
+                        {professionalCount > 1 && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-krooa-green rounded-full flex items-center justify-center">
+                            <span className="text-[10px] text-krooa-dark font-bold">{professionalCount}</span>
+                          </div>
+                        )}
+                        <div className="text-xs font-semibold text-krooa-dark">{slot.time}</div>
+                        {hasDate && (
+                          <div className="text-xs font-semibold text-krooa-dark">
+                            {slot.date}/2024
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )
+            },
+            {
+              key: 'dom',
+              title: 'Dom',
+              align: 'center',
+              render: (_, row) => (
+                <div className="space-y-1.5 flex flex-col items-center">
+                  {row.slots['dom']?.map((slot: any) => {
+                    const professionalCount = slot.professionals?.length || 1;
+                    const hasDate = slot.date && !Array.isArray(slot.date);
+                    return (
+                      <div
+                        key={slot.id}
+                        onClick={() => editSlot(row.id)}
+                        className={`relative inline-flex flex-col items-start justify-center min-w-[70px] px-2 py-1.5 rounded-md cursor-pointer transition-all border hover:shadow-sm ${
+                          hasDate
+                            ? 'bg-blue-50 border-blue-200 hover:bg-blue-100 hover:border-blue-300'
+                            : 'bg-krooa-green/10 border-krooa-green/30 hover:bg-krooa-green/20 hover:border-krooa-green/50'
+                        }`}
+                      >
+                        {professionalCount > 1 && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-krooa-green rounded-full flex items-center justify-center">
+                            <span className="text-[10px] text-krooa-dark font-bold">{professionalCount}</span>
+                          </div>
+                        )}
+                        <div className="text-xs font-semibold text-krooa-dark">{slot.time}</div>
+                        {hasDate && (
+                          <div className="text-xs font-semibold text-krooa-dark">
+                            {slot.date}/2024
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )
+            }
+          ]}
+          data={chairs}
+          hoverable
+          sticky
+        />
       </Card>
 
       {/* Aside Panel for Chair Configuration */}
@@ -863,115 +1049,114 @@ const CadeirasClinica: React.FC = () => {
                 <p className="text-xs text-gray-500">Configure os campos acima e clique em "Adicionar Horário"</p>
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-lg border border-gray-200">
-                <table className="min-w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
-                        Dia/Data
-                      </th>
-                      <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
-                        Horário
-                      </th>
-                      <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
-                        Duração
-                      </th>
-                      <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
-                        Profissionais
-                      </th>
-                      <th className="text-center py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider">
-                        Ações
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {editingChair.slots && Object.entries(editingChair.slots).map(([day, slots]: [string, any]) =>
-                      slots.map((slot: any) => (
-                        <tr key={slot.id} className="hover:bg-gray-50">
-                          <td className="py-2.5 px-4 text-sm text-gray-900">
-                            <span className="font-medium">
-                              {getDayAbbreviation(day)}
-                            </span>
-                            {slot.date && (
-                              <span className="ml-2 text-xs text-gray-500">
-                                ({Array.isArray(slot.date) ? slot.date.join(', ') : slot.date})
-                              </span>
-                            )}
-                          </td>
-                          <td className="py-2.5 px-4 text-sm text-gray-900">
-                            {slot.time}
-                          </td>
-                          <td className="py-2.5 px-4 text-sm text-gray-900">
-                            {slot.duration || '30'} min
-                          </td>
-                          <td className="py-2.5 px-4 text-sm text-gray-900">
-                            <div className="flex flex-wrap gap-1">
-                              {slot.professionals?.map((prof: any) => (
-                                <span key={prof.id} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-krooa-green/10 text-krooa-dark">
-                                  {prof.name}
-                                </span>
-                              ))}
-                            </div>
-                          </td>
-                          <td className="py-2.5 px-4 text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              <IconButton
-                                onClick={() => {
-                                  const [startTime, endTime] = slot.time.split('-');
-                                  setEditingChair({
-                                    ...editingChair,
-                                    startTime: startTime,
-                                    endTime: endTime,
-                                    duration: slot.duration || '30',
-                                    selectedProfessionals: slot.professionals?.map((p: any) => p.id) || [],
-                                    selectedDays: [day],
-                                    specificDates: slot.date ? (Array.isArray(slot.date) ? slot.date : [slot.date]) : []
-                                  });
+              <Table
+                columns={[
+                  {
+                    key: 'day',
+                    title: 'Dia/Data',
+                    render: (_, row) => (
+                      <div>
+                        <span className="font-medium">
+                          {getDayAbbreviation(row.day)}
+                        </span>
+                        {row.date && (
+                          <span className="ml-2 text-xs text-gray-500">
+                            ({Array.isArray(row.date) ? row.date.join(', ') : row.date})
+                          </span>
+                        )}
+                      </div>
+                    )
+                  },
+                  {
+                    key: 'time',
+                    title: 'Horário'
+                  },
+                  {
+                    key: 'duration',
+                    title: 'Duração',
+                    render: (value) => `${value || '30'} min`
+                  },
+                  {
+                    key: 'professionals',
+                    title: 'Profissionais',
+                    render: (value) => (
+                      <div className="flex flex-wrap gap-1">
+                        {value?.map((prof: any) => (
+                          <span key={prof.id} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-krooa-green/10 text-krooa-dark">
+                            {prof.name}
+                          </span>
+                        ))}
+                      </div>
+                    )
+                  },
+                  {
+                    key: 'actions',
+                    title: 'Ações',
+                    align: 'center',
+                    render: (_, row) => (
+                      <div className="flex items-center justify-center gap-2">
+                        <IconButton
+                          onClick={() => {
+                            const [startTime, endTime] = row.time.split('-');
+                            setEditingChair({
+                              ...editingChair,
+                              startTime: startTime,
+                              endTime: endTime,
+                              duration: row.duration || '30',
+                              selectedProfessionals: row.professionals?.map((p: any) => p.id) || [],
+                              selectedDays: [row.day],
+                              specificDates: row.date ? (Array.isArray(row.date) ? row.date : [row.date]) : []
+                            });
 
-                                  if (slot.date) {
-                                    setHasSpecificDates(true);
-                                  }
+                            if (row.date) {
+                              setHasSpecificDates(true);
+                            }
 
-                                  const newSlots = { ...editingChair.slots };
-                                  newSlots[day] = newSlots[day].filter((s: any) => s.id !== slot.id);
-                                  if (newSlots[day].length === 0) {
-                                    delete newSlots[day];
-                                  }
-                                  setEditingChair({ ...editingChair, slots: newSlots });
-                                }}
-                                variant="ghost"
-                                size="sm"
-                                title="Editar"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                </svg>
-                              </IconButton>
-                              <IconButton
-                                onClick={() => {
-                                  const newSlots = { ...editingChair.slots };
-                                  newSlots[day] = newSlots[day].filter((s: any) => s.id !== slot.id);
-                                  if (newSlots[day].length === 0) {
-                                    delete newSlots[day];
-                                  }
-                                  setEditingChair({ ...editingChair, slots: newSlots });
-                                }}
-                                variant="danger"
-                                size="sm"
-                                title="Excluir"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                </svg>
-                              </IconButton>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                            const newSlots = { ...editingChair.slots };
+                            newSlots[row.day] = newSlots[row.day].filter((s: any) => s.id !== row.id);
+                            if (newSlots[row.day].length === 0) {
+                              delete newSlots[row.day];
+                            }
+                            setEditingChair({ ...editingChair, slots: newSlots });
+                          }}
+                          variant="ghost"
+                          size="sm"
+                          title="Editar"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                          </svg>
+                        </IconButton>
+                        <IconButton
+                          onClick={() => {
+                            const newSlots = { ...editingChair.slots };
+                            newSlots[row.day] = newSlots[row.day].filter((s: any) => s.id !== row.id);
+                            if (newSlots[row.day].length === 0) {
+                              delete newSlots[row.day];
+                            }
+                            setEditingChair({ ...editingChair, slots: newSlots });
+                          }}
+                          variant="danger"
+                          size="sm"
+                          title="Excluir"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          </svg>
+                        </IconButton>
+                      </div>
+                    )
+                  }
+                ]}
+                data={
+                  editingChair.slots
+                    ? Object.entries(editingChair.slots).flatMap(([day, slots]: [string, any]) =>
+                        slots.map((slot: any) => ({ ...slot, day }))
+                      )
+                    : []
+                }
+                hoverable
+              />
             )}
           </div>
         </div>
