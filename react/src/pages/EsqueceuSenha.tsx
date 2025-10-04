@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { UnifiedInput } from '../components/ui/UnifiedInput';
@@ -133,13 +133,13 @@ const EsqueceuSenha: React.FC = () => {
 
               {/* Link para voltar ao login */}
               <div className="mt-8 text-center">
-                <button
+                <Button
                   onClick={() => navigate('/login')}
-                  className="inline-flex items-center gap-2 text-sm text-krooa-blue hover:text-krooa-dark font-medium transition-colors"
+                  variant="ghost"
+                  icon={<ArrowLeft className="w-4 h-4" />}
                 >
-                  <ArrowLeft className="w-4 h-4" />
                   Voltar para o login
-                </button>
+                </Button>
               </div>
             </>
           ) : !verificationStep ? (
@@ -169,15 +169,17 @@ const EsqueceuSenha: React.FC = () => {
 
                 <p className="text-sm text-gray-500 mt-6">
                   Não recebeu o e-mail? Verifique sua pasta de spam ou
-                  <button
+                  <Button
                     onClick={() => {
                       setEmailSent(false);
                       setEmail('');
                     }}
-                    className="text-krooa-blue hover:text-krooa-dark font-medium ml-1"
+                    variant="ghost"
+                    size="sm"
+                    className="text-krooa-blue ml-1"
                   >
                     tente novamente
-                  </button>
+                  </Button>
                 </p>
               </div>
             </>
@@ -246,28 +248,31 @@ const EsqueceuSenha: React.FC = () => {
                     {loading ? 'Verificando...' : 'Verificar código'}
                   </Button>
 
-                  <button
+                  <Button
                     onClick={handleResendCode}
-                    className="w-full text-sm text-krooa-blue hover:text-krooa-dark font-medium transition-colors"
+                    variant="ghost"
+                    fullWidth
                     disabled={loading}
+                    className="text-krooa-blue"
                   >
                     Reenviar código
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Link para voltar */}
                 <div className="mt-8 text-center">
-                  <button
+                  <Button
                     onClick={() => {
                       setVerificationStep(false);
                       setVerificationCode(['', '', '', '', '', '']);
                       setVerificationError('');
                     }}
-                    className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-krooa-dark font-medium transition-colors"
+                    variant="ghost"
+                    icon={<ArrowLeft className="w-4 h-4" />}
+                    className="text-gray-600"
                   >
-                    <ArrowLeft className="w-4 h-4" />
                     Voltar
-                  </button>
+                  </Button>
                 </div>
               </div>
             </>

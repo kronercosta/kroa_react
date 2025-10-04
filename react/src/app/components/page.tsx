@@ -10,11 +10,11 @@ import { TimeInput } from '../../components/ui/TimeInput';
 import { Modal } from '../../components/ui/Modal';
 import { Card } from '../../components/ui/Card';
 import { Switch } from '../../components/ui/Switch';
-import { MultiSelect } from '../../components/ui/MultiSelect';
 import { Badge, StatusPill, Tag } from '../../components/ui/Badge';
 import { Avatar, AvatarGroup } from '../../components/ui/Avatar';
 import { DropdownMenu, ActionMenu } from '../../components/ui/DropdownMenu';
 import { FilterDropdown, MultiFilterDropdown } from '../../components/ui/FilterDropdown';
+import { Table, TableActions } from '../../components/ui/Table';
 import { Camera, Edit, Trash, Download, Eye } from 'lucide-react';
 
 const Components: React.FC = () => {
@@ -36,7 +36,6 @@ const Components: React.FC = () => {
 
   // Estados para seletores
   const [selectValue, setSelectValue] = useState('');
-  const [multiSelectValue, setMultiSelectValue] = useState<string[]>([]);
 
   // Estados para checkboxes e radios
   const [checkboxValue, setCheckboxValue] = useState(false);
@@ -228,20 +227,6 @@ const Components: React.FC = () => {
                   />
                 </div>
 
-                <div>
-                  <p className="text-sm text-gray-500 mb-2">MultiSelect - Seleção Múltipla</p>
-                  <MultiSelect
-                    label="Unidades Permitidas"
-                    placeholder="Selecione as unidades"
-                    options={[
-                      { value: '1', label: 'Unidade Principal' },
-                      { value: '2', label: 'Unidade Centro' },
-                      { value: '3', label: 'Unidade Sul' }
-                    ]}
-                    value={multiSelectValue}
-                    onChange={setMultiSelectValue}
-                  />
-                </div>
 
                 <div>
                   <p className="text-sm text-gray-500 mb-2">TextArea</p>
@@ -623,6 +608,90 @@ const Components: React.FC = () => {
               <p className="text-white/90">Card com gradiente de fundo usando cores da marca.</p>
             </Card>
           </div>
+        </section>
+
+        {/* Table */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-krooa-dark mb-6">Table</h2>
+          <Card>
+            <h3 className="text-lg font-semibold text-krooa-dark mb-4">Tabela Básica</h3>
+            <Table
+              columns={[
+                { key: 'id', title: 'ID', width: '80px' },
+                { key: 'name', title: 'Nome' },
+                { key: 'email', title: 'E-mail' },
+                { key: 'role', title: 'Cargo', align: 'center' },
+                { key: 'status', title: 'Status', align: 'center' },
+                {
+                  key: 'actions',
+                  title: 'Ações',
+                  align: 'right',
+                  render: (_, row) => (
+                    <TableActions>
+                      <IconButton variant="ghost" size="sm" title="Visualizar">
+                        <Eye className="w-4 h-4" />
+                      </IconButton>
+                      <IconButton variant="ghost" size="sm" title="Editar">
+                        <Edit className="w-4 h-4" />
+                      </IconButton>
+                      <IconButton variant="ghost" size="sm" title="Excluir" className="text-red-600 hover:text-red-700">
+                        <Trash className="w-4 h-4" />
+                      </IconButton>
+                    </TableActions>
+                  )
+                }
+              ]}
+              data={[
+                {
+                  id: 1,
+                  name: 'João Silva',
+                  email: 'joao@krooa.com',
+                  role: 'Desenvolvedor',
+                  status: 'Ativo'
+                },
+                {
+                  id: 2,
+                  name: 'Maria Santos',
+                  email: 'maria@krooa.com',
+                  role: 'Designer',
+                  status: 'Ativo'
+                },
+                {
+                  id: 3,
+                  name: 'Carlos Oliveira',
+                  email: 'carlos@krooa.com',
+                  role: 'Gerente',
+                  status: 'Inativo'
+                }
+              ]}
+              hoverable
+              sticky
+            />
+
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold text-krooa-dark mb-4">Tabela com Loading</h3>
+              <Table
+                columns={[
+                  { key: 'name', title: 'Nome' },
+                  { key: 'email', title: 'E-mail' }
+                ]}
+                data={[]}
+                loading={true}
+              />
+            </div>
+
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold text-krooa-dark mb-4">Tabela Vazia</h3>
+              <Table
+                columns={[
+                  { key: 'name', title: 'Nome' },
+                  { key: 'email', title: 'E-mail' }
+                ]}
+                data={[]}
+                emptyMessage="Nenhum usuário encontrado"
+              />
+            </div>
+          </Card>
         </section>
 
         {/* Modal */}

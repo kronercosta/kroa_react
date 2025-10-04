@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Card } from '../../../../components/ui/Card';
-import { Input, EmailInput, PhoneInput, CPFInput } from '../../../../components/ui/Input';
-import { DateInput } from '../../../../components/ui/DateInput';
-import { AutocompleteInput } from '../../../../components/ui/AutocompleteInput';
+import { UnifiedInput } from '../../../../components/ui/UnifiedInput';
 import { Select } from '../../../../components/ui/Select';
 import { Button } from '../../../../components/ui/Button';
 import { ColaboradorLayout } from '../../../../layouts/ColaboradorLayout';
@@ -35,61 +33,74 @@ export default function DadosPessoaisColaborador() {
           <h2 className="text-lg font-bold text-gray-900 mb-4">Informações Pessoais</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Input
+            <UnifiedInput
               label="Nome Completo"
               value={formData.nome}
-              onChange={(e) => handleInputChange('nome', e.target.value)}
+              onChange={(value) => handleInputChange('nome', value)}
               placeholder=" "
               floating
+              fullWidth
             />
 
-            <CPFInput
+            <UnifiedInput
               label="CPF"
               value={formData.cpf}
               onChange={(value) => handleInputChange('cpf', value)}
+              mask="cpf"
+              fullWidth
             />
 
-            <DateInput
+            <UnifiedInput
               label="Data de Nascimento"
               value={formData.dataNascimento}
-              onChange={(e) => handleInputChange('dataNascimento', e.target.value)}
+              onChange={(value) => handleInputChange('dataNascimento', value)}
+              mask="date"
+              fullWidth
             />
 
-            <EmailInput
+            <UnifiedInput
               label="E-mail"
               value={formData.email}
               onChange={(value) => handleInputChange('email', value)}
+              validation="email"
+              fullWidth
             />
 
-            <PhoneInput
+            <UnifiedInput
               label="Telefone"
               value={formData.telefone}
               onChange={(value) => handleInputChange('telefone', value)}
+              mask="internationalPhone"
+              fullWidth
             />
 
-            <PhoneInput
+            <UnifiedInput
               label="WhatsApp"
               value={formData.whatsapp}
               onChange={(value) => handleInputChange('whatsapp', value)}
+              mask="internationalPhone"
+              fullWidth
             />
           </div>
 
           <div className="mt-6 pt-6 border-t border-gray-200">
             <h3 className="text-base font-medium text-gray-900 mb-4">Dados Profissionais</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <AutocompleteInput
+            <UnifiedInput
               label="Cargo/Função"
               value={formData.cargo}
               onChange={(value) => handleInputChange('cargo', value)}
+              fullWidth
               placeholder="Digite ou selecione um cargo"
             />
 
-            <Input
+            <UnifiedInput
               label="Especialidade"
               value={formData.especialidade}
-              onChange={(e) => handleInputChange('especialidade', e.target.value)}
+              onChange={(value) => handleInputChange('especialidade', value)}
               placeholder=" "
               floating
+              fullWidth
             />
 
             <Select
@@ -147,12 +158,13 @@ export default function DadosPessoaisColaborador() {
                   ]}
                 />
 
-                <Input
+                <UnifiedInput
                   label={`Número ${formData.conselho}-${formData.estadoConselho || 'UF'}`}
                   value={formData.numeroConselho}
-                  onChange={(e) => handleInputChange('numeroConselho', e.target.value)}
+                  onChange={(value) => handleInputChange('numeroConselho', value)}
                   placeholder=" "
                   floating
+                  fullWidth
                 />
               </>
             )}

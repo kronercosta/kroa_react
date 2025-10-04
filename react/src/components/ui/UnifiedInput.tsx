@@ -758,10 +758,10 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
           return 'E-mail inválido';
         case 'creditCard':
           return 'Número do cartão inválido';
-        case 'url':
-          return 'URL inválida';
-        case 'number':
-          return 'Deve ser um número válido';
+        // case 'url':
+        //   return 'URL inválida';
+        // case 'number':
+        //   return 'Deve ser um número válido';
         default:
           return `${label || 'Campo'} inválido`;
       }

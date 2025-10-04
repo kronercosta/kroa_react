@@ -730,9 +730,9 @@ export function Select({
                       disabled={!newItemText.trim()}
                       variant="primary"
                       size="sm"
-                      title="Adicionar"
                       icon={<Plus className="w-4 h-4" />}
                     >
+                      Adicionar
                     </Button>
                     <IconButton
                       onClick={() => {

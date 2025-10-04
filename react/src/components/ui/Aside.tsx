@@ -1,6 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
-import { Button } from './Button';
+import { Button, IconButton } from './Button';
 
 interface AsideProps {
   isOpen: boolean;
@@ -29,12 +29,14 @@ export const Aside: React.FC<AsideProps> = ({
       <div className="fixed right-0 top-0 h-full w-full sm:w-[500px] lg:w-[600px] xl:w-[700px] 2xl:w-[880px] max-w-full sm:max-w-[880px] bg-white/95 backdrop-blur-md shadow-2xl z-50 transform transition-all duration-300 ease-in-out sm:border-l border-gray-100">
         <div className="flex items-center justify-between px-6 h-16 border-b border-gray-100">
           {/* Botão X à esquerda */}
-          <button
+          <IconButton
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 p-2 hover:bg-white/50 rounded-lg transition-all"
+            variant="ghost"
+            size="sm"
+            className="text-gray-500 hover:text-gray-700"
           >
             <X className="w-5 h-5" />
-          </button>
+          </IconButton>
 
           {/* Título centralizado */}
           <h2 className="text-xl font-semibold text-gray-900 absolute left-1/2 transform -translate-x-1/2">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GripVertical, TrendingUp, TrendingDown, Minus, Trash2, Clock, X, Plus } from 'lucide-react';
-import { Button } from '../../../../components/ui/Button';
+import { Button, IconButton } from '../../../../components/ui/Button';
+import { UnifiedInput } from '../../../../components/ui/UnifiedInput';
 import { Card } from '../../../../components/ui/Card';
 import { Switch } from '../../../../components/ui/Switch';
 import { MultiSelect } from '../../../../components/ui/MultiSelect';
@@ -100,9 +101,6 @@ const CadeirasClinica: React.FC = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
   const [calendarDate, setCalendarDate] = useState(new Date());
-  const [showStartTimeDropdown, setShowStartTimeDropdown] = useState(false);
-  const [showEndTimeDropdown, setShowEndTimeDropdown] = useState(false);
-  const [showDurationDropdown, setShowDurationDropdown] = useState(false);
 
   // Mock professionals list
   const professionals = [
@@ -476,39 +474,33 @@ const CadeirasClinica: React.FC = () => {
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-semibold text-gray-900">Configurar Horários</h3>
             {editingChair?.id && (
-              <button
+              <IconButton
                 onClick={() => {
                   if (confirm('Tem certeza que deseja excluir esta cadeira?')) {
                     setChairs(chairs.filter(c => c.id !== editingChair.id));
                     closeAside();
                   }
                 }}
-                className="p-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+                variant="ghost"
+                size="md"
+                className="text-red-600 hover:bg-red-100"
                 title="Excluir cadeira"
               >
                 <Trash2 className="w-5 h-5" />
-              </button>
+              </IconButton>
             )}
           </div>
 
           {/* Nome da Cadeira */}
           <div>
-            <div className="relative">
-              <input
-                type="text"
-                value={editingChair.name || ''}
-                onChange={(e) => setEditingChair({ ...editingChair, name: e.target.value })}
-                className="peer w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20 placeholder-transparent"
-                placeholder="Nome da Cadeira"
-                id="chairName"
-              />
-              <label
-                htmlFor="chairName"
-                className="absolute left-3 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-gray-600"
-              >
-                Nome da Cadeira
-              </label>
-            </div>
+            <UnifiedInput
+              label="Nome da Cadeira"
+              value={editingChair.name || ''}
+              onChange={(value) => setEditingChair({ ...editingChair, name: value })}
+              placeholder="Nome da Cadeira"
+              floating
+              fullWidth
+            />
           </div>
 
           {/* Toggle de Datas Específicas */}
@@ -610,19 +602,20 @@ const CadeirasClinica: React.FC = () => {
                       onMouseDown={(e) => e.stopPropagation()}
                       onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-between mb-3 gap-2">
-                        <button
-                          type="button"
+                        <IconButton
                           onClick={() => {
                             const newDate = new Date(calendarDate);
                             newDate.setMonth(newDate.getMonth() - 1);
                             setCalendarDate(newDate);
                           }}
-                          className="p-1 hover:bg-gray-100 rounded transition-colors flex-shrink-0"
+                          variant="ghost"
+                          size="sm"
+                          className="flex-shrink-0"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                           </svg>
-                        </button>
+                        </IconButton>
                         <div className="flex items-center gap-2 flex-1 justify-center">
                           <span className="font-medium">
                             {calendarDate.toLocaleDateString('pt-BR', { month: 'long' }).charAt(0).toUpperCase() +
@@ -718,17 +711,19 @@ const CadeirasClinica: React.FC = () => {
                           month: '2-digit',
                           year: 'numeric'
                         })}
-                        <button
+                        <IconButton
                           onClick={() => {
                             setEditingChair({
                               ...editingChair,
                               specificDates: editingChair.specificDates.filter((_: string, i: number) => i !== index)
                             });
                           }}
+                          variant="ghost"
+                          size="xs"
                           className="hover:text-red-600"
                         >
                           <X className="w-3 h-3" />
-                        </button>
+                        </IconButton>
                       </span>
                     ))}
                   </div>
@@ -740,231 +735,45 @@ const CadeirasClinica: React.FC = () => {
           {/* Time Range */}
           <div className="grid grid-cols-2 gap-4">
             <div className="relative">
-              <input
-                type="text"
+              <UnifiedInput
+                mask="timepicker"
+                label="Início"
                 value={editingChair.startTime || ''}
-                onChange={(e) => {
-                  let value = e.target.value.replace(/[^\d]/g, '');
-
-                  if (value.length >= 3) {
-                    value = value.slice(0, 2) + ':' + value.slice(2, 4);
-                  }
-
-                  const parts = value.split(':');
-                  if (parts[0] && parseInt(parts[0]) > 23) {
-                    value = '23' + (parts[1] ? ':' + parts[1] : '');
-                  }
-                  if (parts[1] && parseInt(parts[1]) > 59) {
-                    value = parts[0] + ':59';
-                  }
-
-                  setEditingChair({ ...editingChair, startTime: value });
-                  setShowStartTimeDropdown(true);
-                }}
-                onFocus={() => setShowStartTimeDropdown(true)}
-                onBlur={() => setTimeout(() => setShowStartTimeDropdown(false), 200)}
-                className="peer w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20 placeholder-transparent"
-                placeholder="__:__"
-                maxLength={5}
-                id="startTime"
+                onChange={(value) => setEditingChair({ ...editingChair, startTime: value })}
+                placeholder="Selecione o horário"
+                floating
+                fullWidth
+                timeIntervals={30}
+                timeStart="06:00"
+                timeEnd="22:00"
               />
-              <label
-                htmlFor="startTime"
-                className="absolute left-3 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-gray-600"
-              >
-                Início
-              </label>
 
-              {showStartTimeDropdown && (
-                <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
-                  {Array.from({ length: 48 }, (_, i) => {
-                    const hour = Math.floor(i / 2);
-                    const minute = i % 2 === 0 ? '00' : '30';
-                    const time = `${hour.toString().padStart(2, '0')}:${minute}`;
-
-                    if (editingChair.startTime && !time.startsWith(editingChair.startTime.replace(/[^\d]/g, '').substring(0, 4))) {
-                      if (editingChair.startTime.length > 0 && !time.includes(editingChair.startTime)) {
-                        return null;
-                      }
-                    }
-
-                    return (
-                      <button
-                        key={time}
-                        type="button"
-                        onClick={() => {
-                          setEditingChair({ ...editingChair, startTime: time });
-                          setShowStartTimeDropdown(false);
-                        }}
-                        className={`w-full px-3 py-2 text-left hover:bg-krooa-green/10 transition-colors text-sm ${
-                          editingChair.startTime === time ? 'bg-krooa-green/20 font-medium' : ''
-                        }`}
-                      >
-                        {time}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
             </div>
 
-            <div className="relative">
-              <input
-                type="text"
-                value={editingChair.endTime || ''}
-                onChange={(e) => {
-                  let value = e.target.value.replace(/[^\d]/g, '');
-
-                  if (value.length >= 3) {
-                    value = value.slice(0, 2) + ':' + value.slice(2, 4);
-                  }
-
-                  const parts = value.split(':');
-                  if (parts[0] && parseInt(parts[0]) > 23) {
-                    value = '23' + (parts[1] ? ':' + parts[1] : '');
-                  }
-                  if (parts[1] && parseInt(parts[1]) > 59) {
-                    value = parts[0] + ':59';
-                  }
-
-                  setEditingChair({ ...editingChair, endTime: value });
-                  setShowEndTimeDropdown(true);
-                }}
-                onFocus={() => setShowEndTimeDropdown(true)}
-                onBlur={() => setTimeout(() => setShowEndTimeDropdown(false), 200)}
-                className="peer w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20 placeholder-transparent"
-                placeholder="__:__"
-                maxLength={5}
-                id="endTime"
-              />
-              <label
-                htmlFor="endTime"
-                className="absolute left-3 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-gray-600"
-              >
-                Fim
-              </label>
-
-              {showEndTimeDropdown && (
-                <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
-                  {Array.from({ length: 48 }, (_, i) => {
-                    const hour = Math.floor(i / 2);
-                    const minute = i % 2 === 0 ? '00' : '30';
-                    const time = `${hour.toString().padStart(2, '0')}:${minute}`;
-
-                    if (editingChair.endTime && !time.startsWith(editingChair.endTime.replace(/[^\d]/g, '').substring(0, 4))) {
-                      if (editingChair.endTime.length > 0 && !time.includes(editingChair.endTime)) {
-                        return null;
-                      }
-                    }
-
-                    return (
-                      <button
-                        key={time}
-                        type="button"
-                        onClick={() => {
-                          setEditingChair({ ...editingChair, endTime: time });
-                          setShowEndTimeDropdown(false);
-                        }}
-                        className={`w-full px-3 py-2 text-left hover:bg-krooa-green/10 transition-colors text-sm ${
-                          editingChair.endTime === time ? 'bg-krooa-green/20 font-medium' : ''
-                        }`}
-                      >
-                        {time}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            <UnifiedInput
+              mask="timepicker"
+              label="Fim"
+              value={editingChair.endTime || ''}
+              onChange={(value) => setEditingChair({ ...editingChair, endTime: value })}
+              placeholder="Selecione o horário"
+              floating
+              fullWidth
+              timeIntervals={30}
+              timeStart="06:00"
+              timeEnd="22:00"
+            />
           </div>
 
           {/* Duração dos Atendimentos */}
-          <div className="relative">
-            <input
-              type="text"
-              value={editingChair.duration || ''}
-              onChange={(e) => {
-                let value = e.target.value;
-
-                if (value.length < (editingChair.duration || '').length) {
-                  setEditingChair({ ...editingChair, duration: value });
-                  setShowDurationDropdown(true);
-                  return;
-                }
-
-                value = value.replace(/[^\d:]/g, '');
-
-                if (value.includes(':')) {
-                  const parts = value.split(':');
-                  if (parts.length > 2) {
-                    value = parts[0] + ':' + parts[1];
-                  }
-                  if (parts[1] && parseInt(parts[1]) > 59) {
-                    value = parts[0] + ':59';
-                  }
-                } else {
-                  if (value.length === 2 && !editingChair.duration?.includes(':')) {
-                    value = value[0] + ':' + value[1];
-                  } else if (value.length === 3) {
-                    value = value[0] + ':' + value.slice(1);
-                  }
-                }
-
-                setEditingChair({ ...editingChair, duration: value });
-                setShowDurationDropdown(true);
-              }}
-              onFocus={() => setShowDurationDropdown(true)}
-              onBlur={() => setTimeout(() => setShowDurationDropdown(false), 200)}
-              className="peer w-full rounded-lg border border-gray-300 px-3 py-2 pr-16 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20 placeholder-transparent"
-              placeholder="_:__"
-              maxLength={5}
-              id="duration"
-            />
-            <label
-              htmlFor="duration"
-              className="absolute left-3 -top-2.5 bg-white px-1 text-sm text-gray-600 transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-gray-600 pointer-events-none"
-            >
-              Duração dos Atendimentos
-            </label>
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 pointer-events-none">h:min</span>
-
-            {showDurationDropdown && (
-              <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg">
-                {[15, 20, 30, 45, 60, 75, 90, 120, 150, 180].map((minutes) => {
-                  const hours = Math.floor(minutes / 60);
-                  const mins = minutes % 60;
-                  const timeStr = `${hours}:${mins.toString().padStart(2, '0')}`;
-                  const label = hours > 0
-                    ? `${hours}h${mins > 0 ? ` ${mins}min` : ''}`
-                    : `${mins}min`;
-
-                  if (editingChair.duration) {
-                    const searchValue = editingChair.duration.replace(/[^\d]/g, '');
-                    if (searchValue && !timeStr.includes(searchValue) && !minutes.toString().includes(searchValue)) {
-                      return null;
-                    }
-                  }
-
-                  return (
-                    <button
-                      key={minutes}
-                      type="button"
-                      onClick={() => {
-                        setEditingChair({ ...editingChair, duration: timeStr });
-                        setShowDurationDropdown(false);
-                      }}
-                      className={`w-full px-3 py-2 text-left hover:bg-krooa-green/10 transition-colors text-sm flex items-center justify-between ${
-                        editingChair.duration === timeStr ? 'bg-krooa-green/20 font-medium' : ''
-                      }`}
-                    >
-                      <span>{timeStr}</span>
-                      <span className="text-xs text-gray-500">{label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          <UnifiedInput
+            label="Duração dos Atendimentos"
+            value={editingChair.duration || ''}
+            onChange={(value) => setEditingChair({ ...editingChair, duration: value })}
+            placeholder="h:min"
+            floating
+            fullWidth
+            suffix="h:min"
+          />
 
           {/* Professionals Multi-Select */}
           <div className="relative">
@@ -1106,7 +915,7 @@ const CadeirasClinica: React.FC = () => {
                           </td>
                           <td className="py-2.5 px-4 text-center">
                             <div className="flex items-center justify-center gap-2">
-                              <button
+                              <IconButton
                                 onClick={() => {
                                   const [startTime, endTime] = slot.time.split('-');
                                   setEditingChair({
@@ -1130,14 +939,15 @@ const CadeirasClinica: React.FC = () => {
                                   }
                                   setEditingChair({ ...editingChair, slots: newSlots });
                                 }}
-                                className="p-1.5 rounded-lg transition-all bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                variant="ghost"
+                                size="sm"
                                 title="Editar"
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                 </svg>
-                              </button>
-                              <button
+                              </IconButton>
+                              <IconButton
                                 onClick={() => {
                                   const newSlots = { ...editingChair.slots };
                                   newSlots[day] = newSlots[day].filter((s: any) => s.id !== slot.id);
@@ -1146,13 +956,14 @@ const CadeirasClinica: React.FC = () => {
                                   }
                                   setEditingChair({ ...editingChair, slots: newSlots });
                                 }}
-                                className="p-1.5 rounded-lg transition-all bg-red-100 text-red-600 hover:bg-red-200"
+                                variant="danger"
+                                size="sm"
                                 title="Excluir"
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                 </svg>
-                              </button>
+                              </IconButton>
                             </div>
                           </td>
                         </tr>

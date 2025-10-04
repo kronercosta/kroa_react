@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../../../../components/ui/Button';
-import { Input } from '../../../../components/ui/Input';
+import { UnifiedInput } from '../../../../components/ui/UnifiedInput';
 import { Switch } from '../../../../components/ui/Switch';
 import { Card } from '../../../../components/ui/Card';
 import { ConfiguracoesLayout } from '../../../../layouts/ConfiguracoesLayout';
@@ -78,15 +78,16 @@ const CentroCustoClinica: React.FC = () => {
                     <tr key={center.id} className="hover:bg-gray-50">
                       <td className="py-2.5 px-4 text-sm text-gray-900">
                         {editingCostCenter === center.id ? (
-                          <Input
+                          <UnifiedInput
                             value={center.name}
-                            onChange={(e) => {
+                            onChange={(value) => {
                               const newCenters = costCenters.map((c: any) =>
-                                c.id === center.id ? {...c, name: e.target.value} : c
+                                c.id === center.id ? {...c, name: value} : c
                               );
                               setCostCenters(newCenters);
                             }}
                             className="w-full py-1"
+                            fullWidth
                           />
                         ) : (
                           center.name
@@ -94,14 +95,15 @@ const CentroCustoClinica: React.FC = () => {
                       </td>
                       <td className="py-2.5 px-4 text-sm text-gray-900">
                         {editingCostCenter === center.id ? (
-                          <Input
+                          <UnifiedInput
                             value={center.description}
-                            onChange={(e) => {
+                            onChange={(value) => {
                               const newCenters = costCenters.map((c: any) =>
-                                c.id === center.id ? {...c, description: e.target.value} : c
+                                c.id === center.id ? {...c, description: value} : c
                               );
                               setCostCenters(newCenters);
                             }}
+                            fullWidth
                             className="w-full py-1"
                           />
                         ) : (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Trash2, Clock, ChevronDown, X, GripVertical, TrendingUp, TrendingDown, Minus, Plus } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
-import { Input, EmailInput, PhoneInput, CPFInput } from '../../../components/ui/Input';
+import { UnifiedInput } from '../../../components/ui/UnifiedInput';
 import { Select } from '../../../components/ui/Select';
 import { Switch } from '../../../components/ui/Switch';
 import { Card } from '../../../components/ui/Card';
@@ -689,45 +689,54 @@ const ConfigClinica: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Input
+                <UnifiedInput
                   label="Nome Empresa"
                   value={formData.companyName}
-                  onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                  onChange={(value) => setFormData({ ...formData, companyName: value })}
                   placeholder="Digite o nome da empresa"
+                  fullWidth
                 />
 
-                <EmailInput
+                <UnifiedInput
                   label="E-mail"
                   value={formData.email}
                   onChange={(value) => setFormData({ ...formData, email: value })}
+                  validation="email"
+                  fullWidth
                 />
 
-                <Input
+                <UnifiedInput
                   label="Nome do Responsável"
                   value={formData.responsibleName}
-                  onChange={(e) => setFormData({ ...formData, responsibleName: e.target.value })}
+                  onChange={(value) => setFormData({ ...formData, responsibleName: value })}
                   placeholder="Nome completo"
+                  fullWidth
                 />
 
                 {currentRegion === 'BR' ? (
-                  <CPFInput
+                  <UnifiedInput
                     label="CPF do Responsável"
                     value={formData.responsibleDocument}
                     onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
+                    mask="cpf"
+                    fullWidth
                   />
                 ) : (
-                  <Input
+                  <UnifiedInput
                     label="SSN"
                     value={formData.responsibleDocument}
-                    onChange={(e) => setFormData({ ...formData, responsibleDocument: e.target.value })}
+                    onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
                     placeholder="XXX-XX-XXXX"
+                    fullWidth
                   />
                 )}
 
-                <PhoneInput
+                <UnifiedInput
                   label="Telefone"
                   value={formData.phone}
                   onChange={(value) => setFormData({ ...formData, phone: value })}
+                  mask="internationalPhone"
+                  fullWidth
                 />
 
                 <div>
@@ -762,18 +771,21 @@ const ConfigClinica: React.FC = () => {
 
                 {pessoaJuridica && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Input
+                    <UnifiedInput
                       label="Razão Social"
                       value={formData.legalName}
-                      onChange={(e) => setFormData({ ...formData, legalName: e.target.value })}
+                      onChange={(value) => setFormData({ ...formData, legalName: value })}
                       placeholder="Nome da empresa"
+                      fullWidth
                     />
 
-                    <Input
+                    <UnifiedInput
                       label={currentRegion === 'BR' ? 'CNPJ' : 'EIN'}
                       value={formData.taxId}
-                      onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
+                      onChange={(value) => setFormData({ ...formData, taxId: value })}
+                      mask={currentRegion === 'BR' ? 'cnpj' : 'none'}
                       placeholder={currentRegion === 'BR' ? '00.000.000/0000-00' : 'XX-XXXXXXX'}
+                      fullWidth
                     />
                   </div>
                 )}
@@ -844,15 +856,16 @@ const ConfigClinica: React.FC = () => {
                         <tr key={unidade.id} className="hover:bg-gray-50">
                           <td className="py-2.5 px-4 text-sm text-gray-900">
                             {editingUnit === unidade.id ? (
-                              <Input
+                              <UnifiedInput
                                 value={unidade.titulo}
-                                onChange={(e) => {
+                                onChange={(value) => {
                                   const newUnidades = unidades.map((u: any) =>
-                                    u.id === unidade.id ? {...u, titulo: e.target.value} : u
+                                    u.id === unidade.id ? {...u, titulo: value} : u
                                   );
                                   setUnidades(newUnidades);
                                 }}
                                 className="w-full py-1"
+                                fullWidth
                               />
                             ) : (
                               unidade.titulo
@@ -1416,15 +1429,16 @@ const ConfigClinica: React.FC = () => {
                         <tr key={center.id} className="hover:bg-gray-50">
                           <td className="py-2.5 px-4 text-sm text-gray-900">
                             {editingCostCenter === center.id ? (
-                              <Input
+                              <UnifiedInput
                                 value={center.name}
-                                onChange={(e) => {
+                                onChange={(value) => {
                                   const newCenters = costCenters.map((c: any) =>
-                                    c.id === center.id ? {...c, name: e.target.value} : c
+                                    c.id === center.id ? {...c, name: value} : c
                                   );
                                   setCostCenters(newCenters);
                                 }}
                                 className="w-full py-1"
+                                fullWidth
                               />
                             ) : (
                               center.name
@@ -1432,15 +1446,16 @@ const ConfigClinica: React.FC = () => {
                           </td>
                           <td className="py-2.5 px-4 text-sm text-gray-900">
                             {editingCostCenter === center.id ? (
-                              <Input
+                              <UnifiedInput
                                 value={center.description}
-                                onChange={(e) => {
+                                onChange={(value) => {
                                   const newCenters = costCenters.map((c: any) =>
-                                    c.id === center.id ? {...c, description: e.target.value} : c
+                                    c.id === center.id ? {...c, description: value} : c
                                   );
                                   setCostCenters(newCenters);
                                 }}
                                 className="w-full py-1"
+                                fullWidth
                               />
                             ) : (
                               center.description

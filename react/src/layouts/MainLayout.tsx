@@ -314,7 +314,7 @@ export function MainLayout({ children }: LayoutProps) {
                   {/* Seletor de Unidades (Múltipla Seleção) */}
                   {multiplasUnidadesEnabled && (
                     <MultiSelect
-                      placeholder="Todas as Unidades"
+                      placeholder="Todas 2 Unidades"
                       options={unidadesOptions}
                       value={selectedUnidades}
                       onChange={setSelectedUnidades}

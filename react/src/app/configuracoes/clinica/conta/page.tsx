@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Button } from '../../../../components/ui/Button';
-import { Input, EmailInput, PhoneInput, CPFInput } from '../../../../components/ui/Input';
+import { Button, IconButton } from '../../../../components/ui/Button';
+import { Check, Edit, Trash2 } from 'lucide-react';
+import { UnifiedInput } from '../../../../components/ui/UnifiedInput';
+import { Table, TableActions } from '../../../../components/ui/Table';
 import { Select } from '../../../../components/ui/Select';
 import { Switch } from '../../../../components/ui/Switch';
 import { Card } from '../../../../components/ui/Card';
 import { Modal } from '../../../../components/ui/Modal';
 import { ConfiguracoesLayout } from '../../../../layouts/ConfiguracoesLayout';
 import { useClinic } from '../../../../contexts/ClinicContext';
-import { MultiSelect } from '../../../../components/ui/MultiSelect';
 import { useRegion } from '../../../../contexts/RegionContext';
 
 const ContaClinica: React.FC = () => {
@@ -93,52 +94,67 @@ const ContaClinica: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Input
+            <UnifiedInput
               label="Nome Empresa"
               value={formData.companyName}
-              onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+              onChange={(value) => setFormData({ ...formData, companyName: value })}
               placeholder="Digite o nome da empresa"
+              fullWidth
+              required
             />
 
-            <EmailInput
+            <UnifiedInput
               label="E-mail"
               value={formData.email}
               onChange={(value) => setFormData({ ...formData, email: value })}
+              validation="email"
+              fullWidth
+              required
             />
 
-            <Input
+            <UnifiedInput
               label="Nome do Responsável"
               value={formData.responsibleName}
-              onChange={(e) => setFormData({ ...formData, responsibleName: e.target.value })}
+              onChange={(value) => setFormData({ ...formData, responsibleName: value })}
               placeholder="Nome completo"
+              fullWidth
+              required
             />
 
             {currentRegion === 'BR' ? (
-              <CPFInput
+              <UnifiedInput
                 label="CPF do Responsável"
                 value={formData.responsibleDocument}
                 onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
+                mask="cpf"
+                validation="cpf"
+                fullWidth
+                required
               />
             ) : (
-              <Input
+              <UnifiedInput
                 label="SSN"
                 value={formData.responsibleDocument}
-                onChange={(e) => setFormData({ ...formData, responsibleDocument: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
                 placeholder="XXX-XX-XXXX"
+                fullWidth
               />
             )}
 
-            <PhoneInput
+            <UnifiedInput
               label="Telefone"
               value={formData.phone}
               onChange={(value) => setFormData({ ...formData, phone: value })}
+              mask="internationalPhone"
+              fullWidth
+              required
             />
 
             <div>
               <Select
                 label="Usuário Master"
                 value={formData.masterUser || ''}
-                onChange={(e) => setFormData({ ...formData, masterUser: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, masterUser: Array.isArray(e.target.value) ? e.target.value[0] : e.target.value })}
                 options={[
                   { value: '', label: 'Selecione o usuário master' },
                   ...professionals.map(prof => ({
@@ -146,6 +162,7 @@ const ContaClinica: React.FC = () => {
                     label: `${prof.name} - ${prof.email}`
                   }))
                 ]}
+                required
               />
               <p className="text-xs text-gray-500 mt-1">O usuário master tem acesso total ao sistema</p>
             </div>
@@ -166,18 +183,22 @@ const ContaClinica: React.FC = () => {
 
             {pessoaJuridica && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Input
+                <UnifiedInput
                   label="Razão Social"
                   value={formData.legalName}
-                  onChange={(e) => setFormData({ ...formData, legalName: e.target.value })}
+                  onChange={(value) => setFormData({ ...formData, legalName: value })}
                   placeholder="Nome da empresa"
+                  fullWidth
                 />
 
-                <Input
-                  label={currentRegion === 'BR' ? 'CNPJ' : 'EIN'}
+                <UnifiedInput
+                  label="CNPJ"
                   value={formData.taxId}
-                  onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
-                  placeholder={currentRegion === 'BR' ? '00.000.000/0000-00' : 'XX-XXXXXXX'}
+                  onChange={(value) => setFormData({ ...formData, taxId: value })}
+                  mask="cnpj"
+                  validation="cnpj"
+                  placeholder="00.000.000/0000-00"
+                  fullWidth
                 />
               </div>
             )}
@@ -248,15 +269,16 @@ const ContaClinica: React.FC = () => {
                     <tr key={unidade.id} className="hover:bg-gray-50">
                       <td className="py-2.5 px-4 text-sm text-gray-900">
                         {editingUnit === unidade.id ? (
-                          <Input
+                          <UnifiedInput
                             value={unidade.titulo}
-                            onChange={(e) => {
+                            onChange={(value) => {
                               const newUnidades = unidades.map((u: any) =>
-                                u.id === unidade.id ? {...u, titulo: e.target.value} : u
+                                u.id === unidade.id ? {...u, titulo: value} : u
                               );
                               setUnidades(newUnidades);
                             }}
                             className="w-full py-1"
+                            fullWidth
                           />
                         ) : (
                           unidade.titulo
@@ -264,12 +286,13 @@ const ContaClinica: React.FC = () => {
                       </td>
                       <td className="py-2.5 px-4 text-sm text-gray-900">
                         {editingUnit === unidade.id ? (
-                          <MultiSelect
+                          <Select
                             options={centralOptions}
                             value={unidade.centralComunicacao}
-                            onChange={(values) => {
+                            onChange={(e) => {
+                              const value = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
                               const newUnidades = unidades.map((u: any) =>
-                                u.id === unidade.id ? {...u, centralComunicacao: values} : u
+                                u.id === unidade.id ? {...u, centralComunicacao: value} : u
                               );
                               setUnidades(newUnidades);
                             }}
@@ -285,12 +308,13 @@ const ContaClinica: React.FC = () => {
                       {config.features.centroCusto && (
                         <td className="py-2.5 px-4 text-sm text-gray-900">
                           {editingUnit === unidade.id ? (
-                            <MultiSelect
+                            <Select
                               options={centroCustoOptions}
                               value={unidade.centroCusto}
-                              onChange={(values) => {
+                              onChange={(e) => {
+                                const value = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
                                 const newUnidades = unidades.map((u: any) =>
-                                  u.id === unidade.id ? {...u, centroCusto: values} : u
+                                  u.id === unidade.id ? {...u, centroCusto: value} : u
                                 );
                                 setUnidades(newUnidades);
                               }}
@@ -306,12 +330,13 @@ const ContaClinica: React.FC = () => {
                       )}
                       <td className="py-2.5 px-4 text-sm text-gray-900">
                         {editingUnit === unidade.id ? (
-                          <MultiSelect
+                          <Select
                             options={colaboradoresOptions}
                             value={unidade.colaboradores}
-                            onChange={(values) => {
+                            onChange={(e) => {
+                              const value = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
                               const newUnidades = unidades.map((u: any) =>
-                                u.id === unidade.id ? {...u, colaboradores: values} : u
+                                u.id === unidade.id ? {...u, colaboradores: value} : u
                               );
                               setUnidades(newUnidades);
                             }}
@@ -328,7 +353,7 @@ const ContaClinica: React.FC = () => {
                       </td>
                       <td className="py-2.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <button
+                          <IconButton
                             onClick={() => {
                               if (editingUnit === unidade.id) {
                                 setEditingUnit(null);
@@ -336,41 +361,30 @@ const ContaClinica: React.FC = () => {
                                 setEditingUnit(unidade.id);
                               }
                             }}
-                            className={`p-1.5 rounded-lg transition-all ${
-                              editingUnit === unidade.id
-                                ? 'bg-green-100 text-green-600 hover:bg-green-200'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            }`}
+                            variant={editingUnit === unidade.id ? "primary" : "ghost"}
+                            size="sm"
                             title={editingUnit === unidade.id ? "Salvar" : "Editar"}
                           >
                             {editingUnit === unidade.id ? (
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                              </svg>
+                              <Check className="w-4 h-4" />
                             ) : (
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
+                              <Edit className="w-4 h-4" />
                             )}
-                          </button>
-                          <button
+                          </IconButton>
+                          <IconButton
                             onClick={() => {
                               if (unidades.length > 1 && !unidade.isMaster) {
                                 setDeleteUnitModal({ open: true, sourceUnitId: unidade.id, targetUnitId: null });
                               }
                             }}
-                            className={`p-1.5 rounded-lg transition-all ${
-                              unidade.isMaster
-                                ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
-                                : 'bg-red-100 text-red-600 hover:bg-red-200'
-                            }`}
+                            variant="ghost"
+                            size="sm"
                             title={unidade.isMaster ? 'Unidade principal não pode ser excluída' : 'Excluir'}
                             disabled={unidade.isMaster}
+                            className={unidade.isMaster ? "text-gray-300" : "text-red-600 hover:text-red-700"}
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
+                            <Trash2 className="w-4 h-4" />
+                          </IconButton>
                         </div>
                       </td>
                     </tr>
@@ -421,7 +435,7 @@ const ContaClinica: React.FC = () => {
 
                   <Select
                     value={deleteUnitModal.targetUnitId?.toString() || ''}
-                    onChange={(e) => setDeleteUnitModal({ ...deleteUnitModal, targetUnitId: parseInt(e.target.value) || null })}
+                    onChange={(e) => setDeleteUnitModal({ ...deleteUnitModal, targetUnitId: parseInt(Array.isArray(e.target.value) ? e.target.value[0] : e.target.value) || null })}
                     options={[
                       { value: '', label: 'Não transferir (excluir permanentemente)' },
                       ...unidades.filter(u => u.id !== deleteUnitModal.sourceUnitId).map(u => ({
