@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { GripVertical, TrendingUp, TrendingDown, Minus, Trash2, Clock, X, Plus } from 'lucide-react';
 import { Button, IconButton } from '../../../../components/ui/Button';
 import { Input } from '../../../../components/ui/Input';
+import { Select } from '../../../../components/ui/Select';
 import { Card } from '../../../../components/ui/Card';
 import { Switch } from '../../../../components/ui/Switch';
 import { Table } from '../../../../components/ui/Table';
