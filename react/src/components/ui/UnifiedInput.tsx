@@ -1,5 +1,6 @@
 import React, { forwardRef, useState, useRef, useEffect } from 'react';
-import { Eye, EyeOff, ChevronDown, Upload, X, MapPin, Search, Calendar, Clock } from 'lucide-react';
+import { Eye, EyeOff, ChevronDown, Upload, X, MapPin, Search, Clock } from 'lucide-react';
+import { SketchPicker } from 'react-color';
 import { CustomCalendar } from './CustomCalendar';
 
 // Tipos expandidos de máscara
@@ -184,24 +185,91 @@ const applyMask = (value: string, mask: MaskType, extraData?: any): string => {
         .replace(/^(\d{2})\/(\d{2})(\d)/, '$1/$2/$3');
 
     case 'time':
-      return cleaned
-        .slice(0, 4)
-        .replace(/^(\d{2})(\d)/, '$1:$2');
+      // Limita a 4 dígitos
+      const timeDigits = cleaned.slice(0, 4);
+
+      if (timeDigits.length === 0) return '';
+
+      if (timeDigits.length === 1) {
+        // Primeiro dígito da hora
+        const firstHour = parseInt(timeDigits);
+        if (firstHour > 2) return '0' + timeDigits + ':';
+        return timeDigits;
+      }
+
+      if (timeDigits.length === 2) {
+        // Dois dígitos da hora
+        const hours = parseInt(timeDigits);
+        if (hours > 23) return '23:';
+        return timeDigits;
+      }
+
+      if (timeDigits.length === 3) {
+        // Hora completa + primeiro dígito dos minutos
+        const hours = parseInt(timeDigits.slice(0, 2));
+        const firstMinute = parseInt(timeDigits.slice(2, 3));
+
+        // Validar hora
+        let validHours = hours;
+        if (hours > 23) validHours = 23;
+
+        // Validar primeiro dígito dos minutos (máximo 5)
+        let validFirstMinute = firstMinute;
+        if (firstMinute > 5) validFirstMinute = 5;
+
+        return validHours.toString().padStart(2, '0') + ':' + validFirstMinute;
+      }
+
+      if (timeDigits.length === 4) {
+        // Hora e minutos completos
+        const hours = parseInt(timeDigits.slice(0, 2));
+        const minutes = parseInt(timeDigits.slice(2, 4));
+
+        // Validar hora
+        let validHours = hours;
+        if (hours > 23) validHours = 23;
+
+        // Validar minutos
+        let validMinutes = minutes;
+        if (minutes > 59) validMinutes = 59;
+
+        return validHours.toString().padStart(2, '0') + ':' + validMinutes.toString().padStart(2, '0');
+      }
+
+      return timeDigits;
 
     case 'currency':
-      const numericValue = cleaned.replace(/\D/g, '');
-      const floatValue = parseFloat(numericValue) / 100;
-      if (isNaN(floatValue)) return 'R$ 0,00';
-      return floatValue.toLocaleString('pt-BR', {
+      const currencyNumericValue = cleaned.replace(/\D/g, '');
+      const currencyFloatValue = parseFloat(currencyNumericValue) / 100;
+      if (isNaN(currencyFloatValue)) return 'R$ 0,00';
+      return currencyFloatValue.toLocaleString('pt-BR', {
         style: 'currency',
         currency: 'BRL'
       });
 
     case 'percentage':
-      const percentValue = value.replace(/[^\d,]/g, '').replace(',', '.');
-      const numValue = parseFloat(percentValue);
-      if (isNaN(numValue)) return '';
-      return Math.min(100, numValue).toString().replace('.', ',') + '%';
+      // Remove tudo que não for número (incluindo %)
+      let percentageNumericValue = value.replace(/\D/g, '');
+
+      // Se o usuário apagou tudo, retorna vazio
+      if (percentageNumericValue === '') return '';
+
+      // Limita a 5 dígitos (para máximo de 100,00%)
+      if (percentageNumericValue.length > 5) {
+        percentageNumericValue = percentageNumericValue.slice(0, 5);
+      }
+
+      // Converte para número e divide por 100 para obter casas decimais automáticas
+      const percentageFloatValue = parseFloat(percentageNumericValue) / 100;
+
+      // Limita a 100%
+      const limitedValue = Math.min(100, percentageFloatValue);
+
+      // Formata com 2 casas decimais SEM o %
+      return limitedValue.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
 
     case 'creditCard':
       return cleaned
@@ -264,6 +332,25 @@ const isValidDate = (dateString: string): boolean => {
   return date.getFullYear() === year &&
          date.getMonth() === month - 1 &&
          date.getDate() === day;
+};
+
+// Função para validar se um horário é válido
+const isValidTime = (timeString: string): boolean => {
+  // Formato esperado: HH:MM
+  const parts = timeString.split(':');
+  if (parts.length !== 2) return false;
+
+  const hours = parseInt(parts[0], 10);
+  const minutes = parseInt(parts[1], 10);
+
+  // Verificar se os valores são números válidos
+  if (isNaN(hours) || isNaN(minutes)) return false;
+
+  // Verificar limites
+  if (hours < 0 || hours > 23) return false;
+  if (minutes < 0 || minutes > 59) return false;
+
+  return true;
 };
 
 // Funções de validação
@@ -414,9 +501,12 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
 
   // Estados para date/time pickers
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [timeValue, setTimeValue] = useState('');
+  const [showTimeDropdown, setShowTimeDropdown] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
 
   const countryDropdownRef = useRef<HTMLDivElement>(null);
+  const colorPickerRef = useRef<HTMLDivElement>(null);
   const displayValue = typeof value !== 'undefined' ? value : internalValue;
   const hasValue = displayValue && displayValue !== '' && displayValue !== 'S/N';
 
@@ -440,6 +530,18 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
     const handleClickOutside = (event: MouseEvent) => {
       if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target as Node)) {
         setShowCountryDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Fechar color picker ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (colorPickerRef.current && !colorPickerRef.current.contains(event.target as Node)) {
+        setShowColorPicker(false);
       }
     };
 
@@ -479,6 +581,25 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
         const dateIsValid = isValidDate(newValue);
         setIsValid(dateIsValid);
         currentIsValid = dateIsValid;
+      } else {
+        setIsIncomplete(false);
+        setIsValid(true);
+      }
+    }
+    // Validação especial para horário
+    else if (mask === 'time' && newValue) {
+      const cleaned = newValue.replace(/\D/g, '');
+
+      // Verifica se está incompleto (menos de 4 dígitos)
+      if (cleaned.length > 0 && cleaned.length < 4) {
+        setIsIncomplete(true);
+        setIsValid(true);
+      } else if (cleaned.length === 4) {
+        // Horário completo - validar se é válido
+        setIsIncomplete(false);
+        const timeIsValid = isValidTime(newValue);
+        setIsValid(timeIsValid);
+        currentIsValid = timeIsValid;
       } else {
         setIsIncomplete(false);
         setIsValid(true);
@@ -528,8 +649,8 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
         currentIsValid = true;
       }
     }
-    // Se não tem validação e não é data, reseta estados
-    else if (mask !== 'date') {
+    // Se não tem validação e não é data nem time, reseta estados
+    else if (mask !== 'date' && mask !== 'time') {
       setIsIncomplete(false);
       setIsValid(true);
       currentIsValid = true;
@@ -594,6 +715,16 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
       return 'Data inválida';
     }
 
+    // Verificar se é horário incompleto
+    if (isIncomplete && mask === 'time') {
+      return 'Horário incompleto';
+    }
+
+    // Verificar se é horário inválido
+    if (!isValid && mask === 'time') {
+      return 'Horário inválido';
+    }
+
     if (isIncomplete && validation !== 'none') {
       switch (validation) {
         case 'cpf':
@@ -654,13 +785,17 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
                 setLocalValue(value.toUpperCase());
                 onChange?.(value.toUpperCase(), true);
               }
+              setShowColorPicker(true);
             }}
             onBlur={() => setIsFocused(false)}
-            onFocus={() => setIsFocused(true)}
+            onFocus={() => {
+              setIsFocused(true);
+              setShowColorPicker(true);
+            }}
             placeholder=" "
             disabled={disabled}
             className={`
-              peer w-full h-10 rounded-lg border px-3 py-2 pr-12 text-gray-900 font-mono
+              peer w-full h-10 rounded-lg border px-3 py-2 pr-14 text-gray-900 font-mono
               placeholder-transparent
               ${showError ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' :
                 showWarning ? 'border-orange-400 focus:border-orange-500 focus:ring-orange-500/20' :
@@ -673,23 +808,54 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
           />
 
           {/* Preview da cor no lado direito */}
-          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10">
             <div className="relative w-6 h-6">
-              <input
-                type="color"
-                value={localValue || '#000000'}
-                onChange={(e) => {
-                  const value = e.target.value.toUpperCase();
-                  setLocalValue(value);
-                  onChange?.(value, true);
-                }}
+              <button
+                type="button"
+                onClick={() => setShowColorPicker(!showColorPicker)}
                 disabled={disabled}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-              <div
-                className="w-6 h-6 rounded border border-gray-300 cursor-pointer"
+                className="w-6 h-6 rounded border border-gray-200 cursor-pointer shadow-sm
+                          hover:border-krooa-green hover:shadow-md transition-all duration-200
+                          hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
+                          relative overflow-hidden group"
                 style={{ backgroundColor: localValue || '#000000' }}
-              />
+                title="Escolher cor"
+              >
+                {/* Efeito de brilho/gradiente sutil */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-black/10 rounded"></div>
+
+                {/* Indicador de interação */}
+                <div className="absolute inset-0 rounded ring-0 group-hover:ring-2 group-hover:ring-krooa-green/30 transition-all duration-200"></div>
+              </button>
+
+              {/* Dropdown do seletor de cor com react-color */}
+              {showColorPicker && (
+                <div ref={colorPickerRef} className="absolute top-full right-0 mt-2 z-50">
+                  <SketchPicker
+                    color={localValue || '#000000'}
+                    onChange={(color) => {
+                      const hexColor = color.hex.toUpperCase();
+                      setLocalValue(hexColor);
+                      onChange?.(hexColor, true);
+                    }}
+                    onChangeComplete={(color) => {
+                      const hexColor = color.hex.toUpperCase();
+                      setLocalValue(hexColor);
+                      onChange?.(hexColor, true);
+                    }}
+                    presetColors={[
+                      '#00D4AA', '#007B7F', '#00B896', '#00A8B5',
+                      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
+                      '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F',
+                      '#BB8FCE', '#85C1E9', '#F8C471', '#82E0AA',
+                      '#000000', '#FFFFFF', '#FF0000', '#00FF00',
+                      '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'
+                    ]}
+                    disableAlpha={true}
+                    width="280px"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -784,7 +950,7 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
           warning={showWarning}
           className={className}
           showTime={true}
-          timeIntervals={15}
+          timeIntervals={30}
         />
 
         {/* Mensagem de erro */}
@@ -797,18 +963,93 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
 
   // Renderização especial para timepicker (hora com seletor)
   if (mask === 'timepicker') {
-    const [timeValue, setTimeValue] = useState('');
+    const applyTimeMask = (value: string) => {
+      // Permite campo vazio
+      if (value === '') return '';
+
+      // Remove caracteres inválidos (mantém apenas números)
+      const cleaned = value.replace(/\D/g, '');
+
+      // Limita a 4 dígitos
+      const timeDigits = cleaned.slice(0, 4);
+
+      if (timeDigits.length === 0) return '';
+
+      if (timeDigits.length === 1) {
+        // Primeiro dígito da hora
+        const firstHour = parseInt(timeDigits);
+        if (firstHour > 2) return '0' + timeDigits + ':';
+        return timeDigits;
+      }
+
+      if (timeDigits.length === 2) {
+        // Dois dígitos da hora
+        const hours = parseInt(timeDigits);
+        if (hours > 23) return '23:';
+        return timeDigits;
+      }
+
+      if (timeDigits.length === 3) {
+        // Hora completa + primeiro dígito dos minutos
+        const hours = parseInt(timeDigits.slice(0, 2));
+        const firstMinute = parseInt(timeDigits.slice(2, 3));
+
+        // Validar hora
+        let validHours = hours;
+        if (hours > 23) validHours = 23;
+
+        // Validar primeiro dígito dos minutos (máximo 5)
+        let validFirstMinute = firstMinute;
+        if (firstMinute > 5) validFirstMinute = 5;
+
+        return validHours.toString().padStart(2, '0') + ':' + validFirstMinute;
+      }
+
+      if (timeDigits.length === 4) {
+        // Hora e minutos completos
+        const hours = parseInt(timeDigits.slice(0, 2));
+        const minutes = parseInt(timeDigits.slice(2, 4));
+
+        // Validar hora
+        let validHours = hours;
+        if (hours > 23) validHours = 23;
+
+        // Validar minutos
+        let validMinutes = minutes;
+        if (minutes > 59) validMinutes = 59;
+
+        return validHours.toString().padStart(2, '0') + ':' + validMinutes.toString().padStart(2, '0');
+      }
+
+      return timeDigits;
+    };
 
     const handleTimeChange = (value: string) => {
       setTimeValue(value);
       setInternalValue(value);
 
-      // Criar um Date object para hoje com a hora selecionada
-      const today = new Date();
-      const [hours, minutes] = value.split(':').map(Number);
-      today.setHours(hours, minutes, 0, 0);
+      // Validar se o horário está completo e é válido
+      let isValid = true;
+      if (value.includes(':')) {
+        const [hours, minutes] = value.split(':').map(Number);
+        if (!isNaN(hours) && !isNaN(minutes)) {
+          // Verificar se está dentro dos limites válidos
+          isValid = hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59;
 
-      onChange?.(value, true, { time: today });
+          if (isValid) {
+            const today = new Date();
+            today.setHours(hours, minutes, 0, 0);
+            onChange?.(value, true, { time: today });
+          } else {
+            onChange?.(value, false);
+          }
+        } else {
+          onChange?.(value, false);
+        }
+      } else {
+        // Horário incompleto
+        onChange?.(value, false);
+      }
     };
 
     return (
@@ -820,11 +1061,24 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
         )}
 
         <div className="relative">
-          <select
+          <input
+            type="text"
             value={timeValue || displayValue}
-            onChange={(e) => handleTimeChange(e.target.value)}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
+            onChange={(e) => {
+              const maskedValue = applyTimeMask(e.target.value);
+              setTimeValue(maskedValue);
+              setInternalValue(maskedValue);
+              handleTimeChange(maskedValue);
+            }}
+            onFocus={() => {
+              setIsFocused(true);
+              setShowTimeDropdown(true);
+            }}
+            onBlur={() => {
+              setIsFocused(false);
+              setTimeout(() => setShowTimeDropdown(false), 150);
+            }}
+            placeholder="HH:MM"
             disabled={disabled}
             className={`
               peer w-full h-10 rounded-lg border px-3 py-2 pr-10 text-gray-900
@@ -835,17 +1089,31 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
               disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
               ${className}
             `}
-          >
-            <option value="">Selecione uma hora</option>
-            {Array.from({ length: 96 }, (_, i) => {
-              const hours = Math.floor(i / 4);
-              const minutes = (i % 4) * 15;
-              const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-              return (
-                <option key={timeString} value={timeString}>{timeString}</option>
-              );
-            })}
-          </select>
+          />
+
+          {/* Dropdown de sugestões de horário */}
+          {showTimeDropdown && (
+            <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+              {Array.from({ length: 48 }, (_, i) => {
+                const hours = Math.floor(i / 2);
+                const minutes = (i % 2) * 30;
+                const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                return (
+                  <button
+                    key={timeString}
+                    type="button"
+                    onClick={() => {
+                      handleTimeChange(timeString);
+                      setShowTimeDropdown(false);
+                    }}
+                    className="w-full px-3 py-2 text-left hover:bg-krooa-green/10 transition-colors text-sm"
+                  >
+                    {timeString}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* Ícone de relógio */}
           <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
@@ -901,6 +1169,9 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
           setPreview(reader.result as string);
           setPhotoPosition({ x: 50, y: 50 }); // Reset position
           setPhotoScale(1); // Reset scale
+          setIsEditingPhoto(true); // Abre o editor automaticamente
+          setTempPhotoPosition({ x: 50, y: 50 });
+          setTempPhotoScale(1);
           onChange?.(file.name, true, {
             file,
             preview: reader.result,
@@ -1119,7 +1390,7 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
                       <button
                         type="button"
                         onClick={handleSaveEdit}
-                        className="flex-1 px-3 py-2 text-sm text-white bg-krooa-green rounded-lg hover:bg-green-600 transition-colors"
+                        className="flex-1 px-3 py-2 text-sm text-krooa-dark bg-krooa-green rounded-lg hover:bg-green-600 transition-colors"
                       >
                         Salvar
                       </button>
@@ -1656,15 +1927,23 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
             ${mask === 'creditCard' && cardBrand ? 'pr-24' : ''}
             ${mask === 'password' && showPasswordToggle ? 'pr-10' : ''}
             ${mask === 'addressNumber' && allowNoNumber ? 'pr-24' : ''}
+            ${mask === 'percentage' ? 'pr-8' : ''}
             ${className}
           `}
           {...props}
         />
 
         {/* Todos os ícones e botões aqui também */}
-        {icon && mask !== 'creditCard' && mask !== 'password' && (
+        {icon && mask !== 'creditCard' && mask !== 'password' && mask !== 'percentage' && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
             {icon}
+          </div>
+        )}
+
+        {/* Ícone % para porcentagem */}
+        {mask === 'percentage' && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium pointer-events-none">
+            %
           </div>
         )}
 

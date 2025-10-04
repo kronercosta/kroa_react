@@ -64,6 +64,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
   const [selectedTime, setSelectedTime] = useState(
     value ? `${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}` : '09:00'
   );
+  const [inputValue, setInputValue] = useState('');
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -81,6 +82,14 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Sincronizar selectedTime quando value muda
+  useEffect(() => {
+    if (value && showTime) {
+      const timeString = `${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`;
+      setSelectedTime(timeString);
+    }
+  }, [value, showTime]);
 
   const formatDisplayValue = (date: Date | null): string => {
     if (!date) return '';
@@ -199,17 +208,62 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
         <input
           ref={inputRef}
           type="text"
-          value={formatDisplayValue(value)}
+          value={isFocused ? inputValue : formatDisplayValue(value)}
           placeholder={placeholder}
           disabled={disabled}
-          readOnly
+          onChange={(e) => {
+            const newInputValue = e.target.value;
+            setInputValue(newInputValue);
+
+            // Tentar parsear a data digitada
+            if (showTime) {
+              // Para datetime: DD/MM/AAAA HH:MM ou DD/MM/AAAA, HH:MM (toLocaleString pode usar vírgula)
+              const match = newInputValue.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})[,\s]+(\d{1,2}):(\d{2})$/);
+              if (match) {
+                const [, day, month, year, hour, minute] = match;
+                const newDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
+                if (!isNaN(newDate.getTime())) {
+                  onChange?.(newDate);
+                  return;
+                }
+              }
+
+              // Tenta também o formato mais simples sem segundos
+              const match2 = newInputValue.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/);
+              if (match2) {
+                const [, day, month, year, hour, minute] = match2;
+                const newDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
+                if (!isNaN(newDate.getTime())) {
+                  onChange?.(newDate);
+                  return;
+                }
+              }
+            } else {
+              // Para date: DD/MM/AAAA
+              const match = newInputValue.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+              if (match) {
+                const [, day, month, year] = match;
+                const newDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                if (!isNaN(newDate.getTime())) {
+                  onChange?.(newDate);
+                }
+              }
+            }
+          }}
           onClick={() => {
             if (!disabled) {
               setIsOpen(!isOpen);
               setIsFocused(true);
             }
           }}
-          onFocus={() => setIsFocused(true)}
+          onFocus={() => {
+            setIsFocused(true);
+            setInputValue(formatDisplayValue(value));
+          }}
+          onBlur={() => {
+            setIsFocused(false);
+            setInputValue('');
+          }}
           className={`
             peer w-full h-10 rounded-lg border px-3 py-2 pr-10 text-gray-900 cursor-pointer
             placeholder-transparent
@@ -330,7 +384,11 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
                 <span className="text-sm font-medium text-gray-700">Hora:</span>
                 <select
                   value={selectedTime}
-                  onChange={(e) => handleTimeChange(e.target.value)}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    handleTimeChange(e.target.value);
+                  }}
+                  onClick={(e) => e.stopPropagation()}
                   className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-krooa-green bg-white"
                 >
                   {timeOptions.map(time => (
@@ -367,7 +425,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
                 setCurrentMonth(today.getMonth());
                 setCurrentYear(today.getFullYear());
               }}
-              className="px-3 py-1 text-sm text-krooa-green hover:text-krooa-dark transition-colors font-medium"
+              className="px-3 py-1 text-sm text-krooa-dark hover:text-blue-900 transition-colors font-medium"
             >
               Hoje
             </button>
@@ -379,7 +437,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
                   setIsOpen(false);
                   setIsFocused(false);
                 }}
-                className="px-4 py-2 bg-krooa-green text-white rounded-lg text-sm font-medium hover:bg-krooa-dark transition-colors"
+                className="px-4 py-2 bg-krooa-dark text-white rounded-lg text-sm font-medium hover:bg-blue-900 transition-colors"
               >
                 OK
               </button>

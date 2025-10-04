@@ -1,9 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, ChevronDown, Plus, Edit2, Trash2, X, Check } from 'lucide-react';
+import { Search, ChevronDown, Plus, Edit2, Trash2, X, Check, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Button } from './Button';
 
 interface Option {
   value: string;
   label: string;
+  parentValue?: string; // Para suporte a subcategorias
+  level?: number; // 0 = categoria, 1 = subcategoria
+  children?: Option[]; // Opções filhas
+}
+
+interface DeleteConfirmation {
+  option: Option;
+  showTransfer: boolean;
+  transferTo?: string;
+  affectedRecordsCount?: number;
 }
 
 interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
@@ -16,9 +27,23 @@ interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>
   onChange?: (e: React.ChangeEvent<HTMLSelectElement> | { target: { value: string | string[]; name?: string } }) => void;
   searchable?: boolean;
   multiple?: boolean;
-  editable?: boolean;
-  addable?: boolean;
+  editable?: boolean; // Quando true, permite editar e adicionar novas opções
   onOptionsChange?: (options: Option[]) => void;
+  // Props do modo avançado
+  enhanced?: boolean; // Ativa modo avançado com hierarquia
+  confirmDelete?: boolean; // Pedir confirmação ao deletar
+  allowTransfer?: boolean; // Permitir transferência de registros
+  hierarchical?: boolean; // Suporte a níveis hierárquicos
+  placeholder?: string;
+  advancedEdit?: boolean; // Se true, abre modal ao invés de edição inline
+  onEdit?: (option: Option) => void; // Callback para quando a edição é salva
+  editModalContent?: (option: Option, onSave: (updatedOption: Option) => void, onCancel: () => void) => React.ReactNode; // Conteúdo customizado do modal
+  // Props para controle de exclusão
+  showDeleteAndReplace?: boolean; // Permitir exclusão com substituição automática
+  onDeleteAndReplace?: (deletedOption: Option, replacementOption: Option) => void; // Callback para exclusão com substituição
+  deleteConfirmationText?: string; // Texto customizado para confirmação
+  allowDeleteWithoutTransfer?: boolean; // Permitir exclusão sem transferir registros (padrão: true)
+  getAffectedRecordsCount?: (option: Option) => number; // Função para obter quantidade de registros afetados
 }
 
 // Função para normalizar texto removendo acentos
@@ -44,19 +69,46 @@ export function Select({
   searchable = true,
   multiple = false,
   editable = false,
-  addable = false,
   onOptionsChange,
+  // Props avançadas
+  enhanced = false,
+  confirmDelete = false,
+  allowTransfer = false,
+  hierarchical = false,
+  placeholder,
+  advancedEdit = false,
+  onEdit,
+  editModalContent,
+  // Props de exclusão
+  showDeleteAndReplace = false,
+  onDeleteAndReplace,
+  deleteConfirmationText,
+  allowDeleteWithoutTransfer = true,
+  getAffectedRecordsCount,
   ...props
 }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [options, setOptions] = useState(initialOptions);
   const [editingOption, setEditingOption] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [newItemText, setNewItemText] = useState('');
+  const [selectedParent, setSelectedParent] = useState<string>('');
+  const [deleteConfirmation, setDeleteConfirmation] = useState<DeleteConfirmation | null>(null);
+  const [replacementOption, setReplacementOption] = useState<string>('');
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [showAddField, setShowAddField] = useState(false);
+  const [editModalOption, setEditModalOption] = useState<Option | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Atualiza o estado interno quando as opções externas mudam
+  useEffect(() => {
+    setOptions(initialOptions);
+  }, [initialOptions]);
 
   // Suporte para múltipla seleção
   const selectedValues = multiple
@@ -70,18 +122,125 @@ export function Select({
   const selectedOptions = options.filter(opt => selectedValues.includes(opt.value));
   const selectedOption = !multiple ? options.find(opt => opt.value === value) : null;
 
+  // Organizar opções hierarquicamente
+  const getHierarchicalOptions = (): Option[] => {
+    if (!hierarchical) return options;
+
+    const categories = options.filter(opt => !opt.parentValue);
+    const organized: Option[] = [];
+
+    categories.forEach(cat => {
+      organized.push(cat);
+      const children = options.filter(opt => opt.parentValue === cat.value);
+      // Se a categoria está expandida, mostra os filhos
+      if (expandedCategories.has(cat.value)) {
+        children.forEach(child => {
+          organized.push({ ...child, level: 1 });
+        });
+      }
+    });
+
+    // Se não há categorias organizadas, retorna todas as opções
+    return organized.length > 0 ? organized : options;
+  };
+
+  // Contar filhos de uma categoria
+  const getChildrenCount = (categoryValue: string): number => {
+    return options.filter(opt => opt.parentValue === categoryValue).length;
+  };
+
+  // Verificar se categoria tem filhos
+  const hasChildren = (option: Option): boolean => {
+    return hierarchical && !option.parentValue && getChildrenCount(option.value) > 0;
+  };
+
   // Busca melhorada ignorando acentos
-  const filteredOptions = options.filter(option => {
-    const normalizedLabel = normalizeText(option.label);
+  const displayOptions = hierarchical ? getHierarchicalOptions() : options;
+
+  // Se tem busca e é hierárquico, expande temporariamente todas as categorias que têm match
+  const filteredOptions = (() => {
+    if (!searchTerm) {
+      return displayOptions;
+    }
+
     const normalizedSearch = normalizeText(searchTerm);
-    return normalizedLabel.includes(normalizedSearch);
-  });
+
+    if (hierarchical) {
+      // Primeiro, encontra todas as opções que fazem match
+      const matchingOptions = options.filter(option => {
+        const normalizedLabel = normalizeText(option.label);
+        return normalizedLabel.includes(normalizedSearch);
+      });
+
+      // Organiza hierarquicamente com todas as categorias relevantes expandidas
+      const result: Option[] = [];
+      const categoriesToShow = new Set<string>();
+
+      // Identifica categorias que precisam aparecer
+      matchingOptions.forEach(opt => {
+        if (opt.parentValue) {
+          categoriesToShow.add(opt.parentValue);
+        } else if (!opt.parentValue) {
+          categoriesToShow.add(opt.value);
+        }
+      });
+
+      // Monta a lista organizada
+      options.forEach(opt => {
+        if (!opt.parentValue && categoriesToShow.has(opt.value)) {
+          // É uma categoria que precisa aparecer
+          result.push(opt);
+          // Adiciona os filhos que fazem match
+          const children = matchingOptions.filter(child => child.parentValue === opt.value);
+          children.forEach(child => {
+            result.push({ ...child, level: 1 });
+          });
+        }
+      });
+
+      return result;
+    } else {
+      // Busca normal para não-hierárquico
+      return displayOptions.filter(option => {
+        const normalizedLabel = normalizeText(option.label);
+        return normalizedLabel.includes(normalizedSearch);
+      });
+    }
+  })();
+
+  const toggleCategory = (categoryValue: string) => {
+    const newExpanded = new Set(expandedCategories);
+    if (newExpanded.has(categoryValue)) {
+      newExpanded.delete(categoryValue);
+    } else {
+      newExpanded.add(categoryValue);
+    }
+    setExpandedCategories(newExpanded);
+  };
+
+  // Expande todas as categorias quando modo hierárquico é ativado
+  useEffect(() => {
+    if (hierarchical) {
+      // Pequeno delay para garantir que as opções foram atualizadas
+      setTimeout(() => {
+        const categories = options.filter(opt => !opt.parentValue);
+        const allCategories = new Set(categories.map(cat => cat.value));
+        setExpandedCategories(allCategories);
+      }, 0);
+    } else {
+      setExpandedCategories(new Set());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hierarchical, options.length]); // Monitora mudança no número de opções
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setIsFocused(false);
         setSearchTerm('');
+        setNewItemText('');
+        setShowAddField(false);
       }
     };
 
@@ -95,85 +254,159 @@ export function Select({
     }
   }, [isOpen, searchable]);
 
-  const handleSelect = (option: Option) => {
+  const handleSelect = (option: Option, e?: React.MouseEvent) => {
+    // Se é hierárquico e clicou na seta, apenas expande/colapsa
+    const target = e?.target as HTMLElement;
+    if (hierarchical && target && target.closest('.expand-arrow')) {
+      toggleCategory(option.value);
+      return;
+    }
+
+    // Se é hierárquico e é uma categoria (não tem parentValue), apenas expande/colapsa
+    if (hierarchical && !option.parentValue && hasChildren(option)) {
+      toggleCategory(option.value);
+      return;
+    }
+
     if (multiple) {
       const newValues = selectedValues.includes(option.value)
         ? selectedValues.filter(v => v !== option.value)
         : [...selectedValues, option.value];
 
-      if (onChange) {
-        const syntheticEvent = {
-          target: {
-            value: newValues,
-            name: name
-          }
-        };
-        onChange(syntheticEvent as any);
-      }
+      onChange?.({
+        target: {
+          value: newValues,
+          name
+        }
+      });
     } else {
-      if (onChange) {
-        const syntheticEvent = {
-          target: {
-            value: option.value,
-            name: name
-          }
-        };
-        onChange(syntheticEvent as any);
-      }
+      onChange?.({
+        target: {
+          value: option.value,
+          name
+        }
+      });
       setIsOpen(false);
+      setSearchTerm('');
     }
-    setSearchTerm('');
   };
 
-  const handleAddOption = () => {
-    if (searchTerm && !options.find(opt => opt.label.toLowerCase() === searchTerm.toLowerCase())) {
-      const newOption: Option = {
-        value: searchTerm.toLowerCase().replace(/\s+/g, '_'),
-        label: searchTerm
-      };
-      const newOptions = [...options, newOption];
-      setOptions(newOptions);
-      onOptionsChange?.(newOptions);
+  const handleAddNew = () => {
+    if (!newItemText.trim() && !searchTerm.trim()) return;
+
+    const textToAdd = newItemText.trim() || searchTerm.trim();
+
+    // Se hierárquico e tem uma categoria pai selecionada, adiciona como subcategoria
+    let parentValue = undefined;
+    if (hierarchical && selectedParent && selectedParent !== 'root') {
+      parentValue = selectedParent;
+    }
+
+    const newOption: Option = {
+      value: `new_${Date.now()}`,
+      label: textToAdd,
+      parentValue
+    };
+
+    const updatedOptions = [...options, newOption];
+    setOptions(updatedOptions);
+    onOptionsChange?.(updatedOptions);
+    setNewItemText('');
+    setSearchTerm('');
+    setShowAddField(false);
+    setSelectedParent(''); // Limpa a seleção do pai
+
+    // Se adicionou como subcategoria, expande a categoria pai
+    if (parentValue) {
+      const newExpanded = new Set(expandedCategories);
+      newExpanded.add(parentValue);
+      setExpandedCategories(newExpanded);
+    }
+
+    // Auto-selecionar o novo item se não for múltipla seleção
+    if (!multiple) {
       handleSelect(newOption);
     }
   };
 
-  const handleEditOption = (optionValue: string, newLabel: string) => {
-    const newOptions = options.map(opt =>
-      opt.value === optionValue ? { ...opt, label: newLabel } : opt
+  const handleEdit = (option: Option) => {
+    const updatedOptions = options.map(opt =>
+      opt.value === option.value
+        ? { ...opt, label: editValue }
+        : opt
     );
-    setOptions(newOptions);
-    onOptionsChange?.(newOptions);
+    setOptions(updatedOptions);
+    onOptionsChange?.(updatedOptions);
     setEditingOption(null);
     setEditValue('');
   };
 
-  const handleDeleteOption = (optionValue: string) => {
-    const newOptions = options.filter(opt => opt.value !== optionValue);
-    setOptions(newOptions);
-    onOptionsChange?.(newOptions);
+  const handleDeleteRequest = (option: Option) => {
+    if (!confirmDelete) {
+      handleDelete(option);
+      return;
+    }
 
-    // Remove da seleção se estiver selecionado
-    if (multiple && selectedValues.includes(optionValue)) {
-      const newValues = selectedValues.filter(v => v !== optionValue);
-      if (onChange) {
-        onChange({ target: { value: newValues, name } } as any);
+    const hasChildrenOptions = hierarchical && getChildrenCount(option.value) > 0;
+    const affectedRecordsCount = getAffectedRecordsCount ? getAffectedRecordsCount(option) : 0;
+
+    setDeleteConfirmation({
+      option,
+      showTransfer: allowTransfer && hasChildrenOptions,
+      affectedRecordsCount
+    });
+  };
+
+  const handleDelete = (option: Option, transferTo?: string) => {
+    let updatedOptions = options.filter(opt => opt.value !== option.value);
+
+    // Se há transferência, atualizar os filhos
+    if (transferTo && hierarchical) {
+      updatedOptions = updatedOptions.map(opt => {
+        if (opt.parentValue === option.value) {
+          return { ...opt, parentValue: transferTo === 'root' ? undefined : transferTo };
+        }
+        return opt;
+      });
+    } else {
+      // Remover também os filhos se não houver transferência
+      if (hierarchical) {
+        updatedOptions = updatedOptions.filter(opt => opt.parentValue !== option.value);
       }
-    } else if (value === optionValue) {
-      if (onChange) {
-        onChange({ target: { value: '', name } } as any);
+    }
+
+    // Se há substituição automática, chamar callback
+    if (showDeleteAndReplace && replacementOption && onDeleteAndReplace) {
+      const replacement = options.find(opt => opt.value === replacementOption);
+      if (replacement) {
+        onDeleteAndReplace(option, replacement);
+      }
+    }
+
+    setOptions(updatedOptions);
+    onOptionsChange?.(updatedOptions);
+    setDeleteConfirmation(null);
+    setReplacementOption('');
+
+    // Se o item deletado estava selecionado, substituir pela opção de substituição ou limpar
+    if (selectedValues.includes(option.value)) {
+      if (multiple) {
+        const newValues = selectedValues.filter(v => v !== option.value);
+        // Se há substituição, adicionar à seleção
+        if (replacementOption && !newValues.includes(replacementOption)) {
+          newValues.push(replacementOption);
+        }
+        onChange?.({ target: { value: newValues, name } });
+      } else {
+        // Para seleção única, substituir diretamente
+        const newValue = replacementOption || '';
+        onChange?.({ target: { value: newValue, name } });
       }
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen) {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        setIsOpen(true);
-      }
-      return;
-    }
+    if (!isOpen) return;
 
     switch (e.key) {
       case 'ArrowDown':
@@ -192,324 +425,466 @@ export function Select({
         e.preventDefault();
         if (highlightedIndex >= 0 && highlightedIndex < filteredOptions.length) {
           handleSelect(filteredOptions[highlightedIndex]);
+        } else if (editable && searchTerm.trim()) {
+          handleAddNew();
         }
         break;
       case 'Escape':
-        e.preventDefault();
         setIsOpen(false);
         setSearchTerm('');
         break;
     }
   };
 
-  if (floating && label) {
-    return (
-      <div ref={containerRef} className={`relative ${fullWidth ? 'w-full' : ''}`}>
-        <div className="relative">
-          {/* Campo principal que simula o select */}
-          <button
-            type="button"
-            onClick={() => !disabled && setIsOpen(!isOpen)}
-            onKeyDown={handleKeyDown}
-            disabled={disabled}
-            className={`
-              peer w-full h-10 rounded-lg border border-gray-300 px-3 py-2 pr-8 text-left
-              focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20
-              disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
-              ${isOpen ? 'border-krooa-green ring-2 ring-krooa-green/20' : ''}
-              ${error ? 'border-red-300' : ''}
-              ${className}
-            `}
-          >
-            <span className={hasValue ? 'text-gray-900' : 'text-gray-400'}>
-              {multiple
-                ? selectedOptions.length > 0
-                  ? selectedOptions.map(opt => opt.label).join(', ')
-                  : 'Selecione...'
-                : selectedOption
-                  ? selectedOption.label
-                  : 'Selecione...'}
-            </span>
-          </button>
+  return (
+    <div ref={containerRef} className={`relative ${fullWidth ? 'w-full' : ''}`}>
+      {label && !floating && (
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+      )}
 
-          {/* Ícone da seta */}
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
-            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      <div className="relative">
+        <div
+          className={`
+            peer border rounded-lg bg-white cursor-pointer flex items-center h-10
+            ${fullWidth ? 'w-full' : ''}
+            ${error ? 'border-red-300' : 'border-gray-300'}
+            ${disabled ? 'bg-gray-50 cursor-not-allowed' : ''}
+            ${isFocused ? 'border-krooa-green ring-2 ring-krooa-green/20' : ''}
+            ${className}
+          `}
+          onClick={() => {
+            if (!disabled) {
+              setIsOpen(!isOpen);
+              setIsFocused(true);
+            }
+          }}
+        >
+          <div className="flex-1 px-3 py-2 pr-10">
+            {multiple && selectedValues.length > 0 ? (
+              <div className="flex flex-wrap gap-1">
+                {selectedOptions.map(opt => (
+                  <span
+                    key={opt.value}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 bg-krooa-blue/10 text-krooa-blue text-sm rounded-md"
+                  >
+                    {opt.label}
+                    <X
+                      className="w-3 h-3 cursor-pointer hover:text-krooa-green"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelect(opt, e);
+                      }}
+                    />
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <span className={hasValue ? '' : 'invisible'}>
+                {selectedOption?.label || ' '}
+              </span>
+            )}
           </div>
+          <ChevronDown
+            className={`
+              absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform
+              ${isOpen ? 'rotate-180' : ''}
+            `}
+          />
+        </div>
 
-          {/* Label flutuante */}
+        {floating && label && (
           <label
             className={`
               absolute left-3 transition-all duration-200 pointer-events-none bg-white px-1
-              ${hasValue || isOpen
-                ? 'top-0 -translate-y-1/2 text-xs text-gray-600'
-                : 'top-0 -translate-y-1/2 text-xs text-gray-600'
+              ${hasValue || isFocused || isOpen
+                ? 'top-0 -translate-y-1/2 text-xs'
+                : 'top-1/2 -translate-y-1/2 text-sm'
               }
-              ${error ? 'text-red-500' : ''}
+              ${isFocused || isOpen
+                ? 'text-blue-900'
+                : error
+                  ? 'text-red-500'
+                  : 'text-gray-500'
+              }
+              peer-disabled:text-gray-400
             `}
           >
             {label}
             {required && <span className="text-red-500 ml-0.5">*</span>}
           </label>
-        </div>
+        )}
 
-        {/* Dropdown customizado */}
         {isOpen && (
           <div
             ref={dropdownRef}
-            className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg"
+            className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-auto"
           >
-            {/* Campo de busca */}
             {searchable && (
-              <div className="p-2 border-b border-gray-100">
+              <div className="sticky top-0 bg-white border-b border-gray-100 p-2">
                 <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     ref={inputRef}
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     placeholder="Buscar..."
-                    className="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green focus:ring-1 focus:ring-krooa-green/20"
+                    className="w-full pl-10 pr-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-krooa-green"
                   />
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 </div>
               </div>
             )}
 
-            {/* Lista de opções */}
-            <div className="max-h-60 overflow-y-auto">
+
+            <div className="py-1">
               {filteredOptions.length === 0 ? (
-                <div className="p-3">
-                  <div className="text-sm text-gray-500 mb-2">
-                    Nenhuma opção encontrada
-                  </div>
-                  {addable && searchTerm && (
+                <div className="px-3 py-2 text-sm text-gray-500 text-center">
+                  {searchTerm ? 'Nenhum resultado encontrado' : 'Sem opções disponíveis'}
+                  {editable && searchTerm && (
                     <button
-                      type="button"
-                      onClick={handleAddOption}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-krooa-blue hover:bg-blue-50 rounded transition-colors"
+                      onClick={handleAddNew}
+                      className="mt-2 block w-full text-left px-3 py-2 text-sm text-krooa-blue hover:bg-gray-50"
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus className="inline w-4 h-4 mr-1" />
                       Adicionar "{searchTerm}"
                     </button>
                   )}
                 </div>
               ) : (
-                <>
-                  {filteredOptions.map((option, index) => (
+                filteredOptions.map((option, index) => {
+                  const isSelected = selectedValues.includes(option.value);
+                  const isHighlighted = index === highlightedIndex;
+                  const isCategory = hierarchical && !option.parentValue;
+                  const isExpanded = expandedCategories.has(option.value);
+                  const childCount = getChildrenCount(option.value);
+
+                  const isSelectable = !hierarchical || option.parentValue || !hasChildren(option);
+
+                  return (
                     <div
                       key={option.value}
                       className={`
-                        flex items-center justify-between group
-                        ${selectedValues.includes(option.value) ? 'bg-krooa-green/10' : ''}
-                        ${highlightedIndex === index ? 'bg-gray-50' : ''}
-                        hover:bg-gray-50
+                        group flex items-center justify-between px-3 py-2 transition-colors
+                        ${isSelectable ? 'cursor-pointer' : 'cursor-default'}
+                        ${isHighlighted && isSelectable ? 'bg-gray-50' : ''}
+                        ${isSelected ? 'bg-krooa-blue/5' : ''}
+                        ${isSelectable ? 'hover:bg-gray-50' : ''}
+                        ${option.level === 1 ? 'pl-8' : ''}
+                        ${isCategory && hasChildren(option) ? 'bg-gray-100 font-semibold text-gray-700' : ''}
                       `}
-                      onMouseEnter={() => setHighlightedIndex(index)}
+                      onClick={(e) => handleSelect(option, e)}
+                      onMouseEnter={() => isSelectable && setHighlightedIndex(index)}
                     >
-                      {editingOption === option.value ? (
-                        <div className="flex items-center gap-2 w-full px-3 py-2">
-                          <input
-                            type="text"
-                            value={editValue}
-                            onChange={(e) => setEditValue(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                handleEditOption(option.value, editValue);
-                              } else if (e.key === 'Escape') {
-                                setEditingOption(null);
-                                setEditValue('');
-                              }
+                      <div className="flex items-center gap-2 flex-1">
+                        {isCategory && hasChildren(option) && (
+                          <ChevronRight
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleCategory(option.value);
                             }}
-                            className="flex-1 px-2 py-1 text-sm border border-krooa-green rounded focus:outline-none focus:ring-1 focus:ring-krooa-green"
-                            autoFocus
+                            className={`w-4 h-4 text-gray-400 transition-transform cursor-pointer hover:text-gray-600 ${isExpanded ? 'rotate-90' : ''}`}
                           />
-                          <button
-                            type="button"
-                            onClick={() => handleEditOption(option.value, editValue)}
-                            className="text-green-600 hover:text-green-700"
-                          >
-                            <Check className="w-4 h-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditingOption(null);
-                              setEditValue('');
-                            }}
-                            className="text-gray-400 hover:text-gray-600"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => handleSelect(option)}
+                        )}
+                        {multiple && isSelectable && (
+                          <div
                             className={`
-                              flex-1 px-3 py-2 text-left text-sm transition-colors flex items-center gap-2
-                              ${selectedValues.includes(option.value) ? 'text-krooa-dark font-medium' : 'text-gray-700'}
+                              w-4 h-4 border rounded
+                              ${isSelected ? 'bg-krooa-green border-krooa-green' : 'border-gray-300'}
                             `}
                           >
-                            {multiple && (
-                              <div className={`
-                                w-4 h-4 rounded border-2 flex items-center justify-center
-                                ${selectedValues.includes(option.value)
-                                  ? 'bg-krooa-green border-krooa-green'
-                                  : 'border-gray-300'}
-                              `}>
-                                {selectedValues.includes(option.value) && (
-                                  <Check className="w-3 h-3 text-krooa-dark" />
-                                )}
-                              </div>
+                            {isSelected && (
+                              <Check className="w-3 h-3 text-white" />
                             )}
-                            {option.label}
-                          </button>
-                          {(editable || (addable && options.length > 5)) && (
-                            <div className="flex items-center gap-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              {editable && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setEditingOption(option.value);
-                                    setEditValue(option.label);
-                                  }}
-                                  className="p-1 text-gray-400 hover:text-krooa-blue transition-colors"
-                                  title="Editar"
-                                >
-                                  <Edit2 className="w-3 h-3" />
-                                </button>
-                              )}
-                              {editable && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteOption(option.value)}
-                                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                                  title="Excluir"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </button>
-                              )}
-                            </div>
+                          </div>
+                        )}
+                        <span className={`text-sm ${isCategory && !option.parentValue ? 'font-medium' : ''}`}>
+                          {option.label}
+                          {isCategory && childCount > 0 && (
+                            <span className="ml-2 text-xs text-gray-400">({childCount})</span>
                           )}
-                        </>
+                        </span>
+                      </div>
+
+                      {editable && (
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                          {editingOption === option.value ? (
+                            <>
+                              <input
+                                type="text"
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    handleEdit(option);
+                                  }
+                                  if (e.key === 'Escape') {
+                                    setEditingOption(null);
+                                    setEditValue('');
+                                  }
+                                }}
+                                className="px-2 py-0.5 text-sm border border-gray-200 rounded"
+                                autoFocus
+                              />
+                              <Check
+                                className="w-3 h-3 text-green-500 cursor-pointer hover:text-green-600"
+                                onClick={() => handleEdit(option)}
+                              />
+                              <X
+                                className="w-3 h-3 text-red-500 cursor-pointer hover:text-red-600"
+                                onClick={() => {
+                                  setEditingOption(null);
+                                  setEditValue('');
+                                }}
+                              />
+                            </>
+                          ) : (
+                            <>
+                              {editable && (
+                                <Edit2
+                                  className="w-3 h-3 text-gray-400 hover:text-krooa-blue cursor-pointer"
+                                  onClick={() => {
+                                    if (advancedEdit && editModalContent) {
+                                      // Abrir modal de edição avançada
+                                      setEditModalOption(option);
+                                      setIsOpen(false);
+                                    } else {
+                                      // Edição inline simples
+                                      setEditingOption(option.value);
+                                      setEditValue(option.label);
+                                    }
+                                  }}
+                                  title={advancedEdit ? "Edição avançada" : "Editar"}
+                                />
+                              )}
+                              {editable && (
+                                <Trash2
+                                  className="w-3 h-3 text-gray-400 hover:text-red-500 cursor-pointer"
+                                  onClick={() => handleDeleteRequest(option)}
+                                />
+                              )}
+                            </>
+                          )}
+                        </div>
                       )}
                     </div>
-                  ))}
-                  {addable && searchTerm && !options.find(opt =>
-                    normalizeText(opt.label) === normalizeText(searchTerm)
-                  ) && (
-                    <button
-                      type="button"
-                      onClick={handleAddOption}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-krooa-blue hover:bg-blue-50 border-t border-gray-100 transition-colors"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Adicionar "{searchTerm}"
-                    </button>
-                  )}
-                </>
+                  );
+                })
               )}
             </div>
+
+            {/* Botão de adicionar no final do dropdown */}
+            {editable && (
+              <div className="sticky bottom-0 bg-white border-t border-gray-100 p-2">
+                {!showAddField ? (
+                  <button
+                    onClick={() => setShowAddField(true)}
+                    className="w-full px-3 py-1.5 text-sm text-krooa-blue hover:bg-gray-50 rounded-md flex items-center justify-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Adicionar novo item
+                  </button>
+                ) : (
+                  <div className="space-y-2">
+                    {hierarchical && (
+                      <select
+                        value={selectedParent}
+                        onChange={(e) => setSelectedParent(e.target.value)}
+                        className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-krooa-green"
+                      >
+                        <option value="">Selecione o tipo...</option>
+                        <option value="root">Categoria Principal</option>
+                        {options.filter(opt => !opt.parentValue).map(cat => (
+                          <option key={cat.value} value={cat.value}>
+                            Subcategoria de {cat.label}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                    <div className="flex gap-1">
+                      <input
+                        type="text"
+                        value={newItemText}
+                        onChange={(e) => setNewItemText(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && newItemText.trim()) {
+                            handleAddNew();
+                          }
+                          if (e.key === 'Escape') {
+                            setShowAddField(false);
+                            setNewItemText('');
+                            setSelectedParent('');
+                          }
+                        }}
+                        placeholder="Nome do novo item..."
+                        className="flex-1 px-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-krooa-green"
+                        autoFocus={!hierarchical}
+                      />
+                    <button
+                      onClick={handleAddNew}
+                      disabled={!newItemText.trim()}
+                      className="px-3 py-1.5 bg-krooa-blue text-white text-sm rounded-md hover:bg-krooa-blue/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Adicionar"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowAddField(false);
+                        setNewItemText('');
+                        setSelectedParent('');
+                      }}
+                      className="px-3 py-1.5 text-gray-500 hover:text-gray-700 text-sm"
+                      title="Cancelar"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
-
-        {error && (
-          <p className="mt-1 text-sm text-red-600">{error}</p>
-        )}
       </div>
-    );
-  }
 
-  return (
-    <div ref={containerRef} className={`relative ${fullWidth ? 'w-full' : ''}`}>
-      {label && (
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          {label}
-          {required && <span className="text-red-500 ml-0.5">*</span>}
-        </label>
+      {error && (
+        <p className="mt-1 text-xs text-red-500">{error}</p>
       )}
-      <div className="relative">
-        <button
-          type="button"
-          onClick={() => !disabled && setIsOpen(!isOpen)}
-          onKeyDown={handleKeyDown}
-          disabled={disabled}
-          className={`
-            w-full h-10 rounded-lg border border-gray-300 px-3 py-2 pr-10 text-left
-            focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20
-            disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
-            ${isOpen ? 'border-krooa-green ring-2 ring-krooa-green/20' : ''}
-            ${error ? 'border-red-300' : ''}
-            ${className}
-          `}
-        >
-          <span className={selectedOption ? 'text-gray-900' : 'text-gray-400'}>
-            {selectedOption ? selectedOption.label : 'Selecione...'}
-          </span>
-        </button>
 
-        {/* Ícone da seta */}
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-        </div>
-      </div>
+      {/* Modal de Confirmação de Exclusão */}
+      {deleteConfirmation && (
+        <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
+          <div className="relative bg-white rounded-2xl shadow-xl max-w-lg w-full transform transition-all">
+            {/* Header */}
+            <div className="border-b border-gray-200 px-6 py-4">
+              <h3 className="text-xl font-semibold text-krooa-dark">
+                Excluir {deleteConfirmation.option.label}
+              </h3>
+              <button
+                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
+                onClick={() => {
+                  setDeleteConfirmation(null);
+                  setReplacementOption('');
+                }}
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
 
-      {/* Dropdown customizado */}
-      {isOpen && (
-        <div
-          ref={dropdownRef}
-          className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg"
-        >
-          {/* Campo de busca */}
-          {searchable && (
-            <div className="p-2 border-b border-gray-100">
-              <div className="relative">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Buscar..."
-                  className="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-krooa-green focus:ring-1 focus:ring-krooa-green/20"
-                />
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            {/* Content */}
+            <div className="px-6 py-4">
+              <div className="space-y-4">
+                {/* Alert com contagem de registros */}
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-amber-800">
+                        {deleteConfirmation.affectedRecordsCount || 0} registros serão afetados
+                      </p>
+                      <p className="text-sm text-amber-700 mt-1">
+                        {deleteConfirmationText ||
+                          `Tem certeza que deseja excluir ${deleteConfirmation.option.label}?`
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Opções de transferência */}
+                <div className="space-y-3">
+                  <p className="text-gray-600 text-sm">
+                    Você pode transferir os dados para outra opção ou excluir permanentemente.
+                  </p>
+
+                  {/* Select de transferência */}
+                  <div className="relative">
+                    <div
+                      className="peer border rounded-lg bg-white cursor-pointer flex items-center h-10 border-gray-300"
+                      onClick={() => {
+                        // Implementar abertura do dropdown se necessário
+                      }}
+                    >
+                      <div className="flex-1 px-3 py-2 pr-10">
+                        <span className={replacementOption ? '' : 'text-gray-500'}>
+                          {replacementOption
+                            ? options.find(opt => opt.value === replacementOption)?.label
+                            : 'Não transferir (excluir permanentemente)'
+                          }
+                        </span>
+                      </div>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform" />
+                    </div>
+
+                    {/* Dropdown customizado ou select nativo */}
+                    <select
+                      value={replacementOption}
+                      onChange={(e) => setReplacementOption(e.target.value)}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    >
+                      <option value="">Não transferir (excluir permanentemente)</option>
+                      {options
+                        .filter(opt => opt.value !== deleteConfirmation.option.value)
+                        .map(opt => (
+                          <option key={opt.value} value={opt.value}>
+                            Transferir para "{opt.label}"
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer com botões */}
+              <div className="flex justify-between mt-6">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setDeleteConfirmation(null);
+                    setReplacementOption('');
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => handleDelete(deleteConfirmation.option, replacementOption)}
+                >
+                  Excluir Permanentemente
+                </Button>
               </div>
             </div>
-          )}
+          </div>
+        </div>
+      )}
 
-          {/* Lista de opções */}
-          <div className="max-h-60 overflow-y-auto">
-            {filteredOptions.length === 0 ? (
-              <div className="px-3 py-2 text-sm text-gray-500">
-                Nenhuma opção encontrada
-              </div>
-            ) : (
-              filteredOptions.map((option, index) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => handleSelect(option)}
-                  onMouseEnter={() => setHighlightedIndex(index)}
-                  className={`
-                    w-full px-3 py-2 text-left text-sm transition-colors
-                    ${option.value === value ? 'bg-krooa-green/10 text-krooa-dark font-medium' : 'text-gray-700'}
-                    ${highlightedIndex === index ? 'bg-gray-50' : ''}
-                    hover:bg-gray-50
-                  `}
-                >
-                  {option.label}
-                </button>
-              ))
+      {/* Modal de Edição Avançada */}
+      {editModalOption && editModalContent && (
+        <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            {editModalContent(
+              editModalOption,
+              (updatedOption) => {
+                // Salvar a opção atualizada
+                const updatedOptions = options.map(opt =>
+                  opt.value === updatedOption.value ? updatedOption : opt
+                );
+                setOptions(updatedOptions);
+                onOptionsChange?.(updatedOptions);
+                setEditModalOption(null);
+
+                // Se havia callback onEdit, chamar
+                if (onEdit) {
+                  onEdit(updatedOption);
+                }
+              },
+              () => setEditModalOption(null)
             )}
           </div>
         </div>
-      )}
-
-      {error && (
-        <p className="mt-1 text-sm text-red-600">{error}</p>
       )}
     </div>
   );

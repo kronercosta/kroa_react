@@ -152,7 +152,6 @@ export default function UnifiedShowcase() {
                     if (mask === 'cpf') validation = 'cpf';
                     if (mask === 'cnpj') validation = 'cnpj';
                     if (mask === 'creditCard') validation = 'creditCard';
-                    if (mask === 'cep') validation = 'cep';
 
                     setInputProps({ ...inputProps, mask, validation });
                     setInputValue('');
@@ -171,6 +170,9 @@ export default function UnifiedShowcase() {
                   <option value="addressNumber">Número de Endereço</option>
                   <option value="date">Data (DD/MM/AAAA)</option>
                   <option value="time">Hora (HH:MM)</option>
+                  <option value="datepicker">Data com Calendário</option>
+                  <option value="datetime">Data/Hora com Calendário</option>
+                  <option value="timepicker">Hora com Seletor</option>
                   <option value="currency">Moeda (R$ 0,00)</option>
                   <option value="percentage">Porcentagem (0%)</option>
                   <option value="creditCard">Cartão (0000 0000 0000 0000)</option>
@@ -189,10 +191,8 @@ export default function UnifiedShowcase() {
                   <option value="none">Nenhuma</option>
                   <option value="cpf">CPF Válido</option>
                   <option value="cnpj">CNPJ Válido</option>
-                  <option value="cep">CEP Válido</option>
                   <option value="email">E-mail</option>
-                  <option value="url">URL</option>
-                  <option value="number">Número</option>
+                  <option value="creditCard">Cartão de Crédito</option>
                 </select>
               </div>
 
