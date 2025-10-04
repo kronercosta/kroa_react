@@ -1,7 +1,9 @@
 import React, { forwardRef, useState, useRef, useEffect } from 'react';
-import { Eye, EyeOff, ChevronDown, Upload, X, MapPin, Search, Clock } from 'lucide-react';
+import { Eye, EyeOff, ChevronDown, Upload, MapPin, Search, Clock } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { SketchPicker } from 'react-color';
 import { CustomCalendar } from './CustomCalendar';
+import { Button, IconButton } from './Button';
 
 // Tipos expandidos de máscara
 export type MaskType =
@@ -921,8 +923,8 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
           required={required}
           floating={floating}
           disabled={disabled}
-          error={showError}
-          warning={showWarning}
+          error={!!showError}
+          warning={!!showWarning}
           className={className}
         />
 
@@ -955,8 +957,8 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
           required={required}
           floating={floating}
           disabled={disabled}
-          error={showError}
-          warning={showWarning}
+          error={!!showError}
+          warning={!!showWarning}
           timeIntervals={timeIntervals}
           timeStart={timeStart}
           timeEnd={timeEnd}
@@ -1335,30 +1337,34 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
                 <div className="flex-1 space-y-2">
                   <p className="text-sm text-gray-600 font-medium">Foto carregada</p>
                   <div className="flex gap-2">
-                    <button
+                    <Button
                       type="button"
                       onClick={handleStartEdit}
-                      className="px-3 py-2 text-sm text-krooa-blue border border-krooa-blue rounded-lg hover:bg-krooa-blue hover:text-white transition-colors"
+                      variant="secondary"
+                      size="sm"
                       disabled={disabled}
                     >
                       Editar posição
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                      variant="outline"
+                      size="sm"
                       disabled={disabled}
                     >
                       Trocar foto
-                    </button>
-                    <button
+                    </Button>
+                    <IconButton
                       type="button"
                       onClick={handleRemove}
-                      className="px-3 py-2 text-sm text-red-500 border border-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
+                      variant="outline"
+                      size="sm"
                       disabled={disabled}
+                      className="text-red-500 border-red-300 hover:text-red-700 hover:border-red-500 hover:bg-red-50"
                     >
-                      <X className="w-4 h-4" />
-                    </button>
+                      <Icon icon="mdi:delete" className="w-4 h-4" />
+                    </IconButton>
                   </div>
                 </div>
               </div>
@@ -1415,20 +1421,24 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
 
                     {/* Botões de salvar/cancelar */}
                     <div className="flex gap-2">
-                      <button
+                      <Button
                         type="button"
                         onClick={handleSaveEdit}
-                        className="flex-1 px-3 py-2 text-sm text-krooa-dark bg-krooa-green rounded-lg hover:bg-green-600 transition-colors"
+                        variant="primary"
+                        size="sm"
+                        fullWidth
                       >
                         Salvar
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
                         onClick={handleCancelEdit}
-                        className="flex-1 px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                        variant="outline"
+                        size="sm"
+                        fullWidth
                       >
                         Cancelar
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -1642,7 +1652,7 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
 
                   {/* Controles de zoom */}
                   <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-white/90 backdrop-blur rounded-lg shadow-md p-1">
-                    <button
+                    <IconButton
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -1654,13 +1664,14 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
                           zoom: newZoom
                         });
                       }}
-                      className="p-1 hover:bg-gray-100 rounded transition-colors"
+                      variant="ghost"
+                      size="sm"
                       disabled={disabled || mapZoom <= 10}
                     >
                       <span className="text-lg leading-none">−</span>
-                    </button>
+                    </IconButton>
                     <span className="px-2 text-xs min-w-[30px] text-center">{mapZoom}</span>
-                    <button
+                    <IconButton
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -1672,11 +1683,12 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
                           zoom: newZoom
                         });
                       }}
-                      className="p-1 hover:bg-gray-100 rounded transition-colors"
+                      variant="ghost"
+                      size="sm"
                       disabled={disabled || mapZoom >= 18}
                     >
                       <span className="text-lg leading-none">+</span>
-                    </button>
+                    </IconButton>
                   </div>
                 </>
               )}
@@ -1860,17 +1872,6 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
             </div>
           )}
 
-          {/* Toggle de visualizar senha */}
-          {mask === 'password' && showPasswordToggle && (
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              disabled={disabled}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
-            >
-              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
-          )}
 
           {/* Checkbox "Sem número" */}
           {mask === 'addressNumber' && allowNoNumber && (
@@ -1983,14 +1984,16 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
         )}
 
         {mask === 'password' && showPasswordToggle && (
-          <button
+          <IconButton
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             disabled={disabled}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            variant="ghost"
+            size="sm"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          </button>
+          </IconButton>
         )}
 
         {mask === 'addressNumber' && allowNoNumber && (

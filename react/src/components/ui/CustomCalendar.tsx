@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { Button } from './Button';
 
 interface CustomCalendarProps {
   value?: Date | null;
@@ -546,16 +547,17 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
             </button>
 
             {showTime && (
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   setIsOpen(false);
                   setIsFocused(false);
                 }}
-                className="px-4 py-2 bg-krooa-dark text-white rounded-lg text-sm font-medium hover:bg-blue-900 transition-colors"
+                variant="primary"
+                size="sm"
               >
                 OK
-              </button>
+              </Button>
             )}
           </div>
         </div>

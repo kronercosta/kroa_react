@@ -27,6 +27,12 @@ const sizeStyles: Record<ButtonSize, string> = {
   lg: 'px-6 py-3 text-lg',
 };
 
+const radiusStyles: Record<ButtonSize, string> = {
+  sm: 'rounded-lg',
+  md: 'rounded-xl',
+  lg: 'rounded-xl',
+};
+
 export function Button({
   variant = 'primary',
   size = 'md',
@@ -43,7 +49,7 @@ export function Button({
     <button
       className={`
         inline-flex items-center justify-center gap-2
-        rounded-xl font-semibold transition-all duration-200
+        ${radiusStyles[size]} font-semibold transition-all duration-200
         ${variantStyles[variant]}
         ${sizeStyles[size]}
         ${fullWidth ? 'w-full' : ''}
@@ -93,10 +99,16 @@ export function IconButton({
     lg: 'p-3',
   };
 
+  const iconRadiusStyles: Record<ButtonSize, string> = {
+    sm: 'rounded-md',
+    md: 'rounded-lg',
+    lg: 'rounded-lg',
+  };
+
   return (
     <button
       className={`
-        rounded-lg transition-all duration-200
+        ${iconRadiusStyles[size]} transition-all duration-200
         inline-flex items-center justify-center
         ${variantStyles[variant]}
         ${iconSizeStyles[size]}

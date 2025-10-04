@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, ChevronDown, Plus, Edit2, Trash2, X, Check, AlertTriangle, ChevronRight } from 'lucide-react';
-import { Button } from './Button';
+import { Button, IconButton } from './Button';
 
 interface Option {
   value: string;
@@ -679,13 +679,16 @@ export function Select({
             {editable && (
               <div className="sticky bottom-0 bg-white border-t border-gray-100 p-2">
                 {!showAddField ? (
-                  <button
+                  <Button
                     onClick={() => setShowAddField(true)}
-                    className="w-full px-3 py-1.5 text-sm text-krooa-blue hover:bg-gray-50 rounded-md flex items-center justify-center gap-2"
+                    variant="ghost"
+                    size="sm"
+                    fullWidth
+                    icon={<Plus className="w-4 h-4" />}
+                    className="text-krooa-blue"
                   >
-                    <Plus className="w-4 h-4" />
                     Adicionar novo item
-                  </button>
+                  </Button>
                 ) : (
                   <div className="space-y-2">
                     {hierarchical && (
@@ -722,25 +725,27 @@ export function Select({
                         className="flex-1 px-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-krooa-green"
                         autoFocus={!hierarchical}
                       />
-                    <button
+                    <Button
                       onClick={handleAddNew}
                       disabled={!newItemText.trim()}
-                      className="px-3 py-1.5 bg-krooa-blue text-white text-sm rounded-md hover:bg-krooa-blue/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                      variant="primary"
+                      size="sm"
                       title="Adicionar"
+                      icon={<Plus className="w-4 h-4" />}
                     >
-                      <Plus className="w-4 h-4" />
-                    </button>
-                    <button
+                    </Button>
+                    <IconButton
                       onClick={() => {
                         setShowAddField(false);
                         setNewItemText('');
                         setSelectedParent('');
                       }}
-                      className="px-3 py-1.5 text-gray-500 hover:text-gray-700 text-sm"
+                      variant="ghost"
+                      size="sm"
                       title="Cancelar"
                     >
                       <X className="w-4 h-4" />
-                    </button>
+                    </IconButton>
                   </div>
                   </div>
                 )}
@@ -763,15 +768,17 @@ export function Select({
               <h3 className="text-xl font-semibold text-krooa-dark">
                 Excluir {deleteConfirmation.option.label}
               </h3>
-              <button
-                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
+              <IconButton
+                className="absolute right-4 top-4"
+                variant="ghost"
+                size="sm"
                 onClick={() => {
                   setDeleteConfirmation(null);
                   setReplacementOption('');
                 }}
               >
                 <X className="w-6 h-6" />
-              </button>
+              </IconButton>
             </div>
 
             {/* Content */}
