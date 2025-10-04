@@ -1,12 +1,13 @@
 import React, { forwardRef, useState, useRef, useEffect } from 'react';
-import { Eye, EyeOff, ChevronDown, Upload, X, MapPin, Search } from 'lucide-react';
+import { Eye, EyeOff, ChevronDown, Upload, X, MapPin, Search, Calendar, Clock } from 'lucide-react';
+import { CustomCalendar } from './CustomCalendar';
 
 // Tipos expandidos de máscara
 export type MaskType =
-  | 'cpf' | 'cnpj' | 'internationalPhone' | 'cep' | 'date' | 'time'
+  | 'cpf' | 'cnpj' | 'internationalPhone' | 'cep' | 'date' | 'time' | 'datepicker' | 'datetime' | 'timepicker'
   | 'currency' | 'percentage' | 'creditCard' | 'password' | 'addressNumber' | 'instagram' | 'color' | 'photo' | 'address' | 'none';
 
-export type ValidationType = 'email' | 'url' | 'number' | 'cpf' | 'cnpj' | 'creditCard' | 'cep' | 'none';
+export type ValidationType = 'email' | 'cpf' | 'cnpj' | 'creditCard' | 'none';
 
 // Países com códigos e máscaras de telefone
 const countries = [
@@ -237,6 +238,34 @@ const applyMask = (value: string, mask: MaskType, extraData?: any): string => {
   }
 };
 
+// Função para validar se uma data é válida
+const isValidDate = (dateString: string): boolean => {
+  // Formato esperado: DD/MM/YYYY
+  const parts = dateString.split('/');
+  if (parts.length !== 3) return false;
+
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+  const year = parseInt(parts[2], 10);
+
+  // Verificar se os valores são números válidos
+  if (isNaN(day) || isNaN(month) || isNaN(year)) return false;
+
+  // Verificar limites básicos
+  if (month < 1 || month > 12) return false;
+  if (day < 1 || day > 31) return false;
+  if (year < 1900 || year > 2100) return false;
+
+  // Criar objeto Date e verificar se é válido
+  const date = new Date(year, month - 1, day);
+
+  // Verificar se a data criada corresponde aos valores inseridos
+  // (JavaScript ajusta datas inválidas automaticamente, ex: 32/01 vira 01/02)
+  return date.getFullYear() === year &&
+         date.getMonth() === month - 1 &&
+         date.getDate() === day;
+};
+
 // Funções de validação
 const checkIfIncomplete = (value: string, type: ValidationType): boolean => {
   if (!value) return false;
@@ -249,8 +278,6 @@ const checkIfIncomplete = (value: string, type: ValidationType): boolean => {
       return cleaned.length > 0 && cleaned.length < 14;
     case 'creditCard':
       return cleaned.length > 0 && cleaned.length < 13;
-    case 'cep':
-      return cleaned.length > 0 && cleaned.length < 8;
     default:
       return false;
   }
@@ -263,17 +290,6 @@ const validateValue = (value: string, validation: ValidationType): boolean => {
     case 'email':
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(value);
-
-    case 'url':
-      try {
-        new URL(value);
-        return true;
-      } catch {
-        return false;
-      }
-
-    case 'number':
-      return !isNaN(Number(value));
 
     case 'cpf':
       if (cleaned.length !== 11) return false;
@@ -336,9 +352,6 @@ const validateValue = (value: string, validation: ValidationType): boolean => {
     case 'creditCard':
       return cleaned.length >= 13 && cleaned.length <= 19;
 
-    case 'cep':
-      return cleaned.length === 8;
-
     default:
       return true;
   }
@@ -399,9 +412,20 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
   const [tempPhotoPosition, setTempPhotoPosition] = useState({ x: 50, y: 50 });
   const [tempPhotoScale, setTempPhotoScale] = useState(1);
 
+  // Estados para date/time pickers
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
   const countryDropdownRef = useRef<HTMLDivElement>(null);
   const displayValue = typeof value !== 'undefined' ? value : internalValue;
   const hasValue = displayValue && displayValue !== '' && displayValue !== 'S/N';
+
+  // Inicializar localValue para cor
+  useEffect(() => {
+    if (mask === 'color' && displayValue) {
+      setLocalValue(displayValue as string);
+    }
+  }, [mask, displayValue]);
 
   // Detectar bandeira do cartão
   useEffect(() => {
@@ -441,7 +465,41 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
     // Validar em tempo real durante digitação
     let currentIsValid = true;
 
-    if (validation !== 'none') {
+    // Validação especial para data
+    if (mask === 'date' && newValue) {
+      const cleaned = newValue.replace(/\D/g, '');
+
+      // Verifica se está incompleto (menos de 8 dígitos)
+      if (cleaned.length > 0 && cleaned.length < 8) {
+        setIsIncomplete(true);
+        setIsValid(true);
+      } else if (cleaned.length === 8) {
+        // Data completa - validar se é válida
+        setIsIncomplete(false);
+        const dateIsValid = isValidDate(newValue);
+        setIsValid(dateIsValid);
+        currentIsValid = dateIsValid;
+      } else {
+        setIsIncomplete(false);
+        setIsValid(true);
+      }
+    }
+    // Validação especial para CEP
+    else if (mask === 'cep' && newValue) {
+      const cleaned = newValue.replace(/\D/g, '');
+
+      // Verifica se está incompleto (menos de 8 dígitos)
+      if (cleaned.length > 0 && cleaned.length < 8) {
+        setIsIncomplete(true);
+        setIsValid(true);
+      } else {
+        // CEP completo ou vazio
+        setIsIncomplete(false);
+        setIsValid(true);
+      }
+    }
+    // Validação normal para outros tipos
+    else if (validation !== 'none') {
       if (newValue) {
         // Primeiro verifica se está incompleto
         const incomplete = checkIfIncomplete(newValue, validation);
@@ -469,6 +527,12 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
         setIsValid(true);
         currentIsValid = true;
       }
+    }
+    // Se não tem validação e não é data, reseta estados
+    else if (mask !== 'date') {
+      setIsIncomplete(false);
+      setIsValid(true);
+      currentIsValid = true;
     }
 
     setInternalValue(newValue);
@@ -520,6 +584,16 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
 
   // Mensagens de erro personalizadas por tipo de validação
   const getValidationErrorMessage = () => {
+    // Verificar se é data incompleta
+    if (isIncomplete && mask === 'date') {
+      return 'Data incompleta';
+    }
+
+    // Verificar se é data inválida
+    if (!isValid && mask === 'date') {
+      return 'Data inválida';
+    }
+
     if (isIncomplete && validation !== 'none') {
       switch (validation) {
         case 'cpf':
@@ -528,8 +602,6 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
           return 'CNPJ incompleto';
         case 'creditCard':
           return 'Número do cartão incompleto';
-        case 'cep':
-          return 'CEP incompleto';
         default:
           return `${label || 'Campo'} incompleto`;
       }
@@ -548,8 +620,6 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
           return 'URL inválida';
         case 'number':
           return 'Deve ser um número válido';
-        case 'cep':
-          return 'CEP inválido';
         default:
           return `${label || 'Campo'} inválido`;
       }
@@ -574,64 +644,73 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
         )}
 
         <div className="relative">
-          <div className="flex items-center gap-2">
-            {/* Preview da cor */}
-            <div
-              className="w-10 h-10 rounded-lg border-2 border-gray-300 shadow-sm"
-              style={{ backgroundColor: localValue || '#000000' }}
-            />
+          <input
+            ref={ref}
+            type="text"
+            value={localValue || '#000000'}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^#[0-9A-Fa-f]{0,6}$/.test(value)) {
+                setLocalValue(value.toUpperCase());
+                onChange?.(value.toUpperCase(), true);
+              }
+            }}
+            onBlur={() => setIsFocused(false)}
+            onFocus={() => setIsFocused(true)}
+            placeholder=" "
+            disabled={disabled}
+            className={`
+              peer w-full h-10 rounded-lg border px-3 py-2 pr-12 text-gray-900 font-mono
+              placeholder-transparent
+              ${showError ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' :
+                showWarning ? 'border-orange-400 focus:border-orange-500 focus:ring-orange-500/20' :
+                'border-gray-300 focus:border-krooa-green focus:ring-krooa-green/20'}
+              focus:outline-none focus:ring-2 transition-colors
+              disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
+              ${className}
+            `}
+            {...props}
+          />
 
-            {/* Input de cor */}
-            <input
-              ref={ref}
-              type="color"
-              value={localValue || '#000000'}
-              onChange={handleChange}
-              onBlur={() => setIsFocused(false)}
-              onFocus={() => setIsFocused(true)}
-              disabled={disabled}
-              className={`
-                h-10 rounded-lg border border-gray-300 cursor-pointer
-                hover:border-krooa-blue focus:border-krooa-blue focus:ring-2 focus:ring-krooa-blue/20
-                disabled:opacity-50 disabled:cursor-not-allowed
-                ${showError ? 'border-red-500' : ''}
-                ${fullWidth ? 'flex-1' : 'w-32'}
-              `}
-              {...props}
-            />
-
-            {/* Display do valor hex */}
-            <input
-              type="text"
-              value={localValue || '#000000'}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (/^#[0-9A-Fa-f]{0,6}$/.test(value)) {
-                  setLocalValue(value.toUpperCase());
-                  onChange?.(value.toUpperCase(), true);
-                }
-              }}
-              placeholder="#000000"
-              disabled={disabled}
-              className={`
-                px-3 py-2 h-10 rounded-lg border border-gray-300 text-sm font-mono
-                hover:border-krooa-blue focus:border-krooa-blue focus:ring-2 focus:ring-krooa-blue/20
-                focus:outline-none transition-colors
-                disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50
-                ${showError ? 'border-red-500' : ''}
-                ${fullWidth ? 'flex-1' : 'w-28'}
-              `}
-            />
+          {/* Preview da cor no lado direito */}
+          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+            <div className="relative w-6 h-6">
+              <input
+                type="color"
+                value={localValue || '#000000'}
+                onChange={(e) => {
+                  const value = e.target.value.toUpperCase();
+                  setLocalValue(value);
+                  onChange?.(value, true);
+                }}
+                disabled={disabled}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+              <div
+                className="w-6 h-6 rounded border border-gray-300 cursor-pointer"
+                style={{ backgroundColor: localValue || '#000000' }}
+              />
+            </div>
           </div>
 
           {/* Label flutuante */}
           {label && floating && (
             <label className={`
-              absolute left-3 transition-all duration-200 pointer-events-none
+              absolute left-3 transition-all duration-200 pointer-events-none px-1
+              ${disabled ? 'bg-gray-50' : 'bg-white'}
               ${(isFocused || hasValue)
-                ? `-top-2 text-xs ${disabled ? 'bg-gray-50' : 'bg-white'} px-1 text-blue-900`
-                : 'top-2.5 text-sm text-gray-500'
+                ? 'top-0 -translate-y-1/2 text-xs'
+                : 'top-1/2 -translate-y-1/2 text-sm'
               }
+              ${isFocused
+                ? 'text-blue-900'
+                : showError
+                  ? 'text-red-500'
+                  : showWarning
+                    ? 'text-orange-500'
+                    : 'text-gray-500'
+              }
+              peer-disabled:text-gray-400
             `}>
               {label} {required && <span className="text-red-500">*</span>}
             </label>
@@ -640,7 +719,166 @@ export const UnifiedInput = forwardRef<HTMLInputElement, UnifiedInputProps>(({
 
         {/* Mensagem de erro */}
         {(showError || showWarning) && (
-          <p className={`mt-1 text-sm ${showError ? 'text-red-600' : 'text-orange-600'}`}>{errorMessage}</p>
+          <p className={`mt-1 text-xs ${showError ? 'text-red-500' : 'text-orange-500'}`}>{errorMessage}</p>
+        )}
+      </div>
+    );
+  }
+
+  // Renderização especial para datepicker (data com preview de calendário)
+  if (mask === 'datepicker') {
+    return (
+      <div className={`${fullWidth ? 'w-full' : ''}`}>
+        <CustomCalendar
+          value={selectedDate}
+          onChange={(date) => {
+            setSelectedDate(date);
+            if (date) {
+              const formatted = date.toLocaleDateString('pt-BR');
+              setInternalValue(formatted);
+              onChange?.(formatted, true, { date });
+            } else {
+              setInternalValue('');
+              onChange?.('', true);
+            }
+          }}
+          label={label}
+          required={required}
+          floating={floating}
+          disabled={disabled}
+          error={showError}
+          warning={showWarning}
+          className={className}
+        />
+
+        {/* Mensagem de erro */}
+        {(showError || showWarning) && (
+          <p className={`mt-1 text-xs ${showError ? 'text-red-500' : 'text-orange-500'}`}>{errorMessage}</p>
+        )}
+      </div>
+    );
+  }
+
+  // Renderização especial para datetime (data e hora com preview de calendário)
+  if (mask === 'datetime') {
+    return (
+      <div className={`${fullWidth ? 'w-full' : ''}`}>
+        <CustomCalendar
+          value={selectedDate}
+          onChange={(date) => {
+            setSelectedDate(date);
+            if (date) {
+              const formatted = date.toLocaleString('pt-BR');
+              setInternalValue(formatted);
+              onChange?.(formatted, true, { date });
+            } else {
+              setInternalValue('');
+              onChange?.('', true);
+            }
+          }}
+          label={label}
+          required={required}
+          floating={floating}
+          disabled={disabled}
+          error={showError}
+          warning={showWarning}
+          className={className}
+          showTime={true}
+          timeIntervals={15}
+        />
+
+        {/* Mensagem de erro */}
+        {(showError || showWarning) && (
+          <p className={`mt-1 text-xs ${showError ? 'text-red-500' : 'text-orange-500'}`}>{errorMessage}</p>
+        )}
+      </div>
+    );
+  }
+
+  // Renderização especial para timepicker (hora com seletor)
+  if (mask === 'timepicker') {
+    const [timeValue, setTimeValue] = useState('');
+
+    const handleTimeChange = (value: string) => {
+      setTimeValue(value);
+      setInternalValue(value);
+
+      // Criar um Date object para hoje com a hora selecionada
+      const today = new Date();
+      const [hours, minutes] = value.split(':').map(Number);
+      today.setHours(hours, minutes, 0, 0);
+
+      onChange?.(value, true, { time: today });
+    };
+
+    return (
+      <div className={`relative ${fullWidth ? 'w-full' : ''}`}>
+        {label && !floating && (
+          <label className="block mb-1 text-sm font-medium text-gray-700">
+            {label} {required && <span className="text-red-500">*</span>}
+          </label>
+        )}
+
+        <div className="relative">
+          <select
+            value={timeValue || displayValue}
+            onChange={(e) => handleTimeChange(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            disabled={disabled}
+            className={`
+              peer w-full h-10 rounded-lg border px-3 py-2 pr-10 text-gray-900
+              ${showError ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' :
+                showWarning ? 'border-orange-400 focus:border-orange-500 focus:ring-orange-500/20' :
+                'border-gray-300 focus:border-krooa-green focus:ring-krooa-green/20'}
+              focus:outline-none focus:ring-2
+              disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
+              ${className}
+            `}
+          >
+            <option value="">Selecione uma hora</option>
+            {Array.from({ length: 96 }, (_, i) => {
+              const hours = Math.floor(i / 4);
+              const minutes = (i % 4) * 15;
+              const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+              return (
+                <option key={timeString} value={timeString}>{timeString}</option>
+              );
+            })}
+          </select>
+
+          {/* Ícone de relógio */}
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+            <Clock className="w-4 h-4" />
+          </div>
+
+          {/* Label flutuante */}
+          {label && floating && (
+            <label className={`
+              absolute left-3 transition-all duration-200 pointer-events-none px-1
+              ${disabled ? 'bg-gray-50' : 'bg-white'}
+              ${(isFocused || timeValue || displayValue)
+                ? 'top-0 -translate-y-1/2 text-xs'
+                : 'top-1/2 -translate-y-1/2 text-sm'
+              }
+              ${isFocused
+                ? 'text-blue-900'
+                : showError
+                  ? 'text-red-500'
+                  : showWarning
+                    ? 'text-orange-500'
+                    : 'text-gray-500'
+              }
+              peer-disabled:text-gray-400
+            `}>
+              {label} {required && <span className="text-red-500">*</span>}
+            </label>
+          )}
+        </div>
+
+        {/* Mensagem de erro */}
+        {(showError || showWarning) && (
+          <p className={`mt-1 text-xs ${showError ? 'text-red-500' : 'text-orange-500'}`}>{errorMessage}</p>
         )}
       </div>
     );
