@@ -2,9 +2,16 @@ import React, { useState } from 'react';
 import { Card } from '../../../../components/ui/Card';
 import { Select } from '../../../../components/ui/Select';
 import { Switch } from '../../../../components/ui/Switch';
-import { ColaboradorLayout } from '../../../../layouts/ColaboradorLayout';
+import { Button } from '../../../../components/ui/Button';
+import { ColaboradorLayout } from '../ColaboradorLayout';
 
 export default function ParametrosColaborador() {
+  const [colaboradorData] = useState({
+    nome: 'Dr. João Silva',
+    cargo: 'Ortodontista',
+    foto: ''
+  });
+
   const [formData, setFormData] = useState({
     unidadePadrao: '',
     centroCustoPadrao: '',
@@ -17,6 +24,10 @@ export default function ParametrosColaborador() {
     comissao: '',
     tipoComissao: 'percentual'
   });
+
+  const handleSave = () => {
+    console.log('Salvando parâmetros:', formData);
+  };
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -48,7 +59,15 @@ export default function ParametrosColaborador() {
   ];
 
   return (
-    <ColaboradorLayout>
+    <ColaboradorLayout
+      colaboradorData={colaboradorData}
+      headerControls={
+        <>
+          <Button variant="outline">Cancelar</Button>
+          <Button variant="primary" onClick={handleSave}>Salvar</Button>
+        </>
+      }
+    >
       <div className="space-y-6">
         <Card>
           <h2 className="text-lg font-bold text-gray-900 mb-4">Valores Padrão</h2>

@@ -6,7 +6,8 @@ import { Select } from '../../../../components/ui/Select';
 import { Card } from '../../../../components/ui/Card';
 import { Switch } from '../../../../components/ui/Switch';
 import { Table } from '../../../../components/ui/Table';
-import { ConfiguracoesLayout } from '../ConfiguracoesLayout';
+import { ConfiguracoesClinicaLayout } from '../ConfiguracoesClinicaLayout';
+import { HeaderControls } from '../../../../components/ui/HeaderControls';
 import { Aside } from '../../../../components/ui/Aside';
 
 interface Professional {
@@ -287,7 +288,7 @@ const CadeirasClinica: React.FC = () => {
   };
 
   return (
-    <ConfiguracoesLayout>
+    <ConfiguracoesClinicaLayout headerControls={<HeaderControls />}>
       {/* Status da Configuração */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
         <div className="flex items-center gap-4">
@@ -1156,7 +1157,7 @@ const CadeirasClinica: React.FC = () => {
           </div>
         </div>
       </Aside>
-    </ConfiguracoesLayout>
+    </ConfiguracoesClinicaLayout>
   );
 };
 

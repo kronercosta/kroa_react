@@ -2,9 +2,16 @@ import React, { useState } from 'react';
 import { Card } from '../../../../components/ui/Card';
 import { Switch } from '../../../../components/ui/Switch';
 import { Select } from '../../../../components/ui/Select';
-import { ColaboradorLayout } from '../../../../layouts/ColaboradorLayout';
+import { Button } from '../../../../components/ui/Button';
+import { ColaboradorLayout } from '../ColaboradorLayout';
 
 export default function PermissoesColaborador() {
+  const [colaboradorData] = useState({
+    nome: 'Dr. João Silva',
+    cargo: 'Ortodontista',
+    foto: ''
+  });
+
   const [formData, setFormData] = useState({
     acessoSistema: true,
     acessoMobile: false,
@@ -19,6 +26,10 @@ export default function PermissoesColaborador() {
     unidadesPermitidas: [],
     centrosCustoPermitidos: []
   });
+
+  const handleSave = () => {
+    console.log('Salvando permissões:', formData);
+  };
 
   const handlePermissionChange = (module: string, level: string) => {
     setFormData(prev => ({
@@ -72,7 +83,15 @@ export default function PermissoesColaborador() {
   };
 
   return (
-    <ColaboradorLayout>
+    <ColaboradorLayout
+      colaboradorData={colaboradorData}
+      headerControls={
+        <>
+          <Button variant="outline">Cancelar</Button>
+          <Button variant="primary" onClick={handleSave}>Salvar</Button>
+        </>
+      }
+    >
       <div className="space-y-6">
         <Card>
           <div className="flex items-center justify-between mb-6">

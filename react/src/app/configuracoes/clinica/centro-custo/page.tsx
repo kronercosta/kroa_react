@@ -4,7 +4,8 @@ import { Input } from '../../../../components/ui/Input';
 import { Switch } from '../../../../components/ui/Switch';
 import { Card } from '../../../../components/ui/Card';
 import { Table } from '../../../../components/ui/Table';
-import { ConfiguracoesLayout } from '../ConfiguracoesLayout';
+import { ConfiguracoesClinicaLayout } from '../ConfiguracoesClinicaLayout';
+import { HeaderControls } from '../../../../components/ui/HeaderControls';
 import { useClinic } from '../../../../contexts/ClinicContext';
 
 const CentroCustoClinica: React.FC = () => {
@@ -23,7 +24,7 @@ const CentroCustoClinica: React.FC = () => {
   ]);
 
   return (
-    <ConfiguracoesLayout>
+    <ConfiguracoesClinicaLayout headerControls={<HeaderControls />}>
       <div className="space-y-6">
         {/* Toggle Section */}
         <Card>
@@ -163,7 +164,7 @@ const CentroCustoClinica: React.FC = () => {
           </Card>
         )}
       </div>
-    </ConfiguracoesLayout>
+    </ConfiguracoesClinicaLayout>
   );
 };
 

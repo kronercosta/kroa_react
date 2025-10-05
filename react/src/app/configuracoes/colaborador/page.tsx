@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { Table } from '../../../components/ui/Table';
-import { ColaboradorLayout } from './ColaboradorLayout';
+import { PageLayout } from '../../../components/ui/PageLayout';
+import type { TabItem } from '../../../components/ui/PageTabs';
 import {
   Plus,
   Calendar,
@@ -16,11 +17,19 @@ import {
 
 export default function ConfigColaborador() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeFilter, setActiveFilter] = useState('todos');
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(20);
   const tableRef = useRef<HTMLDivElement>(null);
   const filterRef = useRef<HTMLDivElement>(null);
+
+  const tabItems: TabItem[] = [
+    { id: 'lista', label: 'Colaboradores', path: '/configuracoes/colaborador' },
+    { id: 'dados-pessoais', label: 'Dados Pessoais', path: '/configuracoes/colaborador/dados-pessoais' },
+    { id: 'permissoes', label: 'Permissões', path: '/configuracoes/colaborador/permissoes' },
+    { id: 'parametros', label: 'Parâmetros', path: '/configuracoes/colaborador/parametros' }
+  ];
 
   const [colaboradores] = useState<any[]>([
     {
@@ -178,8 +187,7 @@ export default function ConfigColaborador() {
   };
 
   return (
-    <ColaboradorLayout>
-      <div className="p-3 sm:p-6">
+    <div className="p-3 sm:p-6">
         <Card>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-bold text-gray-900">Colaboradores</h2>
@@ -401,6 +409,5 @@ export default function ConfigColaborador() {
           </div>
         </Card>
       </div>
-    </ColaboradorLayout>
   );
 }

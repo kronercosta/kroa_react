@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Switch } from '../../../../components/ui/Switch';
 import { Card } from '../../../../components/ui/Card';
-import { ConfiguracoesLayout } from '../ConfiguracoesLayout';
+import { ConfiguracoesClinicaLayout } from '../ConfiguracoesClinicaLayout';
+import { HeaderControls } from '../../../../components/ui/HeaderControls';
 
 const ParametrosClinica: React.FC = () => {
   // Estados para Parâmetros de Agenda
@@ -15,7 +16,7 @@ const ParametrosClinica: React.FC = () => {
   const [aliquotaImposto, setAliquotaImposto] = useState('');
 
   return (
-    <ConfiguracoesLayout>
+    <ConfiguracoesClinicaLayout headerControls={<HeaderControls />}>
       <div className="space-y-6">
         {/* Parâmetros de Agenda */}
         <Card>
@@ -208,7 +209,7 @@ const ParametrosClinica: React.FC = () => {
           </div>
         </Card>
       </div>
-    </ConfiguracoesLayout>
+    </ConfiguracoesClinicaLayout>
   );
 };
 

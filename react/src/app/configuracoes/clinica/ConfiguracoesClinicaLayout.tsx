@@ -1,16 +1,15 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { PageHeader } from '../../../components/ui/PageHeader';
-import { PageTabs } from '../../../components/ui/PageTabs';
-import { HeaderControls } from '../../../components/ui/HeaderControls';
+import { PageLayout } from '../../../components/ui/PageLayout';
 import type { TabItem } from '../../../components/ui/PageTabs';
 import { useRegion } from '../../../contexts/RegionContext';
 
-interface ConfiguracoesLayoutProps {
+interface ConfiguracoesClinicaLayoutProps {
+  headerControls?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export function ConfiguracoesLayout({ children }: ConfiguracoesLayoutProps) {
+export function ConfiguracoesClinicaLayout({ headerControls, children }: ConfiguracoesClinicaLayoutProps) {
   const location = useLocation();
   const { currentRegion, config } = useRegion();
 
@@ -31,28 +30,16 @@ export function ConfiguracoesLayout({ children }: ConfiguracoesLayoutProps) {
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
-      {/* Page Header */}
-      <PageHeader
-        title="Configurações da Clínica"
-        subtitle="Gerencie as informações e configurações da sua clínica"
-      >
-        <HeaderControls />
-      </PageHeader>
-
-      {/* Tabs */}
-      <div className="flex-shrink-0">
-        <PageTabs
-          items={tabItems}
-          activeTab={getActiveTab()}
-          variant="default"
-        />
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-6">
+    <PageLayout
+      title="Configurações da Clínica"
+      subtitle="Gerencie as informações e configurações da sua clínica"
+      headerControls={headerControls}
+      tabs={tabItems}
+      activeTab={getActiveTab()}
+    >
+      <div className="p-3 sm:p-6">
         {children}
       </div>
-    </div>
+    </PageLayout>
   );
 }

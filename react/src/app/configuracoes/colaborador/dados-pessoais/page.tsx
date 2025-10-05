@@ -3,7 +3,7 @@ import { Card } from '../../../../components/ui/Card';
 import { Input } from '../../../../components/ui/Input';
 import { Select } from '../../../../components/ui/Select';
 import { Button } from '../../../../components/ui/Button';
-import { ColaboradorLayout } from '../../../../layouts/ColaboradorLayout';
+import { ColaboradorLayout } from '../ColaboradorLayout';
 import { Camera } from 'lucide-react';
 
 export default function DadosPessoaisColaborador() {
@@ -26,8 +26,25 @@ export default function DadosPessoaisColaborador() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleSave = () => {
+    console.log('Salvando dados:', formData);
+    // Aqui você pode adicionar a lógica de salvamento
+  };
+
   return (
-    <ColaboradorLayout>
+    <ColaboradorLayout
+      colaboradorData={{
+        nome: formData.nome,
+        cargo: formData.cargo,
+        foto: formData.foto
+      }}
+      headerControls={
+        <>
+          <Button variant="outline">Cancelar</Button>
+          <Button variant="primary" onClick={handleSave}>Salvar</Button>
+        </>
+      }
+    >
       <div className="space-y-6">
         <Card>
           <h2 className="text-lg font-bold text-gray-900 mb-4">Informações Pessoais</h2>

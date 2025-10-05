@@ -7,7 +7,8 @@ import { Select } from '../../../../components/ui/Select';
 import { Switch } from '../../../../components/ui/Switch';
 import { Card } from '../../../../components/ui/Card';
 import { Modal } from '../../../../components/ui/Modal';
-import { ConfiguracoesLayout } from '../ConfiguracoesLayout';
+import { ConfiguracoesClinicaLayout } from '../ConfiguracoesClinicaLayout';
+import { HeaderControls } from '../../../../components/ui/HeaderControls';
 import { useClinic } from '../../../../contexts/ClinicContext';
 import { useRegion } from '../../../../contexts/RegionContext';
 
@@ -84,7 +85,7 @@ const ContaClinica: React.FC = () => {
   ];
 
   return (
-    <ConfiguracoesLayout>
+    <ConfiguracoesClinicaLayout headerControls={<HeaderControls />}>
       <div className="space-y-6">
         {/* Dados da Conta Section */}
         <Card>
@@ -470,7 +471,7 @@ const ContaClinica: React.FC = () => {
           </div>
         </div>
       </Modal>
-    </ConfiguracoesLayout>
+    </ConfiguracoesClinicaLayout>
   );
 };
 
