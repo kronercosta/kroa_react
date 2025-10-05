@@ -461,17 +461,17 @@ export function Select({
             }
           }}
         >
-          <div className="flex-1 px-3 py-2 pr-10">
+          <div className="flex-1 px-3 py-2 pr-10 overflow-hidden">
             {multiple && selectedValues.length > 0 ? (
               <div className="flex flex-wrap gap-1">
                 {selectedOptions.map(opt => (
                   <span
                     key={opt.value}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 bg-krooa-blue/10 text-krooa-blue text-sm rounded-md"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 bg-krooa-blue/10 text-krooa-blue text-sm rounded-md max-w-full"
                   >
-                    {opt.label}
+                    <span className="truncate">{opt.label}</span>
                     <X
-                      className="w-3 h-3 cursor-pointer hover:text-krooa-green"
+                      className="w-3 h-3 cursor-pointer hover:text-krooa-green flex-shrink-0"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSelect(opt, e);
@@ -481,7 +481,7 @@ export function Select({
                 ))}
               </div>
             ) : (
-              <span className={hasValue ? '' : 'invisible'}>
+              <span className={`truncate block ${hasValue ? '' : 'invisible'}`}>
                 {selectedOption?.label || ' '}
               </span>
             )}
@@ -569,9 +569,9 @@ export function Select({
                       className={`
                         group flex items-center justify-between px-3 py-2 transition-colors
                         ${isSelectable ? 'cursor-pointer' : 'cursor-default'}
-                        ${isHighlighted && isSelectable ? 'bg-gray-50' : ''}
-                        ${isSelected ? 'bg-krooa-blue/5' : ''}
-                        ${isSelectable ? 'hover:bg-gray-50' : ''}
+                        ${isHighlighted && isSelectable && !isSelected ? 'bg-gray-100' : ''}
+                        ${isSelected ? 'bg-krooa-green/20 text-krooa-dark' : ''}
+                        ${isSelectable && !isSelected ? 'hover:bg-gray-75' : ''}
                         ${option.level === 1 ? 'pl-8' : ''}
                         ${isCategory && hasChildren(option) ? 'bg-gray-100 font-semibold text-gray-700' : ''}
                       `}

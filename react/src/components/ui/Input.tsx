@@ -7,10 +7,10 @@ import { Button, IconButton } from './Button';
 
 // Tipos expandidos de máscara
 export type MaskType =
-  | 'cpf' | 'cnpj' | 'internationalPhone' | 'cep' | 'date' | 'time' | 'datepicker' | 'datetime' | 'timepicker'
+  | 'cpf' | 'cnpj' | 'ssn' | 'ein' | 'internationalPhone' | 'cep' | 'date' | 'time' | 'datepicker' | 'datetime' | 'timepicker'
   | 'currency' | 'percentage' | 'creditCard' | 'password' | 'addressNumber' | 'instagram' | 'color' | 'photo' | 'address' | 'none';
 
-export type ValidationType = 'email' | 'cpf' | 'cnpj' | 'creditCard' | 'none';
+export type ValidationType = 'email' | 'cpf' | 'cnpj' | 'ssn' | 'ein' | 'creditCard' | 'none';
 
 // Países com códigos e máscaras de telefone
 const countries = [
@@ -173,6 +173,16 @@ const applyMask = (value: string, mask: MaskType, extraData?: any): string => {
         .replace(/\.(\d{3})(\d)/, '.$1/$2')
         .replace(/(\d{4})(\d)/, '$1-$2');
 
+    case 'ssn':
+      return cleaned
+        .slice(0, 9)
+        .replace(/^(\d{3})(\d)/, '$1-$2')
+        .replace(/^(\d{3})-(\d{2})(\d)/, '$1-$2-$3');
+
+    case 'ein':
+      return cleaned
+        .slice(0, 9)
+        .replace(/^(\d{2})(\d)/, '$1-$2');
 
     case 'internationalPhone':
       if (extraData?.country) {
@@ -370,6 +380,10 @@ const checkIfIncomplete = (value: string, type: ValidationType): boolean => {
       return cleaned.length > 0 && cleaned.length < 11;
     case 'cnpj':
       return cleaned.length > 0 && cleaned.length < 14;
+    case 'ssn':
+      return cleaned.length > 0 && cleaned.length < 9;
+    case 'ein':
+      return cleaned.length > 0 && cleaned.length < 9;
     case 'creditCard':
       return cleaned.length > 0 && cleaned.length < 13;
     default:
@@ -442,6 +456,11 @@ const validateValue = (value: string, validation: ValidationType): boolean => {
       resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
       return resultado === parseInt(digitos.charAt(1));
 
+    case 'ssn':
+      return cleaned.length === 9;
+
+    case 'ein':
+      return cleaned.length === 9;
 
     case 'creditCard':
       return cleaned.length >= 13 && cleaned.length <= 19;
@@ -742,6 +761,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
           return 'CPF incompleto';
         case 'cnpj':
           return 'CNPJ incompleto';
+        case 'ssn':
+          return 'SSN incompleto';
+        case 'ein':
+          return 'EIN incompleto';
         case 'creditCard':
           return 'Número do cartão incompleto';
         default:
@@ -756,6 +779,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
           return 'CNPJ inválido';
         case 'email':
           return 'E-mail inválido';
+        case 'ssn':
+          return 'SSN inválido';
+        case 'ein':
+          return 'EIN inválido';
         case 'creditCard':
           return 'Número do cartão inválido';
         // case 'url':
@@ -778,7 +805,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
                    mask === 'cpf' || mask === 'cnpj' || mask === 'cep' ||
                    mask === 'date' || mask === 'time' || mask === 'creditCard' ||
                    mask === 'currency' || mask === 'percentage' || mask === 'addressNumber' ||
-                   mask === 'internationalPhone' ? 'tel' :
+                   mask === 'ssn' || mask === 'ein' || mask === 'internationalPhone' ? 'tel' :
                    'text';
 
   // Renderização especial para cor
@@ -813,7 +840,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
             disabled={disabled}
             className={`
               peer w-full h-10 rounded-lg border px-3 py-2 pr-14 text-gray-900 font-mono
-              placeholder-transparent
+              placeholder-transparent overflow-hidden
               ${showError ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' :
                 showWarning ? 'border-orange-400 focus:border-orange-500 focus:ring-orange-500/20' :
                 'border-gray-300 focus:border-krooa-green focus:ring-krooa-green/20'}
@@ -1101,6 +1128,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
             disabled={disabled}
             className={`
               peer w-full h-10 rounded-lg border px-3 py-2 pr-10 text-gray-900
+              overflow-hidden
               ${showError ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' :
                 showWarning ? 'border-orange-400 focus:border-orange-500 focus:ring-orange-500/20' :
                 'border-gray-300 focus:border-krooa-green focus:ring-krooa-green/20'}
@@ -1775,6 +1803,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
               placeholder=" "
               className={`
                 peer w-full rounded-r-lg border border-gray-300 px-3 py-2 h-10
+                overflow-hidden
                 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20
                 disabled:bg-gray-50 disabled:text-gray-500
                 ${showError ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' :
@@ -1848,7 +1877,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
             type={inputType}
             className={`
               peer w-full h-10 rounded-lg border px-3 py-2 text-gray-900
-              placeholder-transparent
+              placeholder-transparent overflow-hidden
               ${showError ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' :
                 showWarning ? 'border-orange-400 focus:border-orange-500 focus:ring-orange-500/20' :
                 'border-gray-300 focus:border-krooa-green focus:ring-krooa-green/20'}

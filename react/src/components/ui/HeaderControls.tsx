@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Clock, ChevronDown } from 'lucide-react';
 import { useRegion } from '../../contexts/RegionContext';
+import { useGlobalLanguage } from '../../hooks/useGlobalLanguage';
 
 export function HeaderControls() {
   const { currentRegion, setRegion, formatCurrency } = useRegion();
+  const { currentLanguage, changeLanguage } = useGlobalLanguage();
 
   const [selectedTimezone, setSelectedTimezone] = useState('São Paulo - Brasília');
   const [currentTime, setCurrentTime] = useState('--:--');
-  const [selectedLanguage, setSelectedLanguage] = useState('PT');
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
   const [timezoneDropdownOpen, setTimezoneDropdownOpen] = useState(false);
   const [regionDropdownOpen, setRegionDropdownOpen] = useState(false);
@@ -66,9 +67,9 @@ export function HeaderControls() {
     };
   }, [languageDropdownOpen, timezoneDropdownOpen, regionDropdownOpen]);
 
-  const handleLanguageChange = (newLanguage: string) => {
-    if (newLanguage !== selectedLanguage) {
-      setSelectedLanguage(newLanguage);
+  const handleLanguageChange = (newLanguage: 'PT' | 'EN' | 'ES') => {
+    if (newLanguage !== currentLanguage) {
+      changeLanguage(newLanguage);
       setLanguageDropdownOpen(false);
     }
   };
@@ -118,10 +119,10 @@ export function HeaderControls() {
       </div>
 
       {/* Region selector */}
-      <div className="relative" ref={regionDropdownRef}>
+      <div className="relative flex-1 sm:flex-initial" ref={regionDropdownRef}>
         <button
           onClick={() => setRegionDropdownOpen(!regionDropdownOpen)}
-          className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-xs sm:text-sm font-medium h-[34px]"
+          className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-xs sm:text-sm font-medium h-[34px] w-full sm:w-auto"
           title="Alterar região"
         >
           <span className="text-base">{currentRegion === 'BR' ? '🇧🇷' : '🇺🇸'}</span>
@@ -170,14 +171,14 @@ export function HeaderControls() {
       </div>
 
       {/* Language selector */}
-      <div className="relative" ref={languageDropdownRef}>
+      <div className="relative flex-1 sm:flex-initial" ref={languageDropdownRef}>
         <button
           onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
-          className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-xs sm:text-sm font-medium h-[34px]"
+          className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-xs sm:text-sm font-medium h-[34px] w-full sm:w-auto"
           title="Alterar idioma"
         >
-          <span className="text-base">{languages.find(l => l.code === selectedLanguage)?.flag}</span>
-          <span className="hidden sm:inline">{selectedLanguage}</span>
+          <span className="text-base">{languages.find(l => l.code === currentLanguage)?.flag}</span>
+          <span className="hidden sm:inline">{currentLanguage}</span>
           <ChevronDown className={`w-3 h-3 transition-transform ${languageDropdownOpen ? 'rotate-180' : ''}`} />
         </button>
 
@@ -190,16 +191,16 @@ export function HeaderControls() {
             {languages.map((language) => (
               <button
                 key={language.code}
-                onClick={() => handleLanguageChange(language.code)}
+                onClick={() => handleLanguageChange(language.code as 'PT' | 'EN' | 'ES')}
                 className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 transition-colors flex items-center gap-3 ${
-                  selectedLanguage === language.code
+                  currentLanguage === language.code
                     ? 'bg-krooa-green/10 text-krooa-dark font-medium'
                     : 'text-gray-700'
                 }`}
               >
                 <span className="text-lg">{language.flag}</span>
                 <span>{language.name}</span>
-                {selectedLanguage === language.code && (
+                {currentLanguage === language.code && (
                   <span className="ml-auto text-krooa-green text-xs">✓</span>
                 )}
               </button>

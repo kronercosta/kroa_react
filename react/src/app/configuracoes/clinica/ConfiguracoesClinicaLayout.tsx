@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { PageLayout } from '../../../components/ui/PageLayout';
 import type { TabItem } from '../../../components/ui/PageTabs';
 import { useRegion } from '../../../contexts/RegionContext';
+import { useTranslation } from '../../../hooks/useTranslation';
 
 interface ConfiguracoesClinicaLayoutProps {
   headerControls?: React.ReactNode;
@@ -12,12 +13,13 @@ interface ConfiguracoesClinicaLayoutProps {
 export function ConfiguracoesClinicaLayout({ headerControls, children }: ConfiguracoesClinicaLayoutProps) {
   const location = useLocation();
   const { currentRegion, config } = useRegion();
+  const { t } = useTranslation();
 
   const tabItems: TabItem[] = [
-    { id: 'conta', label: 'Conta', path: '/configuracoes/clinica/conta' },
-    { id: 'cadeiras', label: currentRegion === 'BR' ? 'Cadeiras' : 'Chairs', path: '/configuracoes/clinica/cadeiras' },
-    ...(config.features.centroCusto ? [{ id: 'centro-custo', label: 'Centro de Custo', path: '/configuracoes/clinica/centro-custo' }] : []),
-    { id: 'parametros', label: 'Parâmetros', path: '/configuracoes/clinica/parametros' }
+    { id: 'conta', label: t.account, path: '/configuracoes/clinica/conta' },
+    { id: 'cadeiras', label: t.chairs, path: '/configuracoes/clinica/cadeiras' },
+    ...(config.features.centroCusto ? [{ id: 'centro-custo', label: t.costCenter, path: '/configuracoes/clinica/centro-custo' }] : []),
+    { id: 'parametros', label: t.parameters, path: '/configuracoes/clinica/parametros' }
   ];
 
   const getActiveTab = () => {
@@ -31,8 +33,8 @@ export function ConfiguracoesClinicaLayout({ headerControls, children }: Configu
 
   return (
     <PageLayout
-      title="Configurações da Clínica"
-      subtitle="Gerencie as informações e configurações da sua clínica"
+      title={t.clinicSettings}
+      subtitle={t.clinicSettingsSubtitle}
       headerControls={headerControls}
       tabs={tabItems}
       activeTab={getActiveTab()}

@@ -11,10 +11,13 @@ import { ConfiguracoesClinicaLayout } from '../ConfiguracoesClinicaLayout';
 import { HeaderControls } from '../../../../components/ui/HeaderControls';
 import { useClinic } from '../../../../contexts/ClinicContext';
 import { useRegion } from '../../../../contexts/RegionContext';
+import { useTranslation } from '../../../../hooks/useTranslation';
 
 const ContaClinica: React.FC = () => {
   const { multiplasUnidadesEnabled, setMultiplasUnidadesEnabled } = useClinic();
   const { currentRegion, config } = useRegion();
+  const { t, regionConfig, getFieldLabels } = useTranslation();
+  const fieldLabels = getFieldLabels();
 
   const [pessoaJuridica, setPessoaJuridica] = useState(true);
   const [editingUnit, setEditingUnit] = useState<number | null>(null);
@@ -90,22 +93,22 @@ const ContaClinica: React.FC = () => {
         {/* Dados da Conta Section */}
         <Card>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold text-gray-900">Conta</h2>
-            <Button>Salvar</Button>
+            <h2 className="text-lg font-bold text-gray-900">{t.account}</h2>
+            <Button>{t.save}</Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Input
-              label="Nome Empresa"
+              label={t.companyName}
               value={formData.companyName}
               onChange={(value) => setFormData({ ...formData, companyName: value })}
-              placeholder="Digite o nome da empresa"
+              placeholder={t.placeholders.companyName}
               fullWidth
               required
             />
 
             <Input
-              label="E-mail"
+              label={t.email}
               value={formData.email}
               onChange={(value) => setFormData({ ...formData, email: value })}
               validation="email"
@@ -114,50 +117,43 @@ const ContaClinica: React.FC = () => {
             />
 
             <Input
-              label="Nome do Responsável"
+              label={t.responsibleName}
               value={formData.responsibleName}
               onChange={(value) => setFormData({ ...formData, responsibleName: value })}
-              placeholder="Nome completo"
+              placeholder={t.placeholders.responsibleName}
               fullWidth
               required
             />
 
-            {currentRegion === 'BR' ? (
-              <Input
-                label="CPF do Responsável"
-                value={formData.responsibleDocument}
-                onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
-                mask="cpf"
-                validation="cpf"
-                fullWidth
-                required
-              />
-            ) : (
-              <Input
-                label="SSN"
-                value={formData.responsibleDocument}
-                onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
-                placeholder="XXX-XX-XXXX"
-                fullWidth
-              />
-            )}
+            <Input
+              label={fieldLabels.responsibleDocumentLabel}
+              value={formData.responsibleDocument}
+              onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
+              mask={regionConfig.responsibleDocument.secret ? 'password' : regionConfig.responsibleDocument.mask as any}
+              validation={regionConfig.responsibleDocument.validation as any}
+              placeholder={regionConfig.responsibleDocument.placeholder}
+              fullWidth
+              required={regionConfig.responsibleDocument.required}
+              showPasswordToggle={regionConfig.responsibleDocument.secret}
+            />
 
             <Input
-              label="Telefone"
+              label={t.phone}
               value={formData.phone}
               onChange={(value) => setFormData({ ...formData, phone: value })}
               mask="internationalPhone"
+              defaultCountry={regionConfig.phone.defaultCountry}
               fullWidth
               required
             />
 
             <div>
               <Select
-                label="Usuário Master"
+                label={t.masterUser}
                 value={formData.masterUser || ''}
                 onChange={(e) => setFormData({ ...formData, masterUser: Array.isArray(e.target.value) ? e.target.value[0] : e.target.value })}
                 options={[
-                  { value: '', label: 'Selecione o usuário master' },
+                  { value: '', label: t.placeholders.selectMasterUser },
                   ...professionals.map(prof => ({
                     value: prof.id,
                     label: `${prof.name} - ${prof.email}`
@@ -165,7 +161,7 @@ const ContaClinica: React.FC = () => {
                 ]}
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">O usuário master tem acesso total ao sistema</p>
+              <p className="text-xs text-gray-500 mt-1">{t.masterUserDescription}</p>
             </div>
           </div>
 
@@ -173,8 +169,8 @@ const ContaClinica: React.FC = () => {
           <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <h3 className="text-base font-medium text-gray-900">Pessoa Jurídica</h3>
-                <p className="text-sm text-gray-500">Habilite para adicionar dados da empresa</p>
+                <h3 className="text-base font-medium text-gray-900">{t.legalEntity}</h3>
+                <p className="text-sm text-gray-500">{t.legalEntityDescription}</p>
               </div>
               <Switch
                 checked={pessoaJuridica}
@@ -185,20 +181,20 @@ const ContaClinica: React.FC = () => {
             {pessoaJuridica && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Input
-                  label="Razão Social"
+                  label={t.legalName}
                   value={formData.legalName}
                   onChange={(value) => setFormData({ ...formData, legalName: value })}
-                  placeholder="Nome da empresa"
+                  placeholder={t.placeholders.legalName}
                   fullWidth
                 />
 
                 <Input
-                  label="CNPJ"
+                  label={fieldLabels.taxIdLabel}
                   value={formData.taxId}
                   onChange={(value) => setFormData({ ...formData, taxId: value })}
-                  mask="cnpj"
-                  validation="cnpj"
-                  placeholder="00.000.000/0000-00"
+                  mask={regionConfig.taxId.mask as any}
+                  validation={regionConfig.taxId.validation as any}
+                  placeholder={regionConfig.taxId.placeholder}
                   fullWidth
                 />
               </div>
@@ -209,8 +205,8 @@ const ContaClinica: React.FC = () => {
           <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-base font-medium text-gray-900">Múltiplas Unidades</h3>
-                <p className="text-sm text-gray-500">Gerencie múltiplas unidades da sua clínica</p>
+                <h3 className="text-base font-medium text-gray-900">{t.multipleUnits}</h3>
+                <p className="text-sm text-gray-500">{t.multipleUnitsDescription}</p>
               </div>
               <Switch
                 checked={multiplasUnidadesEnabled}
@@ -224,11 +220,11 @@ const ContaClinica: React.FC = () => {
         {multiplasUnidadesEnabled && (
           <Card>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-gray-900">Unidades</h2>
+              <h2 className="text-lg font-bold text-gray-900">{t.units}</h2>
               <Button
                 onClick={() => setUnidades([...unidades, {
                   id: Date.now(),
-                  titulo: 'Nova Unidade',
+                  titulo: t.newUnit,
                   centralComunicacao: [],
                   centroCusto: [],
                   colaboradores: []
@@ -238,7 +234,7 @@ const ContaClinica: React.FC = () => {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                Nova Unidade
+                {t.newUnit}
               </Button>
             </div>
 
@@ -247,21 +243,21 @@ const ContaClinica: React.FC = () => {
                 <thead className="bg-gray-50 sticky top-0 z-10">
                   <tr>
                     <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider first:rounded-tl-lg bg-gray-50">
-                      Título
+                      {t.title}
                     </th>
                     <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50">
-                      Central de Comunicação
+                      {t.communicationCenter}
                     </th>
                     {config.features.centroCusto && (
                       <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50">
-                        Centro de Custo
+                        {t.costCenter}
                       </th>
                     )}
                     <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50">
-                      Colaboradores
+                      {t.collaborators}
                     </th>
                     <th className="text-right py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider last:rounded-tr-lg bg-gray-50">
-                      Ações
+                      {t.actions}
                     </th>
                   </tr>
                 </thead>
@@ -297,7 +293,7 @@ const ContaClinica: React.FC = () => {
                               );
                               setUnidades(newUnidades);
                             }}
-                            placeholder="Selecione as centrais"
+                            placeholder={t.placeholders.selectCommunicationCenters}
                             multiple={true}
                           />
                         ) : (
@@ -319,7 +315,7 @@ const ContaClinica: React.FC = () => {
                                 );
                                 setUnidades(newUnidades);
                               }}
-                              placeholder="Selecione os centros"
+                              placeholder={t.placeholders.selectCostCenters}
                               multiple={true}
                             />
                           ) : (
@@ -341,7 +337,7 @@ const ContaClinica: React.FC = () => {
                               );
                               setUnidades(newUnidades);
                             }}
-                            placeholder="Selecione colaboradores"
+                            placeholder={t.placeholders.selectCollaborators}
                             multiple={true}
                           />
                         ) : (
@@ -364,7 +360,7 @@ const ContaClinica: React.FC = () => {
                             }}
                             variant={editingUnit === unidade.id ? "primary" : "ghost"}
                             size="sm"
-                            title={editingUnit === unidade.id ? "Salvar" : "Editar"}
+                            title={editingUnit === unidade.id ? t.save : t.edit}
                           >
                             {editingUnit === unidade.id ? (
                               <Check className="w-4 h-4" />
@@ -380,7 +376,7 @@ const ContaClinica: React.FC = () => {
                             }}
                             variant="ghost"
                             size="sm"
-                            title={unidade.isMaster ? 'Unidade principal não pode ser excluída' : 'Excluir'}
+                            title={unidade.isMaster ? t.masterUnitCannotBeDeleted : t.delete}
                             disabled={unidade.isMaster}
                             className={unidade.isMaster ? "text-gray-300" : "text-red-600 hover:text-red-700"}
                           >
@@ -401,7 +397,7 @@ const ContaClinica: React.FC = () => {
       <Modal
         isOpen={deleteUnitModal.open}
         onClose={() => setDeleteUnitModal({ open: false, targetUnitId: null, sourceUnitId: null })}
-        title="Excluir Unidade"
+        title={t.deleteUnit}
       >
         <div className="space-y-4">
           {(() => {
@@ -417,10 +413,10 @@ const ContaClinica: React.FC = () => {
                     </svg>
                     <div>
                       <p className="font-semibold text-amber-800">
-                        {registros} registros serão afetados
+                        {registros} {t.recordsAffected}
                       </p>
                       <p className="text-sm text-amber-700 mt-1">
-                        Tem certeza que deseja excluir a unidade <strong>{unit?.titulo}</strong>?
+                        {t.deleteUnitConfirm} <strong>{unit?.titulo}</strong>?
                       </p>
                     </div>
                   </div>
@@ -428,17 +424,14 @@ const ContaClinica: React.FC = () => {
 
                 <div className="space-y-3">
                   <p className="text-gray-600 text-sm">
-                    {registros > 0
-                      ? `Você pode transferir os ${registros} registros afetados para outra unidade ou excluir permanentemente.`
-                      : 'Você pode transferir os dados para outra unidade ou excluir permanentemente.'
-                    }
+                    {t.transferRecords}
                   </p>
 
                   <Select
                     value={deleteUnitModal.targetUnitId?.toString() || ''}
                     onChange={(e) => setDeleteUnitModal({ ...deleteUnitModal, targetUnitId: parseInt(Array.isArray(e.target.value) ? e.target.value[0] : e.target.value) || null })}
                     options={[
-                      { value: '', label: 'Não transferir (excluir permanentemente)' },
+                      { value: '', label: t.doNotTransfer },
                       ...unidades.filter(u => u.id !== deleteUnitModal.sourceUnitId).map(u => ({
                         value: u.id.toString(),
                         label: u.titulo
@@ -455,7 +448,7 @@ const ContaClinica: React.FC = () => {
               variant="outline"
               onClick={() => setDeleteUnitModal({ open: false, targetUnitId: null, sourceUnitId: null })}
             >
-              Cancelar
+              {t.cancel}
             </Button>
             <Button
               variant="danger"
@@ -466,7 +459,7 @@ const ContaClinica: React.FC = () => {
                 }
               }}
             >
-              {deleteUnitModal.targetUnitId ? 'Excluir e Transferir' : 'Excluir Permanentemente'}
+              {deleteUnitModal.targetUnitId ? t.deleteAndTransfer : t.deletePermanently}
             </Button>
           </div>
         </div>

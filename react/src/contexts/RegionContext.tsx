@@ -102,7 +102,7 @@ const regionConfigs: Record<RegionType, RegionConfig> = {
       {
         name: 'Professional',
         basePrice: 99.00,
-        features: ['Up to 5 providers', 'Advanced scheduling', 'Detailed reports', 'Insurance billing']
+        features: ['Up to 5 providers', 'Advanced scheduling', 'Detailed reports', 'Cost centers', 'Insurance billing']
       },
       {
         name: 'Enterprise',
@@ -112,7 +112,7 @@ const regionConfigs: Record<RegionType, RegionConfig> = {
     ],
     features: {
       multiplasUnidades: true,
-      centroCusto: false,
+      centroCusto: true,
       nfse: false,
       insurance: true,
       hipaa: true
