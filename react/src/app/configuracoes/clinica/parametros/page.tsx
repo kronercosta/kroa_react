@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Switch } from '../../../../components/ui/Switch';
 import { Card } from '../../../../components/ui/Card';
-import { ConfiguracoesLayout } from '../../../../layouts/ConfiguracoesLayout';
+import { ConfiguracoesLayout } from '../ConfiguracoesLayout';
 
 const ParametrosClinica: React.FC = () => {
   // Estados para Parâmetros de Agenda

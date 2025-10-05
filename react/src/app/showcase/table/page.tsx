@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Table } from '../../components/ui/Table';
-import { Button, IconButton } from '../../components/ui/Button';
-import { Badge, StatusPill } from '../../components/ui/Badge';
-import { Avatar } from '../../components/ui/Avatar';
+import { Table } from '../../../components/ui/Table';
+import { Button, IconButton } from '../../../components/ui/Button';
+import { Badge, StatusPill } from '../../../components/ui/Badge';
+import { Avatar } from '../../../components/ui/Avatar';
 import { Eye, Edit, Trash2, Download, Mail, Phone, Star, MapPin, Calendar, Users, Building, DollarSign } from 'lucide-react';
 
 const TableShowcase: React.FC = () => {

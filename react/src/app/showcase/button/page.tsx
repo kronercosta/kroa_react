@@ -82,6 +82,7 @@ export default function ButtonShowcase() {
                   <option value="danger">Danger (Vermelho)</option>
                   <option value="ghost">Ghost (Transparente)</option>
                   <option value="outline">Outline (Bordas)</option>
+                  <option value="menu-item">Menu Item</option>
                 </select>
               </div>
 
@@ -393,6 +394,22 @@ export default function ButtonShowcase() {
                 <Button variant="danger">Danger</Button>
                 <Button variant="ghost">Ghost</Button>
                 <Button variant="outline">Outline</Button>
+              </div>
+            </div>
+
+            {/* Menu Item */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Menu Item (Dropdown)</h3>
+              <div className="bg-white border border-gray-200 rounded-lg shadow-sm w-64">
+                <Button variant="menu-item" fullWidth className="px-4 py-2 text-sm">
+                  Visualizar histórico
+                </Button>
+                <Button variant="menu-item" fullWidth className="px-4 py-2 text-sm">
+                  Editar informações
+                </Button>
+                <Button variant="menu-item" fullWidth className="px-4 py-2 text-sm">
+                  Excluir item
+                </Button>
               </div>
             </div>
 

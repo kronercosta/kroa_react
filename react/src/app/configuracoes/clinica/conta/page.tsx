@@ -7,7 +7,7 @@ import { Select } from '../../../../components/ui/Select';
 import { Switch } from '../../../../components/ui/Switch';
 import { Card } from '../../../../components/ui/Card';
 import { Modal } from '../../../../components/ui/Modal';
-import { ConfiguracoesLayout } from '../../../../layouts/ConfiguracoesLayout';
+import { ConfiguracoesLayout } from '../ConfiguracoesLayout';
 import { useClinic } from '../../../../contexts/ClinicContext';
 import { useRegion } from '../../../../contexts/RegionContext';
 

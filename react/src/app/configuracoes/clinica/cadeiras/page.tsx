@@ -6,7 +6,7 @@ import { Select } from '../../../../components/ui/Select';
 import { Card } from '../../../../components/ui/Card';
 import { Switch } from '../../../../components/ui/Switch';
 import { Table } from '../../../../components/ui/Table';
-import { ConfiguracoesLayout } from '../../../../layouts/ConfiguracoesLayout';
+import { ConfiguracoesLayout } from '../ConfiguracoesLayout';
 import { Aside } from '../../../../components/ui/Aside';
 
 interface Professional {

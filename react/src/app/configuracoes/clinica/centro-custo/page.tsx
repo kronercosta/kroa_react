@@ -4,7 +4,7 @@ import { Input } from '../../../../components/ui/Input';
 import { Switch } from '../../../../components/ui/Switch';
 import { Card } from '../../../../components/ui/Card';
 import { Table } from '../../../../components/ui/Table';
-import { ConfiguracoesLayout } from '../../../../layouts/ConfiguracoesLayout';
+import { ConfiguracoesLayout } from '../ConfiguracoesLayout';
 import { useClinic } from '../../../../contexts/ClinicContext';
 
 const CentroCustoClinica: React.FC = () => {

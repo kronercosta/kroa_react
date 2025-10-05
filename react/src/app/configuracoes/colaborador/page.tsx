@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { Table } from '../../../components/ui/Table';
+import { ColaboradorLayout } from './ColaboradorLayout';
 import {
   Plus,
   Calendar,
@@ -177,8 +178,8 @@ export default function ConfigColaborador() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-3 sm:p-6">
-      <div className="space-y-6">
+    <ColaboradorLayout>
+      <div className="p-3 sm:p-6">
         <Card>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-bold text-gray-900">Colaboradores</h2>
@@ -345,34 +346,42 @@ export default function ConfigColaborador() {
                       >
                         <ChevronDown className="w-4 h-4" />
                         <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-                          <button
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 rounded-t-lg"
+                          <Button
+                            variant="menu-item"
+                            fullWidth
+                            className="px-4 py-2 text-sm rounded-t-lg"
                             onClick={(e) => {
                               e.stopPropagation();
                               navigate(`/configuracoes/colaborador/dados-pessoais?id=${row.id}`);
                             }}
                           >
                             Editar
-                          </button>
-                          <button
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                          </Button>
+                          <Button
+                            variant="menu-item"
+                            fullWidth
+                            className="px-4 py-2 text-sm"
                             onClick={(e) => e.stopPropagation()}
                           >
                             Visualizar histórico
-                          </button>
-                          <button
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                          </Button>
+                          <Button
+                            variant="menu-item"
+                            fullWidth
+                            className="px-4 py-2 text-sm"
                             onClick={(e) => e.stopPropagation()}
                           >
                             Resetar senha
-                          </button>
+                          </Button>
                           <hr className="my-1" />
-                          <button
-                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-lg"
+                          <Button
+                            variant="menu-item"
+                            fullWidth
+                            className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-lg"
                             onClick={(e) => e.stopPropagation()}
                           >
                             Desativar
-                          </button>
+                          </Button>
                         </div>
                       </button>
                     </div>
@@ -392,6 +401,6 @@ export default function ConfigColaborador() {
           </div>
         </Card>
       </div>
-    </div>
+    </ColaboradorLayout>
   );
 }

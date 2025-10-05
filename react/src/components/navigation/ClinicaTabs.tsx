@@ -1,18 +1,18 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { SubMenu } from './SubMenu';
+import { useLocation } from 'react-router-dom';
+import { PageTabs } from '../ui/PageTabs';
+import type { TabItem } from '../ui/PageTabs';
 import { useRegion } from '../../contexts/RegionContext';
 
 export function ClinicaTabs() {
   const location = useLocation();
-  const navigate = useNavigate();
   const { currentRegion, config } = useRegion();
 
-  const tabItems = [
-    { id: 'conta', label: 'Conta' },
-    { id: 'cadeiras', label: currentRegion === 'BR' ? 'Cadeiras' : 'Chairs' },
-    ...(config.features.centroCusto ? [{ id: 'centro-custo', label: 'Centro de Custo' }] : []),
-    { id: 'parametros', label: 'Parâmetros' }
+  const tabItems: TabItem[] = [
+    { id: 'conta', label: 'Conta', path: '/configuracoes/clinica/conta' },
+    { id: 'cadeiras', label: currentRegion === 'BR' ? 'Cadeiras' : 'Chairs', path: '/configuracoes/clinica/cadeiras' },
+    ...(config.features.centroCusto ? [{ id: 'centro-custo', label: 'Centro de Custo', path: '/configuracoes/clinica/centro-custo' }] : []),
+    { id: 'parametros', label: 'Parâmetros', path: '/configuracoes/clinica/parametros' }
   ];
 
   // Determina a aba ativa baseado na URL
@@ -25,15 +25,10 @@ export function ClinicaTabs() {
     return 'conta';
   };
 
-  const handleTabChange = (tabId: string) => {
-    navigate(`/configuracoes/clinica/${tabId}`);
-  };
-
   return (
-    <SubMenu
+    <PageTabs
       items={tabItems}
-      activeItem={getActiveTab()}
-      onItemClick={handleTabChange}
+      activeTab={getActiveTab()}
       variant="default"
     />
   );
