@@ -42,7 +42,7 @@ export function ColaboradorLayout({ colaboradorData, headerControls, children }:
 
   return (
     <PageLayout
-      headerType={colaboradorData ? 'avatar' : 'default'}
+      headerType={'avatar'}
 
       // Props para header padrão
       title="Configurações de Colaboradores"
