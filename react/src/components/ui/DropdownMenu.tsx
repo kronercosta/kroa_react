@@ -148,6 +148,8 @@ export function ActionMenu({
   buttonClassName = '',
   triggerOnHover = false
 }: ActionMenuProps) {
+  const uiTranslations = useUITranslation();
+
   const trigger = (
     <button
       className={`
