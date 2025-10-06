@@ -166,10 +166,10 @@ export default function Step3Page() {
         {/* Header */}
         <div className="bg-gradient-to-r from-krooa-green to-krooa-blue text-white p-8 text-center">
           <h1 className="text-2xl font-bold mb-2">
-            Informações de Pagamento
+            {t?.step2?.title || 'Informações de Pagamento'}
           </h1>
           <p className="text-krooa-green-100">
-            Dados seguros e criptografados
+            {t?.step2?.securityNote?.replace('🔒 ', '') || 'Dados seguros e criptografados'}
           </p>
         </div>
 
@@ -177,10 +177,10 @@ export default function Step3Page() {
           {/* Plan Summary */}
           {planData && (
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <h3 className="font-semibold text-gray-900 mb-2">Resumo do pedido</h3>
+              <h3 className="font-semibold text-gray-900 mb-2">{t?.step2?.orderSummary || 'Resumo do pedido'}</h3>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Plano {planData.selectedPlan}</span>
-                <span className="font-semibold">7 dias grátis</span>
+                <span className="text-gray-600">{t?.step2?.plan || 'Plano'} {planData.selectedPlan}</span>
+                <span className="font-semibold">{t?.step2?.freeTrial || '7 dias grátis'}</span>
               </div>
               {planData.couponCode && (
                 <div className="flex justify-between items-center text-green-600">
@@ -201,7 +201,7 @@ export default function Step3Page() {
               </div>
               <div className="text-sm">
                 <p className="font-medium text-blue-900 mb-1">
-                  {t?.step2?.trialInfo ? 'Período de teste gratuito' : 'Período de teste gratuito'}
+                  {t?.step2?.freeTrialPeriod || 'Período de teste gratuito'}
                 </p>
                 <p className="text-blue-700">
                   {t?.step2?.trialInfo || 'Você terá 7 dias para testar gratuitamente. Após esse período, será cobrado o valor do plano escolhido.'}
@@ -347,7 +347,7 @@ export default function Step3Page() {
             {/* Alternative Payment Methods */}
             <div className="mt-6 pt-6 border-t border-gray-200">
               <div className="text-center mb-4">
-                <span className="text-sm text-gray-500 bg-white px-3">ou escolha outra forma de pagamento</span>
+                <span className="text-sm text-gray-500 bg-white px-3">{t?.step2?.alternativePayment || 'ou escolha outra forma de pagamento'}</span>
               </div>
 
               {/* Show Google Pay and Stripe Link only for card payments */}

@@ -59,6 +59,11 @@
       ],
       "generateBoleto": "Gerar Boleto",
       "generatingBoleto": "Gerando boleto...",
+      "orderSummary": "Resumo do pedido",
+      "plan": "Plano",
+      "freeTrial": "7 dias grátis",
+      "freeTrialPeriod": "Período de teste gratuito",
+      "alternativePayment": "ou escolha outra forma de pagamento",
       "startTrial": "Iniciar teste grátis",
       "termsRequired": "Você deve aceitar os termos para continuar",
       "coupon": "Cupom de desconto (opcional)",
@@ -238,7 +243,7 @@
       }
     },
     "step2": {
-      "title": "7-day free trial",
+      "title": "Payment Information",
       "subtitle": "Try all features without commitment",
       "benefits": [
         "✓ Full access to all features",
@@ -258,6 +263,11 @@
       "paymentMethod": "Payment method",
       "creditCard": "Credit Card",
       "creditCardDescription": "Immediate debit • Instant approval",
+      "orderSummary": "Order summary",
+      "plan": "Plan",
+      "freeTrial": "7 days free",
+      "freeTrialPeriod": "Free trial period",
+      "alternativePayment": "or choose another payment method",
       "startTrial": "Start free trial",
       "termsRequired": "You must accept the terms to continue",
       "coupon": "Discount coupon (optional)",

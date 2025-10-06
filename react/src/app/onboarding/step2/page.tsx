@@ -218,7 +218,7 @@ export default function Step2Page() {
                         <div className="flex items-center gap-3 mb-2">
                           <div className={`w-4 h-4 rounded-full border-2 ${
                             selectedPlan === planKey
-                              ? 'border-krooa-green bg-krooa-green'
+                              ? 'border-slate-700 bg-slate-700'
                               : 'border-gray-300'
                           }`}>
                             {selectedPlan === planKey && (
