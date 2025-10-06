@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface SubMenuItem {
   id: string;
@@ -31,6 +31,38 @@ export function SubMenu({
   header,
   className = ''
 }: SubMenuProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const activeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Auto-scroll to active item on mobile
+  useEffect(() => {
+    if (activeButtonRef.current && scrollRef.current) {
+      const button = activeButtonRef.current;
+      const container = scrollRef.current;
+
+      // Check if we're on mobile (viewport width < 768px)
+      const isMobile = window.innerWidth < 768;
+
+      if (isMobile) {
+        const buttonRect = button.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+
+        const isVisible =
+          buttonRect.left >= containerRect.left &&
+          buttonRect.right <= containerRect.right;
+
+        if (!isVisible) {
+          // Calculate scroll position to center the active button
+          const scrollLeft = button.offsetLeft - container.offsetWidth / 2 + button.offsetWidth / 2;
+
+          container.scrollTo({
+            left: Math.max(0, scrollLeft),
+            behavior: 'smooth'
+          });
+        }
+      }
+    }
+  }, [activeItem]);
 
   // Variant with header
   if (variant === 'withHeader' && header) {
@@ -76,11 +108,12 @@ export function SubMenu({
         </div>
 
         {/* Tabs Section */}
-        <div className="bg-white px-6 overflow-x-auto">
+        <div className="bg-white px-6 overflow-x-auto" ref={scrollRef}>
           <div className="flex gap-1 border-b border-gray-200 min-w-max">
             {items.map((item) => (
               <button
                 key={item.id}
+                ref={activeItem === item.id ? activeButtonRef : null}
                 onClick={() => onItemClick(item.id)}
                 className={`
                   relative px-4 py-3 text-sm font-medium transition-all duration-200
@@ -128,11 +161,12 @@ export function SubMenu({
   if (variant === 'compact') {
     return (
       <div className={`w-full bg-white ${className}`}>
-        <div className="px-4 overflow-x-auto">
+        <div className="px-4 overflow-x-auto" ref={scrollRef}>
           <div className="flex gap-0.5 border-b border-gray-200 min-w-max">
             {items.map((item) => (
               <button
                 key={item.id}
+                ref={activeItem === item.id ? activeButtonRef : null}
                 onClick={() => onItemClick(item.id)}
                 className={`
                   relative px-3 py-2 text-xs font-medium transition-all duration-200
@@ -170,33 +204,50 @@ export function SubMenu({
 
   // Default variant
   return (
-    <div className={`w-full bg-white ${className}`}>
-      <div className="px-3 sm:px-6 py-2 overflow-x-auto scrollbar-hide">
-        <div className="flex gap-1 sm:gap-2 min-w-max">
+    <div className={`w-full max-w-[100dvw] bg-white border-b border-gray-200 ${className}`}>
+      <div
+        ref={scrollRef}
+        className="px-4 sm:px-6 py-2 overflow-x-auto overflow-y-hidden"
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
+        <style jsx>{`
+          div::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+        <div className="flex gap-2 min-w-max">
           {items.map((item) => (
             <button
               key={item.id}
+              ref={activeItem === item.id ? activeButtonRef : null}
               onClick={() => onItemClick(item.id)}
               className={`
-                relative px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 rounded-full whitespace-nowrap
+                relative px-4 py-2 text-sm font-medium transition-all duration-200 rounded-full whitespace-nowrap flex-shrink-0
                 ${activeItem === item.id
                   ? 'bg-krooa-green text-krooa-dark shadow-sm'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }
               `}
             >
-              {item.label}
-              {item.badge && (
-                <span className={`
-                  ml-1 sm:ml-1.5 px-1 sm:px-1.5 py-0.5 text-[10px] sm:text-xs rounded-full
-                  ${activeItem === item.id
-                    ? 'bg-krooa-dark/10 text-krooa-dark'
-                    : 'bg-gray-200 text-gray-600'
-                  }
-                `}>
-                  {item.badge}
-                </span>
-              )}
+              <span className="flex items-center gap-2">
+                {item.icon}
+                <span>{item.label}</span>
+                {item.badge && (
+                  <span className={`
+                    ml-1 px-2 py-0.5 text-xs rounded-full flex-shrink-0
+                    ${activeItem === item.id
+                      ? 'bg-krooa-dark/10 text-krooa-dark'
+                      : 'bg-gray-200 text-gray-600'
+                    }
+                  `}>
+                    {item.badge}
+                  </span>
+                )}
+              </span>
             </button>
           ))}
         </div>

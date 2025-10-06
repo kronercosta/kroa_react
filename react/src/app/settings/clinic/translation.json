@@ -3,9 +3,10 @@
     "title": "Configurações da Clínica",
     "subtitle": "Gerencie as informações e configurações da sua clínica",
     "tabs": {
-      "conta": "Conta",
+      "conta": "Configurações Administrativas",
       "cadeiras": "Cadeiras",
       "centroCusto": "Centro de Custo",
+      "multiplasUnidades": "Múltiplas Unidades",
       "parametros": "Parâmetros"
     }
   },
@@ -13,9 +14,10 @@
     "title": "Clinic Settings",
     "subtitle": "Manage your clinic information and settings",
     "tabs": {
-      "conta": "Account",
+      "conta": "Administrative Settings",
       "cadeiras": "Chairs",
       "centroCusto": "Cost Center",
+      "multiplasUnidades": "Multiple Units",
       "parametros": "Parameters"
     }
   },
@@ -23,9 +25,10 @@
     "title": "Configuraciones de la Clínica",
     "subtitle": "Gestione la información y configuraciones de su clínica",
     "tabs": {
-      "conta": "Cuenta",
+      "conta": "Configuraciones Administrativas",
       "cadeiras": "Sillas",
       "centroCusto": "Centro de Costo",
+      "multiplasUnidades": "Múltiples Unidades",
       "parametros": "Parámetros"
     }
   }

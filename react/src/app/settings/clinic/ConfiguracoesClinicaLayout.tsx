@@ -17,9 +17,10 @@ export function ConfiguracoesClinicaLayout({ headerControls, children }: Configu
   const { t } = useTranslation(translations);
 
   const tabItems: TabItem[] = [
-    { id: 'account', label: t.tabs?.conta || 'Conta', path: '/settings/clinic/account' },
+    { id: 'account', label: t.tabs?.conta || 'Configurações Administrativas', path: '/settings/clinic/account' },
     { id: 'operatory', label: t.tabs?.cadeiras || 'Cadeiras', path: '/settings/clinic/operatory' },
     ...(config.features.centroCusto ? [{ id: 'cost-center', label: t.tabs?.centroCusto || 'Centro de Custo', path: '/settings/clinic/cost-center' }] : []),
+    { id: 'multiple-units', label: t.tabs?.multiplasUnidades || 'Múltiplas Unidades', path: '/settings/clinic/multiple-units' },
     { id: 'parameters', label: t.tabs?.parametros || 'Parâmetros', path: '/settings/clinic/parameters' }
   ];
 
@@ -28,6 +29,7 @@ export function ConfiguracoesClinicaLayout({ headerControls, children }: Configu
     if (path.includes('/account')) return 'account';
     if (path.includes('/operatory')) return 'operatory';
     if (path.includes('/cost-center')) return 'cost-center';
+    if (path.includes('/multiple-units')) return 'multiple-units';
     if (path.includes('/parameters')) return 'parameters';
     return 'account';
   };
@@ -40,7 +42,7 @@ export function ConfiguracoesClinicaLayout({ headerControls, children }: Configu
       tabs={tabItems}
       activeTab={getActiveTab()}
     >
-      <div className="p-3 sm:p-6">
+      <div className="p-4 sm:p-6 max-w-full overflow-hidden">
         {children}
       </div>
     </PageLayout>

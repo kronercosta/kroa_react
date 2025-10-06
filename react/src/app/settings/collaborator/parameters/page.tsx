@@ -20,6 +20,7 @@ export default function ParametrosColaborador() {
     centroCustoPadrao: '',
     profissionalPadrao: '',
     bancoPadrao: '',
+    idioma: 'pt',
     responsavelOrcamento: false,
     responsavelAgendamento: false,
     notificacoesWhatsapp: true,
@@ -59,6 +60,12 @@ export default function ParametrosColaborador() {
     { value: '1', label: 'Banco do Brasil - Ag 1234 / CC 5678-9' },
     { value: '2', label: 'Itaú - Ag 4321 / CC 8765-4' },
     { value: '3', label: 'Bradesco - Ag 5678 / CC 1234-5' }
+  ];
+
+  const idiomaOptions = [
+    { value: 'pt', label: 'Português (Brasil)' },
+    { value: 'en', label: 'English (United States)' },
+    { value: 'es', label: 'Español' }
   ];
 
   return (
@@ -117,6 +124,13 @@ export default function ParametrosColaborador() {
                 { value: '', label: t?.defaultValues?.defaultBankPlaceholder || 'Selecione o banco/conta' },
                 ...bancoOptions
               ]}
+            />
+
+            <Select
+              label={t?.defaultValues?.language || 'Idioma Preferido'}
+              value={formData.idioma}
+              onChange={(e) => handleInputChange('idioma', e.target.value)}
+              options={idiomaOptions}
             />
           </div>
         </Card>

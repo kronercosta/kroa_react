@@ -9,43 +9,39 @@ import { Card } from '../../../../components/ui/Card';
 import { Modal } from '../../../../components/ui/Modal';
 import { ConfiguracoesClinicaLayout } from '../ConfiguracoesClinicaLayout';
 import { HeaderControls } from '../../../../components/ui/HeaderControls';
-import { useClinic } from '../../../../contexts/ClinicContext';
 import { useRegion } from '../../../../contexts/RegionContext';
 import { useTranslation } from '../../../../hooks/useTranslation';
 import translations from './translation.json';
+import { DocumentModal } from './DocumentModal';
+import lgpdTerms from './lgpd-terms.json';
+import adminTerms from './admin-responsibility-terms.json';
 
 const ContaClinica: React.FC = () => {
-  const { multiplasUnidadesEnabled, setMultiplasUnidadesEnabled } = useClinic();
-  const { currentRegion, config } = useRegion();
+  const { currentRegion } = useRegion();
+
+  // Mapear região para idioma
+  const getLanguageByRegion = (region: string) => {
+    switch (region) {
+      case 'BR': return 'PT';
+      case 'US': return 'EN';
+      default: return 'PT';
+    }
+  };
+
+  const language = getLanguageByRegion(currentRegion);
   const { t } = useTranslation(translations);
 
   const [pessoaJuridica, setPessoaJuridica] = useState(true);
-  const [editingUnit, setEditingUnit] = useState<number | null>(null);
 
-  // Opções para os MultiSelects
-  const centralOptions = [
-    { value: 'central1', label: 'Central 1' },
-    { value: 'central2', label: 'Central 2' },
-    { value: 'central3', label: 'Central 3' },
-    { value: 'central4', label: 'Central 4' }
-  ];
+  // Document modal states
+  const [documentModal, setDocumentModal] = useState<{
+    isOpen: boolean;
+    type: 'lgpd' | 'admin' | null;
+  }>({ isOpen: false, type: null });
 
-  const centroCustoOptions = [
-    { value: 'cc001', label: 'CC 001' },
-    { value: 'cc002', label: 'CC 002' },
-    { value: 'cc003', label: 'CC 003' },
-    { value: 'cc004', label: 'CC 004' }
-  ];
-
-  const colaboradoresOptions = [
-    { value: '1', label: 'Dr. João Silva' },
-    { value: '2', label: 'Dra. Maria Santos' },
-    { value: '3', label: 'Dr. Pedro Costa' },
-    { value: '4', label: 'Dra. Ana Lima' }
-  ];
-
-  // Modal states
-  const [deleteUnitModal, setDeleteUnitModal] = useState<{open: boolean, targetUnitId: number | null, sourceUnitId: number | null}>({open: false, targetUnitId: null, sourceUnitId: null});
+  // Terms acceptance states
+  const [lgpdAccepted, setLgpdAccepted] = useState(false);
+  const [adminResponsibilityAccepted, setAdminResponsibilityAccepted] = useState(false);
 
   // Form data
   const [formData, setFormData] = useState({
@@ -66,17 +62,6 @@ const ContaClinica: React.FC = () => {
     masterUser: '',
   });
 
-  const [unidades, setUnidades] = useState<any[]>([
-    {
-      id: 1,
-      titulo: 'Unidade Principal',
-      centralComunicacao: [],
-      centroCusto: [],
-      colaboradores: [],
-      isMaster: true,
-      registrosVinculados: 127 // Exemplo de registros vinculados
-    }
-  ]);
 
   // Mock professionals list - in production this would come from API
   const professionals = [
@@ -89,78 +74,88 @@ const ContaClinica: React.FC = () => {
 
   return (
     <ConfiguracoesClinicaLayout headerControls={<HeaderControls />}>
-      <div className="space-y-6">
+      <div className="space-y-6 w-full max-w-full">
         {/* Dados da Conta Section */}
-        <Card>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold text-gray-900">{t?.account || 'Conta'}</h2>
-            <Button>{t?.save || 'Salvar'}</Button>
+        <Card className="w-full max-w-full overflow-hidden">
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start mb-6">
+            <div className="flex-1">
+              <h2 className="text-lg font-bold text-gray-900">{t?.account || 'Conta'}</h2>
+            </div>
+            <div className="flex-shrink-0">
+              <Button size="sm" className="w-full sm:w-auto min-w-[120px]">
+                {t?.save || 'Salvar'}
+              </Button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Input
-              label={t?.companyName || 'Nome Empresa'}
-              value={formData.companyName}
-              onChange={(value) => setFormData({ ...formData, companyName: value })}
-              placeholder={t?.placeholders?.companyName || 'Digite o nome da empresa'}
-              fullWidth
-              required
-            />
+          <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4">
+            <div className="w-full">
+              <Input
+                label={t?.companyName || 'Nome Empresa'}
+                value={formData.companyName}
+                onChange={(value) => setFormData({ ...formData, companyName: value })}
+                placeholder={t?.placeholders?.companyName || 'Digite o nome da empresa'}
+                required
+              />
+            </div>
 
-            <Input
-              label={t?.email || 'E-mail'}
-              value={formData.email}
-              onChange={(value) => setFormData({ ...formData, email: value })}
-              validation="email"
-              fullWidth
-              required
-            />
+            <div className="w-full">
+              <Input
+                label={t?.email || 'E-mail'}
+                value={formData.email}
+                onChange={(value) => setFormData({ ...formData, email: value })}
+                validation="email"
+                required
+              />
+            </div>
 
-            <Input
-              label={t?.responsibleName || 'Nome do Responsável'}
-              value={formData.responsibleName}
-              onChange={(value) => setFormData({ ...formData, responsibleName: value })}
-              placeholder={t?.placeholders?.responsibleName || 'Nome completo'}
-              fullWidth
-              required
-            />
+            <div className="w-full">
+              <Input
+                label={t?.responsibleName || 'Nome do Responsável'}
+                value={formData.responsibleName}
+                onChange={(value) => setFormData({ ...formData, responsibleName: value })}
+                placeholder={t?.placeholders?.responsibleName || 'Nome completo'}
+                required
+              />
+            </div>
 
             {/* Campo de documento varia por região */}
-            {currentRegion === 'BR' ? (
+            <div className="w-full">
+              {currentRegion === 'BR' ? (
+                <Input
+                  label={t?.regionLabels?.BR?.responsibleDocument || 'CPF do Responsável'}
+                  value={formData.responsibleDocument}
+                  onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
+                  mask="cpf"
+                  validation="cpf"
+                  placeholder="000.000.000-00"
+                  required
+                />
+              ) : (
+                <Input
+                  label={t?.regionLabels?.US?.responsibleDocument || "Responsible's SSN"}
+                  value={formData.responsibleDocument}
+                  onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
+                  mask="ssn"
+                  validation="ssn"
+                  placeholder="000-00-0000"
+                  required
+                />
+              )}
+            </div>
+
+            <div className="w-full">
               <Input
-                label={t?.regionLabels?.BR?.responsibleDocument || 'CPF do Responsável'}
-                value={formData.responsibleDocument}
-                onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
-                mask="cpf"
-                validation="cpf"
-                placeholder="000.000.000-00"
-                fullWidth
+                label={t?.phone || 'Telefone'}
+                value={formData.phone}
+                onChange={(value) => setFormData({ ...formData, phone: value })}
+                mask="internationalPhone"
+                defaultCountry={currentRegion === 'BR' ? 'BR' : 'US'}
                 required
               />
-            ) : (
-              <Input
-                label={t?.regionLabels?.US?.responsibleDocument || "Responsible's SSN"}
-                value={formData.responsibleDocument}
-                onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
-                mask="ssn"
-                validation="ssn"
-                placeholder="000-00-0000"
-                fullWidth
-                required
-              />
-            )}
+            </div>
 
-            <Input
-              label={t?.phone || 'Telefone'}
-              value={formData.phone}
-              onChange={(value) => setFormData({ ...formData, phone: value })}
-              mask="internationalPhone"
-              defaultCountry={currentRegion === 'BR' ? 'BR' : 'US'}
-              fullWidth
-              required
-            />
-
-            <div>
+            <div className="w-full">
               <Select
                 label={t?.masterUser || 'Usuário Master'}
                 value={formData.masterUser || ''}
@@ -192,304 +187,127 @@ const ContaClinica: React.FC = () => {
             </div>
 
             {pessoaJuridica && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Input
-                  label={t?.legalName || 'Razão Social'}
-                  value={formData.legalName}
-                  onChange={(value) => setFormData({ ...formData, legalName: value })}
-                  placeholder={t?.placeholders?.legalName || 'Nome da empresa'}
-                  fullWidth
-                />
+              <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4">
+                <div className="w-full">
+                  <Input
+                    label={t?.legalName || 'Razão Social'}
+                    value={formData.legalName}
+                    onChange={(value) => setFormData({ ...formData, legalName: value })}
+                    placeholder={t?.placeholders?.legalName || 'Nome da empresa'}
+                  />
+                </div>
 
                 {/* Campo de CNPJ/EIN varia por região */}
-                {currentRegion === 'BR' ? (
-                  <Input
-                    label={t?.regionLabels?.BR?.taxId || 'CNPJ'}
-                    value={formData.taxId}
-                    onChange={(value) => setFormData({ ...formData, taxId: value })}
-                    mask="cnpj"
-                    validation="cnpj"
-                    placeholder="00.000.000/0000-00"
-                    fullWidth
-                  />
-                ) : (
-                  <Input
-                    label={t?.regionLabels?.US?.taxId || 'EIN'}
-                    value={formData.taxId}
-                    onChange={(value) => setFormData({ ...formData, taxId: value })}
-                    mask="ein"
-                    validation="ein"
-                    placeholder="00-0000000"
-                    fullWidth
-                  />
-                )}
+                <div className="w-full">
+                  {currentRegion === 'BR' ? (
+                    <Input
+                      label={t?.regionLabels?.BR?.taxId || 'CNPJ'}
+                      value={formData.taxId}
+                      onChange={(value) => setFormData({ ...formData, taxId: value })}
+                      mask="cnpj"
+                      validation="cnpj"
+                      placeholder="00.000.000/0000-00"
+                    />
+                  ) : (
+                    <Input
+                      label={t?.regionLabels?.US?.taxId || 'EIN'}
+                      value={formData.taxId}
+                      onChange={(value) => setFormData({ ...formData, taxId: value })}
+                      mask="ein"
+                      validation="ein"
+                      placeholder="00-0000000"
+                    />
+                  )}
+                </div>
               </div>
             )}
           </div>
 
-          {/* Múltiplas Unidades Toggle */}
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-medium text-gray-900">{t?.multipleUnits || 'Múltiplas Unidades'}</h3>
-                <p className="text-sm text-gray-500">{t?.multipleUnitsDescription || 'Gerencie múltiplas unidades da sua clínica'}</p>
-              </div>
-              <Switch
-                checked={multiplasUnidadesEnabled}
-                onChange={setMultiplasUnidadesEnabled}
-              />
-            </div>
-          </div>
-        </Card>
-
-        {/* Unidades Section */}
-        {multiplasUnidadesEnabled && (
-          <Card>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-gray-900">{t?.units || 'Unidades'}</h2>
-              <Button
-                onClick={() => setUnidades([...unidades, {
-                  id: Date.now(),
-                  titulo: t?.newUnit || 'Nova Unidade',
-                  centralComunicacao: [],
-                  centroCusto: [],
-                  colaboradores: []
-                }])}
-                variant="primary"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                {t?.newUnit || 'Nova Unidade'}
-              </Button>
-            </div>
-
-            <div className="overflow-x-auto rounded-lg border border-gray-200">
-              <table className="min-w-full">
-                <thead className="bg-gray-50 sticky top-0 z-10">
-                  <tr>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider first:rounded-tl-lg bg-gray-50">
-                      {t?.title || 'Título'}
-                    </th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50">
-                      {t?.communicationCenter || 'Central de Comunicação'}
-                    </th>
-                    {config.features.centroCusto && (
-                      <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50">
-                        {t?.costCenter || 'Centro de Custo'}
-                      </th>
-                    )}
-                    <th className="text-left py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider bg-gray-50">
-                      {t?.collaborators || 'Colaboradores'}
-                    </th>
-                    <th className="text-right py-3 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider last:rounded-tr-lg bg-gray-50">
-                      {t?.actions || 'Ações'}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {unidades.map((unidade) => (
-                    <tr key={unidade.id} className="hover:bg-gray-50">
-                      <td className="py-2.5 px-4 text-sm text-gray-900">
-                        {editingUnit === unidade.id ? (
-                          <Input
-                            value={unidade.titulo}
-                            onChange={(value) => {
-                              const newUnidades = unidades.map((u: any) =>
-                                u.id === unidade.id ? {...u, titulo: value} : u
-                              );
-                              setUnidades(newUnidades);
-                            }}
-                            className="w-full py-1"
-                            fullWidth
-                          />
-                        ) : (
-                          unidade.titulo
-                        )}
-                      </td>
-                      <td className="py-2.5 px-4 text-sm text-gray-900">
-                        {editingUnit === unidade.id ? (
-                          <Select
-                            options={centralOptions}
-                            value={unidade.centralComunicacao}
-                            onChange={(e) => {
-                              const value = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
-                              const newUnidades = unidades.map((u: any) =>
-                                u.id === unidade.id ? {...u, centralComunicacao: value} : u
-                              );
-                              setUnidades(newUnidades);
-                            }}
-                            placeholder={t.placeholders.selectCommunicationCenters}
-                            multiple={true}
-                          />
-                        ) : (
-                          unidade.centralComunicacao.map((c: any) =>
-                            centralOptions.find(opt => opt.value === c)?.label
-                          ).join(', ')
-                        )}
-                      </td>
-                      {config.features.centroCusto && (
-                        <td className="py-2.5 px-4 text-sm text-gray-900">
-                          {editingUnit === unidade.id ? (
-                            <Select
-                              options={centroCustoOptions}
-                              value={unidade.centroCusto}
-                              onChange={(e) => {
-                                const value = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
-                                const newUnidades = unidades.map((u: any) =>
-                                  u.id === unidade.id ? {...u, centroCusto: value} : u
-                                );
-                                setUnidades(newUnidades);
-                              }}
-                              placeholder={t.placeholders.selectCostCenters}
-                              multiple={true}
-                            />
-                          ) : (
-                            unidade.centroCusto.map((c: any) =>
-                              centroCustoOptions.find(opt => opt.value === c)?.label
-                            ).join(', ')
-                          )}
-                        </td>
-                      )}
-                      <td className="py-2.5 px-4 text-sm text-gray-900">
-                        {editingUnit === unidade.id ? (
-                          <Select
-                            options={colaboradoresOptions}
-                            value={unidade.colaboradores}
-                            onChange={(e) => {
-                              const value = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
-                              const newUnidades = unidades.map((u: any) =>
-                                u.id === unidade.id ? {...u, colaboradores: value} : u
-                              );
-                              setUnidades(newUnidades);
-                            }}
-                            placeholder={t.placeholders.selectCollaborators}
-                            multiple={true}
-                          />
-                        ) : (
-                          unidade.colaboradores.length > 0
-                            ? unidade.colaboradores.map((c: any) =>
-                                colaboradoresOptions.find(opt => opt.value === c)?.label
-                              ).join(', ')
-                            : '-'
-                        )}
-                      </td>
-                      <td className="py-2.5 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <IconButton
-                            onClick={() => {
-                              if (editingUnit === unidade.id) {
-                                setEditingUnit(null);
-                              } else {
-                                setEditingUnit(unidade.id);
-                              }
-                            }}
-                            variant={editingUnit === unidade.id ? "primary" : "ghost"}
-                            size="sm"
-                            title={editingUnit === unidade.id ? t.save : t.edit}
-                          >
-                            {editingUnit === unidade.id ? (
-                              <Check className="w-4 h-4" />
-                            ) : (
-                              <Edit className="w-4 h-4" />
-                            )}
-                          </IconButton>
-                          <IconButton
-                            onClick={() => {
-                              if (unidades.length > 1 && !unidade.isMaster) {
-                                setDeleteUnitModal({ open: true, sourceUnitId: unidade.id, targetUnitId: null });
-                              }
-                            }}
-                            variant="ghost"
-                            size="sm"
-                            title={unidade.isMaster ? t.masterUnitCannotBeDeleted : t.delete}
-                            disabled={unidade.isMaster}
-                            className={unidade.isMaster ? "text-gray-300" : "text-red-600 hover:text-red-700"}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </IconButton>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-        )}
-      </div>
-
-      {/* Delete Unit Modal */}
-      <Modal
-        isOpen={deleteUnitModal.open}
-        onClose={() => setDeleteUnitModal({ open: false, targetUnitId: null, sourceUnitId: null })}
-        title={t.deleteUnit}
-      >
-        <div className="space-y-4">
-          {(() => {
-            const unit = unidades.find(u => u.id === deleteUnitModal.sourceUnitId);
-            const registros = unit?.registrosVinculados || 0;
-
-            return (
-              <>
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                  <div className="flex items-start gap-2">
-                    <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <div>
-                      <p className="font-semibold text-amber-800">
-                        {registros} {t.recordsAffected}
-                      </p>
-                      <p className="text-sm text-amber-700 mt-1">
-                        {t.deleteUnitConfirm} <strong>{unit?.titulo}</strong>?
-                      </p>
-                    </div>
+          {/* Aceite de Termos LGPD */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <h3 className="text-base font-medium text-gray-900 mb-4">{t?.termsSection || 'Aceite de Termos'}</h3>
+            <div className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="lgpd-consent"
+                    checked={lgpdAccepted}
+                    onChange={(e) => setLgpdAccepted(e.target.checked)}
+                    className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
+                  />
+                  <div className="flex-1">
+                    <label htmlFor="lgpd-consent" className="text-sm font-medium text-blue-900 cursor-pointer block">
+                      {t?.lgpdConsent || 'Aceite dos Termos LGPD'}
+                    </label>
+                    <p className="text-xs text-blue-700 mt-1 leading-relaxed">
+                      {t?.lgpdDescription || 'Declaro estar ciente e concordo com os termos da Lei Geral de Proteção de Dados (LGPD) e autorizo o tratamento dos dados pessoais conforme descrito na política de privacidade.'}
+                    </p>
+                    <button
+                      onClick={() => setDocumentModal({ isOpen: true, type: 'lgpd' })}
+                      className="text-xs text-blue-600 underline mt-2 hover:text-blue-800 transition-colors"
+                    >
+                      {t?.viewLgpdDocument || 'Ver documento completo →'}
+                    </button>
                   </div>
                 </div>
+              </div>
 
-                <div className="space-y-3">
-                  <p className="text-gray-600 text-sm">
-                    {t.transferRecords}
-                  </p>
-
-                  <Select
-                    value={deleteUnitModal.targetUnitId?.toString() || ''}
-                    onChange={(e) => setDeleteUnitModal({ ...deleteUnitModal, targetUnitId: parseInt(Array.isArray(e.target.value) ? e.target.value[0] : e.target.value) || null })}
-                    options={[
-                      { value: '', label: t.doNotTransfer },
-                      ...unidades.filter(u => u.id !== deleteUnitModal.sourceUnitId).map(u => ({
-                        value: u.id.toString(),
-                        label: u.titulo
-                      }))
-                    ]}
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="admin-responsibility"
+                    checked={adminResponsibilityAccepted}
+                    onChange={(e) => setAdminResponsibilityAccepted(e.target.checked)}
+                    className="mt-1 w-4 h-4 text-amber-600 bg-gray-100 border-gray-300 rounded focus:ring-amber-500 flex-shrink-0"
                   />
+                  <div className="flex-1">
+                    <label htmlFor="admin-responsibility" className="text-sm font-medium text-amber-900 cursor-pointer block">
+                      {t?.adminResponsibility || 'Responsabilidade do Usuário Administrador'}
+                    </label>
+                    <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+                      {t?.adminResponsibilityDescription || 'Assumo total responsabilidade pelas configurações e dados inseridos no sistema, comprometendo-me a manter a segurança e confidencialidade das informações dos pacientes.'}
+                    </p>
+                    <button
+                      onClick={() => setDocumentModal({ isOpen: true, type: 'admin' })}
+                      className="text-xs text-amber-600 underline mt-2 hover:text-amber-800 transition-colors"
+                    >
+                      {t?.viewResponsibilityDocument || 'Ver termo de responsabilidade →'}
+                    </button>
+                  </div>
                 </div>
-              </>
-            );
-          })()}
-
-          <div className="flex justify-between">
-            <Button
-              variant="outline"
-              onClick={() => setDeleteUnitModal({ open: false, targetUnitId: null, sourceUnitId: null })}
-            >
-              {t.cancel}
-            </Button>
-            <Button
-              variant="danger"
-              onClick={() => {
-                if (deleteUnitModal.sourceUnitId) {
-                  setUnidades(unidades.filter(u => u.id !== deleteUnitModal.sourceUnitId));
-                  setDeleteUnitModal({ open: false, targetUnitId: null, sourceUnitId: null });
-                }
-              }}
-            >
-              {deleteUnitModal.targetUnitId ? t.deleteAndTransfer : t.deletePermanently}
-            </Button>
+              </div>
+            </div>
           </div>
-        </div>
-      </Modal>
+
+        </Card>
+      </div>
+
+
+      {/* Document Modal */}
+      <DocumentModal
+        isOpen={documentModal.isOpen}
+        onClose={() => setDocumentModal({ isOpen: false, type: null })}
+        document={
+          documentModal.type === 'lgpd'
+            ? lgpdTerms[language as keyof typeof lgpdTerms] || lgpdTerms.PT
+            : documentModal.type === 'admin'
+            ? adminTerms[language as keyof typeof adminTerms] || adminTerms.PT
+            : null
+        }
+        onAccept={() => {
+          if (documentModal.type === 'lgpd') {
+            setLgpdAccepted(true);
+          } else if (documentModal.type === 'admin') {
+            setAdminResponsibilityAccepted(true);
+          }
+        }}
+        showAcceptButton={
+          (documentModal.type === 'lgpd' && !lgpdAccepted) ||
+          (documentModal.type === 'admin' && !adminResponsibilityAccepted)
+        }
+      />
     </ConfiguracoesClinicaLayout>
   );
 };

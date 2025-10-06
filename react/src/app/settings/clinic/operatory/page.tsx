@@ -294,8 +294,9 @@ const CadeirasClinica: React.FC = () => {
 
   return (
     <ConfiguracoesClinicaLayout headerControls={<HeaderControls />}>
-      {/* Status da Configuração */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+      <div className="w-full max-w-full space-y-6">
+        {/* Status da Configuração */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0 p-3 bg-blue-100 rounded-lg">
             <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -352,21 +353,25 @@ const CadeirasClinica: React.FC = () => {
         </div>
       </div>
 
-      <Card>
-        <div className="flex justify-between items-center mb-4">
-          <div>
+      <Card className="w-full max-w-full overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+          <div className="flex-1 min-w-0">
             <h2 className="text-lg font-bold text-gray-900">{t.pageTitle || 'Configuração de Cadeiras'}</h2>
             <p className="text-sm text-gray-600 mt-1">{t.pageSubtitle || 'Configure horários e profissionais para cada cadeira'}</p>
           </div>
-          <Button onClick={() => openAside()} variant="primary">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            {t.buttons?.newChair || 'Nova Cadeira'}
-          </Button>
+          <div className="flex-shrink-0">
+            <Button onClick={() => openAside()} variant="primary" className="w-full sm:w-auto">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              {t.buttons?.newChair || 'Nova Cadeira'}
+            </Button>
+          </div>
         </div>
 
         <Table
+          responsive="cards"
+          mobileBreakpoint="md"
           columns={[
             {
               key: 'order',
@@ -1051,6 +1056,8 @@ const CadeirasClinica: React.FC = () => {
               </div>
             ) : (
               <Table
+                responsive="stack"
+                mobileBreakpoint="md"
                 columns={[
                   {
                     key: 'day',
@@ -1162,6 +1169,7 @@ const CadeirasClinica: React.FC = () => {
           </div>
         </div>
       </Aside>
+      </div>
     </ConfiguracoesClinicaLayout>
   );
 };

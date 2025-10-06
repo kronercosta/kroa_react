@@ -25,13 +25,15 @@ export function PageTabs({ items, activeTab, variant = 'default' }: PageTabsProp
   };
 
   return (
-    <SubMenu
-      items={items.map(item => ({ id: item.id, label: item.label }))}
-      activeItem={activeTab}
-      onItemClick={handleTabChange}
-      variant={variant}
-    />
+    <div className="w-full max-w-[100dvw] overflow-hidden">
+      <SubMenu
+        items={items.map(item => ({ id: item.id, label: item.label }))}
+        activeItem={activeTab}
+        onItemClick={handleTabChange}
+        variant={variant}
+        className="w-full max-w-[100dvw]"
+      />
+    </div>
   );
 }
 
-export type { TabItem };

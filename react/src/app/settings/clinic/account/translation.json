@@ -1,12 +1,12 @@
 {
   "PT": {
-    "account": "Conta",
+    "account": "Configurações Administrativas",
     "save": "Salvar",
-    "companyName": "Nome Empresa",
-    "email": "E-mail",
-    "responsibleName": "Nome do Responsável",
-    "phone": "Telefone",
-    "masterUser": "Usuário Master",
+    "companyName": "Nome da Clínica",
+    "email": "Melhor E-mail",
+    "responsibleName": "Nome Completo",
+    "phone": "Melhor Telefone",
+    "masterUser": "Vincular Usuário Admin",
     "masterUserDescription": "O usuário master tem acesso total ao sistema",
     "legalEntity": "Pessoa Jurídica",
     "legalEntityDescription": "Habilite para adicionar dados da empresa",
@@ -31,9 +31,16 @@
     "deleteAndTransfer": "Excluir e Transferir",
     "deletePermanently": "Excluir Permanentemente",
     "masterUnitCannotBeDeleted": "Unidade principal não pode ser excluída",
+    "termsSection": "Aceite de Termos",
+    "lgpdConsent": "Aceite dos Termos LGPD",
+    "lgpdDescription": "Declaro estar ciente e concordo com os termos da Lei Geral de Proteção de Dados (LGPD) e autorizo o tratamento dos dados pessoais conforme descrito na política de privacidade.",
+    "viewLgpdDocument": "Ver documento completo →",
+    "adminResponsibility": "Responsabilidade do Usuário Administrador",
+    "adminResponsibilityDescription": "Assumo total responsabilidade pelas configurações e dados inseridos no sistema, comprometendo-me a manter a segurança e confidencialidade das informações dos pacientes.",
+    "viewResponsibilityDocument": "Ver termo de responsabilidade →",
     "regionLabels": {
       "BR": {
-        "responsibleDocument": "CPF do Responsável",
+        "responsibleDocument": "CPF",
         "taxId": "CNPJ",
         "zipCode": "CEP",
         "state": "Estado",
@@ -48,9 +55,9 @@
       }
     },
     "placeholders": {
-      "companyName": "Digite o nome da empresa",
-      "responsibleName": "Nome completo",
-      "selectMasterUser": "Selecione o usuário master",
+      "companyName": "Digite o nome da clínica",
+      "responsibleName": "Nome completo do responsável",
+      "selectMasterUser": "Selecione o usuário administrador",
       "selectCommunicationCenters": "Selecione as centrais",
       "selectCostCenters": "Selecione os centros",
       "selectCollaborators": "Selecione colaboradores",
@@ -89,6 +96,13 @@
     "deleteAndTransfer": "Delete and Transfer",
     "deletePermanently": "Delete Permanently",
     "masterUnitCannotBeDeleted": "Master unit cannot be deleted",
+    "termsSection": "Terms Acceptance",
+    "lgpdConsent": "LGPD Terms Acceptance",
+    "lgpdDescription": "I declare that I am aware of and agree to the terms of the General Data Protection Law (LGPD) and authorize the processing of personal data as described in the privacy policy.",
+    "viewLgpdDocument": "View full document →",
+    "adminResponsibility": "Administrator User Responsibility",
+    "adminResponsibilityDescription": "I assume full responsibility for the configurations and data entered in the system, committing to maintain the security and confidentiality of patient information.",
+    "viewResponsibilityDocument": "View responsibility terms →",
     "regionLabels": {
       "BR": {
         "responsibleDocument": "Responsible's CPF",
@@ -147,6 +161,13 @@
     "deleteAndTransfer": "Eliminar y Transferir",
     "deletePermanently": "Eliminar Permanentemente",
     "masterUnitCannotBeDeleted": "La unidad principal no puede ser eliminada",
+    "termsSection": "Aceptación de Términos",
+    "lgpdConsent": "Aceptación de Términos LGPD",
+    "lgpdDescription": "Declaro estar consciente y de acuerdo con los términos de la Ley General de Protección de Datos (LGPD) y autorizo el tratamiento de datos personales según se describe en la política de privacidad.",
+    "viewLgpdDocument": "Ver documento completo →",
+    "adminResponsibility": "Responsabilidad del Usuario Administrador",
+    "adminResponsibilityDescription": "Asumo total responsabilidad por las configuraciones y datos ingresados en el sistema, comprometiéndome a mantener la seguridad y confidencialidad de la información de los pacientes.",
+    "viewResponsibilityDocument": "Ver términos de responsabilidad →",
     "regionLabels": {
       "BR": {
         "responsibleDocument": "CPF del Responsable",

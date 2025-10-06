@@ -1,0 +1,116 @@
+{
+  "PT": {
+    "title": "Múltiplas Unidades",
+    "description": "Habilite para gerenciar unidades adicionais da sua clínica",
+    "units": "Unidades",
+    "newUnit": "Nova Unidade",
+    "masterUnit": {
+      "title": "Unidade Principal",
+      "description": "Configure a unidade principal da sua clínica. Esta unidade sempre estará disponível e não pode ser excluída.",
+      "name": "Nome da Unidade",
+      "timezone": "Fuso Horário"
+    },
+    "additionalUnits": {
+      "title": "Unidades Adicionais"
+    },
+    "tableHeaders": {
+      "title": "Título",
+      "communicationCenter": "Central de Comunicação",
+      "costCenter": "Centro de Custo",
+      "collaborators": "Colaboradores",
+      "timezone": "Fuso Horário",
+      "actions": "Ações"
+    },
+    "actions": {
+      "edit": "Editar",
+      "save": "Salvar",
+      "delete": "Excluir",
+      "masterUnitCannotBeDeleted": "Unidade principal não pode ser excluída"
+    },
+    "placeholders": {
+      "selectCommunicationCenters": "Selecione as centrais",
+      "selectCostCenters": "Selecione os centros",
+      "selectCollaborators": "Selecione colaboradores"
+    },
+    "deleteModal": {
+      "title": "Excluir Unidade",
+      "recordsAffected": "registros serão afetados",
+      "confirmMessage": "Tem certeza que deseja excluir a unidade",
+      "transferRecords": "Você pode transferir os registros afetados para outra unidade ou excluir permanentemente.",
+      "doNotTransfer": "Não transferir (excluir permanentemente)",
+      "cancel": "Cancelar",
+      "deleteAndTransfer": "Excluir e Transferir",
+      "deletePermanently": "Excluir Permanentemente"
+    }
+  },
+  "EN": {
+    "title": "Multiple Units",
+    "description": "Manage multiple units of your clinic",
+    "units": "Units",
+    "newUnit": "New Unit",
+    "tableHeaders": {
+      "title": "Title",
+      "communicationCenter": "Communication Center",
+      "costCenter": "Cost Center",
+      "collaborators": "Collaborators",
+      "timezone": "Timezone",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "save": "Save",
+      "delete": "Delete",
+      "masterUnitCannotBeDeleted": "Master unit cannot be deleted"
+    },
+    "placeholders": {
+      "selectCommunicationCenters": "Select centers",
+      "selectCostCenters": "Select cost centers",
+      "selectCollaborators": "Select collaborators"
+    },
+    "deleteModal": {
+      "title": "Delete Unit",
+      "recordsAffected": "records will be affected",
+      "confirmMessage": "Are you sure you want to delete the unit",
+      "transferRecords": "You can transfer the affected records to another unit or delete permanently.",
+      "doNotTransfer": "Do not transfer (delete permanently)",
+      "cancel": "Cancel",
+      "deleteAndTransfer": "Delete and Transfer",
+      "deletePermanently": "Delete Permanently"
+    }
+  },
+  "ES": {
+    "title": "Múltiples Unidades",
+    "description": "Gestione múltiples unidades de su clínica",
+    "units": "Unidades",
+    "newUnit": "Nueva Unidad",
+    "tableHeaders": {
+      "title": "Título",
+      "communicationCenter": "Centro de Comunicación",
+      "costCenter": "Centro de Costo",
+      "collaborators": "Colaboradores",
+      "timezone": "Zona Horaria",
+      "actions": "Acciones"
+    },
+    "actions": {
+      "edit": "Editar",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "masterUnitCannotBeDeleted": "La unidad principal no puede ser eliminada"
+    },
+    "placeholders": {
+      "selectCommunicationCenters": "Seleccione centrales",
+      "selectCostCenters": "Seleccione centros",
+      "selectCollaborators": "Seleccione colaboradores"
+    },
+    "deleteModal": {
+      "title": "Eliminar Unidad",
+      "recordsAffected": "registros serán afectados",
+      "confirmMessage": "¿Está seguro de que desea eliminar la unidad",
+      "transferRecords": "Puede transferir los registros afectados a otra unidad o eliminar permanentemente.",
+      "doNotTransfer": "No transferir (eliminar permanentemente)",
+      "cancel": "Cancelar",
+      "deleteAndTransfer": "Eliminar y Transferir",
+      "deletePermanently": "Eliminar Permanentemente"
+    }
+  }
+}
