@@ -179,7 +179,7 @@ export default function Step1Page() {
             type="email"
             value={formData.email}
             onChange={(value) => setFormData(prev => ({ ...prev, email: value }))}
-            placeholder={t?.step1?.emailPlaceholder || 'Digite seu melhor e-mail'}
+            placeholder={currentRegion === 'BR' ? (t?.step1?.emailPlaceholder || 'Digite seu melhor e-mail') : (t?.step1?.emailPlaceholderUS || 'Enter your best email')}
             error={errors.email}
             required
             fullWidth
@@ -193,7 +193,7 @@ export default function Step1Page() {
             onChange={(value) => {
               setFormData(prev => ({ ...prev, phone: value }));
             }}
-            placeholder=""
+            placeholder={currentRegion === 'BR' ? (t?.step1?.phonePlaceholder || '') : (t?.step1?.phonePlaceholderUS || 'Enter your best phone number')}
             error={errors.phone}
             required
             fullWidth

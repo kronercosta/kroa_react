@@ -15,8 +15,10 @@
       "namePlaceholder": "Digite seu nome completo",
       "email": "E-mail",
       "emailPlaceholder": "Digite seu melhor e-mail",
+      "emailPlaceholderUS": "Digite seu melhor e-mail",
       "phone": "Telefone",
       "phonePlaceholder": "Digite seu telefone",
+      "phonePlaceholderUS": "Digite seu melhor telefone",
       "signInWithGoogle": "Entrar com Google",
       "or": "ou",
       "validation": {
@@ -250,8 +252,10 @@
       "namePlaceholder": "Enter your full name",
       "email": "Email",
       "emailPlaceholder": "Enter your best email",
+      "emailPlaceholderUS": "Enter your best email",
       "phone": "Phone",
       "phonePlaceholder": "Enter your phone number",
+      "phonePlaceholderUS": "Enter your best phone number",
       "signInWithGoogle": "Sign in with Google",
       "or": "or",
       "validation": {
