@@ -10,6 +10,7 @@ interface Step3Props {
     clinicName: string;
     customDomain: string;
     password: string;
+    email: string;
     isEmailVerified: boolean;
   }) => void;
   onBack: () => void;
@@ -26,7 +27,8 @@ export function Step4AdvancedSettings({ onNext, onBack, userData }: Step3Props) 
     clinicName: '',
     customDomain: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    email: userData.email
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -34,11 +36,12 @@ export function Step4AdvancedSettings({ onNext, onBack, userData }: Step3Props) 
   const [isCheckingDomain, setIsCheckingDomain] = useState(false);
 
   // Email verification
-  const [needsEmailVerification] = useState(!userData.isGoogleAuth);
+  const [needsEmailVerification, setNeedsEmailVerification] = useState(!userData.isGoogleAuth);
   const [verificationCode, setVerificationCode] = useState('');
   const [isEmailVerified, setIsEmailVerified] = useState(userData.isGoogleAuth || false);
   const [verificationSent, setVerificationSent] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [emailChanged, setEmailChanged] = useState(false);
 
   // Password strength
   const [passwordStrength, setPasswordStrength] = useState({
@@ -88,7 +91,7 @@ export function Step4AdvancedSettings({ onNext, onBack, userData }: Step3Props) 
     setVerificationSent(true);
     setResendCooldown(60);
     // Simular envio do código
-    console.log(`Código de verificação enviado para ${userData.email}`);
+    console.log(`Código de verificação enviado para ${formData.email}`);
   };
 
   const verifyEmail = () => {
@@ -105,6 +108,12 @@ export function Step4AdvancedSettings({ onNext, onBack, userData }: Step3Props) 
 
     if (!formData.clinicName.trim()) {
       newErrors.clinicName = t?.step3?.validation?.clinicNameRequired || 'Nome da clínica é obrigatório';
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = t?.step1?.validation?.emailRequired || 'E-mail é obrigatório';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = t?.step1?.validation?.emailInvalid || 'E-mail inválido';
     }
 
     if (!formData.customDomain.trim()) {
@@ -125,7 +134,7 @@ export function Step4AdvancedSettings({ onNext, onBack, userData }: Step3Props) 
       newErrors.confirmPassword = t?.step3?.validation?.passwordMismatch || 'Senhas não coincidem';
     }
 
-    if (needsEmailVerification && !isEmailVerified) {
+    if ((needsEmailVerification || emailChanged) && !isEmailVerified) {
       if (!verificationCode) {
         newErrors.verificationCode = t?.step3?.validation?.verificationRequired || 'Código de verificação é obrigatório';
       }
@@ -144,6 +153,7 @@ export function Step4AdvancedSettings({ onNext, onBack, userData }: Step3Props) 
           clinicName: formData.clinicName,
           customDomain: formData.customDomain,
           password: formData.password,
+          email: formData.email,
           isEmailVerified
         });
         setIsLoading(false);
@@ -170,6 +180,41 @@ export function Step4AdvancedSettings({ onNext, onBack, userData }: Step3Props) 
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Email */}
+        <div>
+          <Input
+            label={t?.step1?.email || 'E-mail'}
+            value={formData.email}
+            onChange={(value) => {
+              setFormData(prev => ({ ...prev, email: value }));
+              if (value !== userData.email) {
+                setEmailChanged(true);
+                setIsEmailVerified(false);
+                setVerificationSent(false);
+                setVerificationCode('');
+                setNeedsEmailVerification(true);
+              } else {
+                setEmailChanged(false);
+                setIsEmailVerified(userData.isGoogleAuth || false);
+                setNeedsEmailVerification(!userData.isGoogleAuth);
+              }
+            }}
+            placeholder={t?.step1?.emailPlaceholder || 'Digite seu melhor e-mail'}
+            error={errors.email}
+            validation="email"
+            required
+            fullWidth
+          />
+          {emailChanged && (
+            <p className="text-sm text-amber-600 mt-1 flex items-center gap-1">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              E-mail alterado. É necessário verificar o novo endereço.
+            </p>
+          )}
+        </div>
+
         {/* Clinic Name */}
         <Input
           label={t?.step3?.clinicName || 'Nome da clínica'}
@@ -298,13 +343,13 @@ export function Step4AdvancedSettings({ onNext, onBack, userData }: Step3Props) 
         </div>
 
         {/* Email Verification */}
-        {needsEmailVerification && (
+        {(needsEmailVerification || emailChanged) && (
           <div className="bg-blue-50 rounded-lg p-4">
             <h3 className="font-medium text-blue-900 mb-2">
               {t?.step3?.emailVerification || 'Verificação de e-mail'}
             </h3>
             <p className="text-sm text-blue-700 mb-4">
-              {t?.step3?.emailVerificationDescription || 'Enviamos um código de verificação para seu e-mail'}: <strong>{userData.email}</strong>
+              {t?.step3?.emailVerificationDescription || 'Enviamos um código de verificação para seu e-mail'}: <strong>{formData.email}</strong>
             </p>
 
             {!verificationSent ? (
@@ -377,7 +422,7 @@ export function Step4AdvancedSettings({ onNext, onBack, userData }: Step3Props) 
           <Button
             type="submit"
             variant="primary"
-            disabled={isLoading || (needsEmailVerification && !isEmailVerified) || domainAvailable === false}
+            disabled={isLoading || ((needsEmailVerification || emailChanged) && !isEmailVerified) || domainAvailable === false}
             className="flex-1"
           >
             {isLoading ? (

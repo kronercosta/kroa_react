@@ -9,6 +9,7 @@ export default function Step4Page() {
     clinicName: string;
     customDomain: string;
     password: string;
+    email: string;
     isEmailVerified: boolean;
   }) => {
     // Armazenar dados no sessionStorage
