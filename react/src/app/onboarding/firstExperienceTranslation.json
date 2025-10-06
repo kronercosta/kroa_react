@@ -1,0 +1,209 @@
+{
+  "PT": {
+    "welcome": {
+      "title": "Bem-vindo ao KROA! 🎉",
+      "subtitle": "Estamos muito felizes em tê-lo conosco! O KROA foi desenvolvido para transformar sua clínica odontológica em uma operação de alta performance.",
+      "howToStart": "Como você gostaria de começar?",
+      "guidedTour": "🎯 Quero o tour guiado completo",
+      "guidedTourDescription": "Vamos te explicar os 4 estágios evolutivos do sistema e como maximizar seus resultados desde o primeiro dia. Recomendado!",
+      "skipToSetup": "⚡ Ir direto para configuração",
+      "skipToSetupDescription": "Pular a explicação e ir direto para criar minha conta. Posso ver o tour depois nas configurações."
+    },
+    "stages": {
+      "title": "🎯 Sistema de Estágios Evolutivos",
+      "subtitle": "Nossa implementação segue um cronograma específico. Cada estágio libera recursos avançados baseado no seu progresso. Isso garante que a inteligência do sistema funcione corretamente.",
+      "whyWorks": "Por que funciona assim?",
+      "explanation": "Quando a agenda é usada de forma consistente, os alertas funcionam. Quando os alertas funcionam, as evoluções fazem sentido. Uma coisa está conectada à outra. Em apenas 7 dias você consegue atingir os requisitos para subir de nível.",
+      "fastProgression": "⚡ Progressão Rápida",
+      "progressionInfo": "O processo é rápido! Em apenas 7 dias você já consegue atingir os requisitos para subir de nível. Cada estágio é avaliado automaticamente toda segunda-feira baseado no seu uso dos últimos 7 dias.",
+      "trainingBlocks": "blocos de treinamento",
+      "automaticEvaluation": "Avaliação automática toda segunda-feira"
+    },
+    "dataMigration": {
+      "title": "📋 Migração de Dados",
+      "subtitle": "Você possui dados de outro sistema que gostaria de migrar para o KROA?",
+      "yes": "✅ Sim, quero migrar dados primeiro",
+      "yesDescription": "Recomendado! Vamos migrar seus dados (pacientes, histórico, etc.) antes de você começar a testar. Assim você já inicia com seus dados reais.",
+      "no": "🚀 Não, quero testar sem migrar",
+      "noDescription": "Vou começar a testar agora e criar dados do zero. Posso solicitar migração depois, mas os dados de teste serão perdidos.",
+      "later": "⏰ Decidir depois",
+      "laterDescription": "Quero primeiro conhecer o sistema e depois decidir sobre a migração. Posso solicitar a qualquer momento.",
+      "greatChoice": "Ótima escolha!",
+      "contactInfo": "Nossa equipe entrará em contato nas próximas 24h para agendar a migração. Enquanto isso, você pode começar a configurar sua conta."
+    },
+    "stageSelection": {
+      "title": "🎯 Qual estágio melhor descreve sua clínica hoje?",
+      "subtitle": "Isso nos ajuda a personalizar sua experiência e focar no que mais importa para você. Não se preocupe, isso muda automaticamente baseado no seu progresso.",
+      "remember": "Lembre-se",
+      "reminder": "Seu estágio é reavaliado automaticamente toda segunda-feira baseado no uso dos últimos 7 dias. Você pode evoluir rapidamente ou até retroceder se não usar o sistema de forma consistente."
+    },
+    "stageDetails": {
+      "E1": {
+        "name": "Desorganizado",
+        "description": "Configuração básica do sistema",
+        "goals": ["60% evolução de status", "85% evolução de procedimentos", "95% alertas de continuidade"]
+      },
+      "E2": {
+        "name": "Básico",
+        "description": "Integração entre processos",
+        "goals": ["5% outras evoluções", "40% com orçamento", "5% CRM agendamentos"]
+      },
+      "E3": {
+        "name": "Consistente",
+        "description": "Controle financeiro integrado",
+        "goals": ["50% orçamentos vinculados", "50% transações com nota", "Integração completa"]
+      },
+      "E4": {
+        "name": "Alta Performance",
+        "description": "Motor de crescimento escalável",
+        "goals": ["Metas financeiras", "DRE em tempo real", "Marketing integrado"]
+      }
+    },
+    "navigation": {
+      "back": "Voltar",
+      "continue": "Continuar",
+      "skip": "Pular",
+      "startSetup": "Começar configuração",
+      "step": "Passo",
+      "of": "de"
+    }
+  },
+  "EN": {
+    "welcome": {
+      "title": "Welcome to KROA! 🎉",
+      "subtitle": "We're thrilled to have you with us! KROA was developed to transform your dental clinic into a high-performance operation.",
+      "howToStart": "How would you like to get started?",
+      "guidedTour": "🎯 I want the complete guided tour",
+      "guidedTourDescription": "We'll explain the 4 evolutionary stages of the system and how to maximize your results from day one. Recommended!",
+      "skipToSetup": "⚡ Go straight to setup",
+      "skipToSetupDescription": "Skip the explanation and go straight to creating my account. I can see the tour later in settings."
+    },
+    "stages": {
+      "title": "🎯 Evolutionary Stages System",
+      "subtitle": "Our implementation follows a specific schedule. Each stage unlocks advanced features based on your progress. This ensures the system's intelligence works correctly.",
+      "whyWorks": "Why does it work this way?",
+      "explanation": "When the schedule is used consistently, alerts work. When alerts work, evolutions make sense. Everything is connected. In just 7 days you can meet the requirements to level up.",
+      "fastProgression": "⚡ Fast Progression",
+      "progressionInfo": "The process is fast! In just 7 days you can meet the requirements to level up. Each stage is automatically evaluated every Monday based on your usage over the last 7 days.",
+      "trainingBlocks": "training blocks",
+      "automaticEvaluation": "Automatic evaluation every Monday"
+    },
+    "dataMigration": {
+      "title": "📋 Data Migration",
+      "subtitle": "Do you have data from another system that you'd like to migrate to KROA?",
+      "yes": "✅ Yes, I want to migrate data first",
+      "yesDescription": "Recommended! We'll migrate your data (patients, history, etc.) before you start testing. This way you start with your real data.",
+      "no": "🚀 No, I want to test without migrating",
+      "noDescription": "I'll start testing now and create data from scratch. I can request migration later, but test data will be lost.",
+      "later": "⏰ Decide later",
+      "laterDescription": "I want to first get to know the system and then decide about migration. I can request it at any time.",
+      "greatChoice": "Great choice!",
+      "contactInfo": "Our team will contact you within the next 24h to schedule the migration. Meanwhile, you can start setting up your account."
+    },
+    "stageSelection": {
+      "title": "🎯 Which stage best describes your clinic today?",
+      "subtitle": "This helps us personalize your experience and focus on what matters most to you. Don't worry, this changes automatically based on your progress.",
+      "remember": "Remember",
+      "reminder": "Your stage is automatically re-evaluated every Monday based on usage over the last 7 days. You can evolve quickly or even regress if you don't use the system consistently."
+    },
+    "stageDetails": {
+      "E1": {
+        "name": "Disorganized",
+        "description": "Basic system configuration",
+        "goals": ["60% status evolution", "85% procedure evolution", "95% continuity alerts"]
+      },
+      "E2": {
+        "name": "Basic",
+        "description": "Process integration",
+        "goals": ["5% other evolutions", "40% with budget", "5% CRM appointments"]
+      },
+      "E3": {
+        "name": "Consistent",
+        "description": "Integrated financial control",
+        "goals": ["50% linked budgets", "50% transactions with invoice", "Complete integration"]
+      },
+      "E4": {
+        "name": "High Performance",
+        "description": "Scalable growth engine",
+        "goals": ["Financial goals", "Real-time P&L", "Integrated marketing"]
+      }
+    },
+    "navigation": {
+      "back": "Back",
+      "continue": "Continue",
+      "skip": "Skip",
+      "startSetup": "Start setup",
+      "step": "Step",
+      "of": "of"
+    }
+  },
+  "ES": {
+    "welcome": {
+      "title": "¡Bienvenido a KROA! 🎉",
+      "subtitle": "¡Estamos muy contentos de tenerte con nosotros! KROA fue desarrollado para transformar tu clínica dental en una operación de alto rendimiento.",
+      "howToStart": "¿Cómo te gustaría comenzar?",
+      "guidedTour": "🎯 Quiero el tour guiado completo",
+      "guidedTourDescription": "Te explicaremos las 4 etapas evolutivas del sistema y cómo maximizar tus resultados desde el primer día. ¡Recomendado!",
+      "skipToSetup": "⚡ Ir directo a la configuración",
+      "skipToSetupDescription": "Saltar la explicación e ir directo a crear mi cuenta. Puedo ver el tour después en configuraciones."
+    },
+    "stages": {
+      "title": "🎯 Sistema de Etapas Evolutivas",
+      "subtitle": "Nuestra implementación sigue un cronograma específico. Cada etapa desbloquea características avanzadas basadas en tu progreso. Esto garantiza que la inteligencia del sistema funcione correctamente.",
+      "whyWorks": "¿Por qué funciona así?",
+      "explanation": "Cuando la agenda se usa de manera consistente, las alertas funcionan. Cuando las alertas funcionan, las evoluciones tienen sentido. Todo está conectado. En solo 7 días puedes cumplir los requisitos para subir de nivel.",
+      "fastProgression": "⚡ Progresión Rápida",
+      "progressionInfo": "¡El proceso es rápido! En solo 7 días ya puedes cumplir los requisitos para subir de nivel. Cada etapa se evalúa automáticamente cada lunes basándose en tu uso de los últimos 7 días.",
+      "trainingBlocks": "bloques de entrenamiento",
+      "automaticEvaluation": "Evaluación automática cada lunes"
+    },
+    "dataMigration": {
+      "title": "📋 Migración de Datos",
+      "subtitle": "¿Tienes datos de otro sistema que te gustaría migrar a KROA?",
+      "yes": "✅ Sí, quiero migrar datos primero",
+      "yesDescription": "¡Recomendado! Migraremos tus datos (pacientes, historial, etc.) antes de que comiences a probar. Así inicias con tus datos reales.",
+      "no": "🚀 No, quiero probar sin migrar",
+      "noDescription": "Comenzaré a probar ahora y crearé datos desde cero. Puedo solicitar migración después, pero los datos de prueba se perderán.",
+      "later": "⏰ Decidir después",
+      "laterDescription": "Quiero primero conocer el sistema y después decidir sobre la migración. Puedo solicitarla en cualquier momento.",
+      "greatChoice": "¡Excelente elección!",
+      "contactInfo": "Nuestro equipo se pondrá en contacto contigo en las próximas 24h para programar la migración. Mientras tanto, puedes comenzar a configurar tu cuenta."
+    },
+    "stageSelection": {
+      "title": "🎯 ¿Qué etapa describe mejor tu clínica hoy?",
+      "subtitle": "Esto nos ayuda a personalizar tu experiencia y enfocarnos en lo que más te importa. No te preocupes, esto cambia automáticamente basado en tu progreso.",
+      "remember": "Recuerda",
+      "reminder": "Tu etapa se reevalúa automáticamente cada lunes basándose en el uso de los últimos 7 días. Puedes evolucionar rápidamente o incluso retroceder si no usas el sistema de manera consistente."
+    },
+    "stageDetails": {
+      "E1": {
+        "name": "Desorganizado",
+        "description": "Configuración básica del sistema",
+        "goals": ["60% evolución de estado", "85% evolución de procedimientos", "95% alertas de continuidad"]
+      },
+      "E2": {
+        "name": "Básico",
+        "description": "Integración entre procesos",
+        "goals": ["5% otras evoluciones", "40% con presupuesto", "5% citas CRM"]
+      },
+      "E3": {
+        "name": "Consistente",
+        "description": "Control financiero integrado",
+        "goals": ["50% presupuestos vinculados", "50% transacciones con factura", "Integración completa"]
+      },
+      "E4": {
+        "name": "Alto Rendimiento",
+        "description": "Motor de crecimiento escalable",
+        "goals": ["Metas financieras", "P&L en tiempo real", "Marketing integrado"]
+      }
+    },
+    "navigation": {
+      "back": "Volver",
+      "continue": "Continuar",
+      "skip": "Saltar",
+      "startSetup": "Comenzar configuración",
+      "step": "Paso",
+      "of": "de"
+    }
+  }
+}
