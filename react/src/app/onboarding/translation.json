@@ -469,6 +469,20 @@
           "content": "By accepting this term, the Administrator User declares:\n\n• Having read and fully understood all clauses\n• Agreeing to comply with all established responsibilities\n• Being aware of consequences of non-compliance\n• Committing to always act in accordance with the law\n• Assuming full responsibility for actions under their management\n• Understanding the importance of protecting patients' personal data"
         }
       ]
+    },
+    "layout": {
+      "sidebarTitle": "You're just a few steps away from transforming your clinic",
+      "sidebarSubtitle": "Join over 1,000 professionals who have already revolutionized their dental practice management.",
+      "feature1Title": "5-minute setup",
+      "feature1Description": "Set up your clinic quickly with our guided process",
+      "feature2Title": "Immediate results",
+      "feature2Description": "Start using on the same day with all features",
+      "feature3Title": "Specialized support",
+      "feature3Description": "Team of dental management specialists at your disposal",
+      "testimonialAuthor": "Dr. Carlos Mendes",
+      "testimonialClinic": "OdontoCare Clinic",
+      "testimonialText": "\"In 3 months with KROA, our productivity increased 40% and we reduced administrative costs by half.\"",
+      "footerText": "© 2025 KROA. All rights reserved."
     }
   },
   "ES": {
@@ -627,22 +641,6 @@
         }
       ]
     },
-    "layout": {
-      "sidebarTitle": "You're just a few steps away from transforming your clinic",
-      "sidebarSubtitle": "Join over 1,000 professionals who have already revolutionized their dental practice management.",
-      "feature1Title": "5-minute setup",
-      "feature1Description": "Set up your clinic quickly with our guided process",
-      "feature2Title": "Immediate results",
-      "feature2Description": "Start using on the same day with all features",
-      "feature3Title": "Specialized support",
-      "feature3Description": "Team of dental management specialists at your disposal",
-      "testimonialAuthor": "Dr. Carlos Mendes",
-      "testimonialClinic": "OdontoCare Clinic",
-      "testimonialText": "\"In 3 months with KROA, our productivity increased 40% and we reduced administrative costs by half.\"",
-      "footerText": "© 2025 KROA. All rights reserved."
-    }
-  },
-  "ES": {
     "layout": {
       "sidebarTitle": "Estás a solo unos pasos de transformar tu clínica",
       "sidebarSubtitle": "Únete a más de 1.000 profesionales que ya han revolucionado su gestión dental.",
