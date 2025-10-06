@@ -1,0 +1,371 @@
+{
+  "PT": {
+    "common": {
+      "next": "Continuar",
+      "back": "Voltar",
+      "cancel": "Cancelar",
+      "loading": "Carregando...",
+      "step": "Passo",
+      "of": "de"
+    },
+    "step1": {
+      "title": "Vamos começar!",
+      "subtitle": "Primeiro, precisamos de algumas informações básicas sobre você",
+      "name": "Nome completo",
+      "namePlaceholder": "Digite seu nome completo",
+      "email": "E-mail",
+      "emailPlaceholder": "Digite seu melhor e-mail",
+      "phone": "Telefone",
+      "phonePlaceholder": "Digite seu telefone",
+      "signInWithGoogle": "Entrar com Google",
+      "or": "ou",
+      "validation": {
+        "nameRequired": "Nome é obrigatório",
+        "emailRequired": "E-mail é obrigatório",
+        "emailInvalid": "E-mail inválido",
+        "phoneRequired": "Telefone é obrigatório",
+        "phoneInvalid": "Telefone inválido"
+      }
+    },
+    "step2": {
+      "title": "Teste grátis por 7 dias",
+      "subtitle": "Experimente todas as funcionalidades sem compromisso",
+      "benefits": [
+        "✓ Acesso completo a todas as funcionalidades",
+        "✓ Suporte técnico incluído",
+        "✓ Sem taxas de configuração",
+        "✓ Cancele a qualquer momento"
+      ],
+      "trialInfo": "Você terá 7 dias para testar gratuitamente. Após esse período, será cobrado o valor do plano escolhido.",
+      "cancelInfo": "Você pode cancelar durante os 7 dias de teste sem cobrança alguma.",
+      "cardInfo": "Cartão de crédito",
+      "cardInfoDescription": "Precisamos do seu cartão para garantir a continuidade do serviço após o período de teste",
+      "cardNumber": "Número do cartão",
+      "cardName": "Nome no cartão",
+      "cardExpiry": "Validade",
+      "cardCvv": "CVV",
+      "securityNote": "🔒 Seus dados estão seguros e criptografados",
+      "startTrial": "Iniciar teste grátis",
+      "plans": {
+        "basic": {
+          "name": "Básico",
+          "price": "R$ 149,90",
+          "period": "/mês",
+          "features": [
+            "Até 2 profissionais",
+            "Agenda básica",
+            "Relatórios simples"
+          ]
+        },
+        "professional": {
+          "name": "Profissional",
+          "price": "R$ 299,90",
+          "period": "/mês",
+          "features": [
+            "Até 5 profissionais",
+            "Agenda completa",
+            "Relatórios avançados",
+            "Centro de custo"
+          ]
+        },
+        "enterprise": {
+          "name": "Empresarial",
+          "price": "R$ 599,90",
+          "period": "/mês",
+          "features": [
+            "Profissionais ilimitados",
+            "Múltiplas unidades",
+            "NFSe integrado",
+            "API completa"
+          ]
+        }
+      }
+    },
+    "step3": {
+      "title": "Configurações avançadas",
+      "subtitle": "Agora vamos personalizar sua clínica no sistema",
+      "clinicName": "Nome da clínica",
+      "clinicNamePlaceholder": "Digite o nome da sua clínica",
+      "customDomain": "Endereço de acesso personalizado",
+      "customDomainPlaceholder": "Digite o endereço desejado",
+      "domainExample": "Exemplo: minhaclinica.kroa.com.br",
+      "domainAvailable": "Endereço disponível!",
+      "domainUnavailable": "Endereço não disponível",
+      "password": "Senha",
+      "passwordPlaceholder": "Digite uma senha segura",
+      "confirmPassword": "Confirmar senha",
+      "confirmPasswordPlaceholder": "Digite a senha novamente",
+      "passwordRequirements": [
+        "Mínimo de 8 caracteres",
+        "Pelo menos 1 letra maiúscula",
+        "Pelo menos 1 número",
+        "Pelo menos 1 caractere especial"
+      ],
+      "emailVerification": "Verificação de e-mail",
+      "emailVerificationDescription": "Enviamos um código de verificação para seu e-mail",
+      "verificationCode": "Código de verificação",
+      "verificationCodePlaceholder": "Digite o código de 6 dígitos",
+      "resendCode": "Reenviar código",
+      "emailVerified": "E-mail verificado com sucesso!",
+      "validation": {
+        "clinicNameRequired": "Nome da clínica é obrigatório",
+        "domainRequired": "Endereço de acesso é obrigatório",
+        "domainInvalid": "Endereço inválido",
+        "passwordRequired": "Senha é obrigatória",
+        "passwordWeak": "Senha não atende aos requisitos",
+        "passwordMismatch": "Senhas não coincidem",
+        "verificationRequired": "Código de verificação é obrigatório"
+      }
+    },
+    "step4": {
+      "title": "Criando sua conta...",
+      "subtitle": "Estamos preparando tudo para você",
+      "steps": [
+        "Validando informações",
+        "Criando banco de dados",
+        "Configurando domínio personalizado",
+        "Preparando ambiente",
+        "Finalizando configurações"
+      ],
+      "almostDone": "Quase pronto!",
+      "success": "Conta criada com sucesso!",
+      "successMessage": "Sua clínica está pronta para uso. Você será redirecionado em alguns segundos.",
+      "accessNow": "Acessar agora"
+    }
+  },
+  "EN": {
+    "common": {
+      "next": "Continue",
+      "back": "Back",
+      "cancel": "Cancel",
+      "loading": "Loading...",
+      "step": "Step",
+      "of": "of"
+    },
+    "step1": {
+      "title": "Let's get started!",
+      "subtitle": "First, we need some basic information about you",
+      "name": "Full name",
+      "namePlaceholder": "Enter your full name",
+      "email": "Email",
+      "emailPlaceholder": "Enter your best email",
+      "phone": "Phone",
+      "phonePlaceholder": "Enter your phone number",
+      "signInWithGoogle": "Sign in with Google",
+      "or": "or",
+      "validation": {
+        "nameRequired": "Name is required",
+        "emailRequired": "Email is required",
+        "emailInvalid": "Invalid email",
+        "phoneRequired": "Phone is required",
+        "phoneInvalid": "Invalid phone"
+      }
+    },
+    "step2": {
+      "title": "7-day free trial",
+      "subtitle": "Try all features without commitment",
+      "benefits": [
+        "✓ Full access to all features",
+        "✓ Technical support included",
+        "✓ No setup fees",
+        "✓ Cancel anytime"
+      ],
+      "trialInfo": "You'll have 7 days to test for free. After this period, you'll be charged for the chosen plan.",
+      "cancelInfo": "You can cancel during the 7-day trial without any charges.",
+      "cardInfo": "Credit card",
+      "cardInfoDescription": "We need your card to ensure service continuity after the trial period",
+      "cardNumber": "Card number",
+      "cardName": "Name on card",
+      "cardExpiry": "Expiry date",
+      "cardCvv": "CVV",
+      "securityNote": "🔒 Your data is secure and encrypted",
+      "startTrial": "Start free trial",
+      "plans": {
+        "basic": {
+          "name": "Starter",
+          "price": "$49.00",
+          "period": "/month",
+          "features": [
+            "Up to 2 providers",
+            "Basic scheduling",
+            "Simple reports"
+          ]
+        },
+        "professional": {
+          "name": "Professional",
+          "price": "$99.00",
+          "period": "/month",
+          "features": [
+            "Up to 5 providers",
+            "Advanced scheduling",
+            "Detailed reports",
+            "Cost centers",
+            "Insurance billing"
+          ]
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "price": "$199.00",
+          "period": "/month",
+          "features": [
+            "Unlimited providers",
+            "Multiple locations",
+            "HIPAA compliant",
+            "Full API access"
+          ]
+        }
+      }
+    },
+    "step3": {
+      "title": "Advanced settings",
+      "subtitle": "Now let's customize your clinic in the system",
+      "clinicName": "Clinic name",
+      "clinicNamePlaceholder": "Enter your clinic name",
+      "customDomain": "Custom access address",
+      "customDomainPlaceholder": "Enter desired address",
+      "domainExample": "Example: myclinic.kroa.com",
+      "domainAvailable": "Address available!",
+      "domainUnavailable": "Address not available",
+      "password": "Password",
+      "passwordPlaceholder": "Enter a secure password",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Enter password again",
+      "passwordRequirements": [
+        "Minimum 8 characters",
+        "At least 1 uppercase letter",
+        "At least 1 number",
+        "At least 1 special character"
+      ],
+      "emailVerification": "Email verification",
+      "emailVerificationDescription": "We sent a verification code to your email",
+      "verificationCode": "Verification code",
+      "verificationCodePlaceholder": "Enter 6-digit code",
+      "resendCode": "Resend code",
+      "emailVerified": "Email verified successfully!",
+      "validation": {
+        "clinicNameRequired": "Clinic name is required",
+        "domainRequired": "Access address is required",
+        "domainInvalid": "Invalid address",
+        "passwordRequired": "Password is required",
+        "passwordWeak": "Password doesn't meet requirements",
+        "passwordMismatch": "Passwords don't match",
+        "verificationRequired": "Verification code is required"
+      }
+    },
+    "step4": {
+      "title": "Creating your account...",
+      "subtitle": "We're setting everything up for you",
+      "steps": [
+        "Validating information",
+        "Creating database",
+        "Setting up custom domain",
+        "Preparing environment",
+        "Finalizing settings"
+      ],
+      "almostDone": "Almost done!",
+      "success": "Account created successfully!",
+      "successMessage": "Your clinic is ready to use. You'll be redirected in a few seconds.",
+      "accessNow": "Access now"
+    }
+  },
+  "ES": {
+    "common": {
+      "next": "Continuar",
+      "back": "Volver",
+      "cancel": "Cancelar",
+      "loading": "Cargando...",
+      "step": "Paso",
+      "of": "de"
+    },
+    "step1": {
+      "title": "¡Comencemos!",
+      "subtitle": "Primero, necesitamos información básica sobre usted",
+      "name": "Nombre completo",
+      "namePlaceholder": "Ingrese su nombre completo",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "Ingrese su mejor correo",
+      "phone": "Teléfono",
+      "phonePlaceholder": "Ingrese su teléfono",
+      "signInWithGoogle": "Iniciar sesión con Google",
+      "or": "o",
+      "validation": {
+        "nameRequired": "El nombre es obligatorio",
+        "emailRequired": "El correo es obligatorio",
+        "emailInvalid": "Correo inválido",
+        "phoneRequired": "El teléfono es obligatorio",
+        "phoneInvalid": "Teléfono inválido"
+      }
+    },
+    "step2": {
+      "title": "Prueba gratuita de 7 días",
+      "subtitle": "Pruebe todas las funciones sin compromiso",
+      "benefits": [
+        "✓ Acceso completo a todas las funciones",
+        "✓ Soporte técnico incluido",
+        "✓ Sin tarifas de configuración",
+        "✓ Cancele en cualquier momento"
+      ],
+      "trialInfo": "Tendrá 7 días para probar gratis. Después de este período, se cobrará el valor del plan elegido.",
+      "cancelInfo": "Puede cancelar durante los 7 días de prueba sin cargo alguno.",
+      "cardInfo": "Tarjeta de crédito",
+      "cardInfoDescription": "Necesitamos su tarjeta para garantizar la continuidad del servicio después del período de prueba",
+      "cardNumber": "Número de tarjeta",
+      "cardName": "Nombre en la tarjeta",
+      "cardExpiry": "Vencimiento",
+      "cardCvv": "CVV",
+      "securityNote": "🔒 Sus datos están seguros y encriptados",
+      "startTrial": "Iniciar prueba gratuita"
+    },
+    "step3": {
+      "title": "Configuraciones avanzadas",
+      "subtitle": "Ahora personalicemos su clínica en el sistema",
+      "clinicName": "Nombre de la clínica",
+      "clinicNamePlaceholder": "Ingrese el nombre de su clínica",
+      "customDomain": "Dirección de acceso personalizada",
+      "customDomainPlaceholder": "Ingrese la dirección deseada",
+      "domainExample": "Ejemplo: miclinica.kroa.com",
+      "domainAvailable": "¡Dirección disponible!",
+      "domainUnavailable": "Dirección no disponible",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Ingrese una contraseña segura",
+      "confirmPassword": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Ingrese la contraseña nuevamente",
+      "passwordRequirements": [
+        "Mínimo 8 caracteres",
+        "Al menos 1 letra mayúscula",
+        "Al menos 1 número",
+        "Al menos 1 carácter especial"
+      ],
+      "emailVerification": "Verificación de correo",
+      "emailVerificationDescription": "Enviamos un código de verificación a su correo",
+      "verificationCode": "Código de verificación",
+      "verificationCodePlaceholder": "Ingrese el código de 6 dígitos",
+      "resendCode": "Reenviar código",
+      "emailVerified": "¡Correo verificado con éxito!",
+      "validation": {
+        "clinicNameRequired": "El nombre de la clínica es obligatorio",
+        "domainRequired": "La dirección de acceso es obligatoria",
+        "domainInvalid": "Dirección inválida",
+        "passwordRequired": "La contraseña es obligatoria",
+        "passwordWeak": "La contraseña no cumple los requisitos",
+        "passwordMismatch": "Las contraseñas no coinciden",
+        "verificationRequired": "El código de verificación es obligatorio"
+      }
+    },
+    "step4": {
+      "title": "Creando su cuenta...",
+      "subtitle": "Estamos preparando todo para usted",
+      "steps": [
+        "Validando información",
+        "Creando base de datos",
+        "Configurando dominio personalizado",
+        "Preparando ambiente",
+        "Finalizando configuraciones"
+      ],
+      "almostDone": "¡Casi listo!",
+      "success": "¡Cuenta creada con éxito!",
+      "successMessage": "Su clínica está lista para usar. Será redirigido en unos segundos.",
+      "accessNow": "Acceder ahora"
+    }
+  }
+}
