@@ -14,7 +14,9 @@
       "Bash(if [ -d \"demonstracao\" ])",
       "Bash(then rm -rf demonstracao)",
       "Bash(fi)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,15 +1,11 @@
-import React from 'react';
 import { Button } from '../../components/ui/Button';
 import { Logo } from '../../components/Logo';
-import { useTranslation } from '../../hooks/useTranslation';
-import translations from './translation.json';
 
 interface LandingEntryProps {
   onStartOnboarding: () => void;
 }
 
 export function LandingEntry({ onStartOnboarding }: LandingEntryProps) {
-  const { t } = useTranslation(translations);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-krooa-green/10 via-blue-50 to-krooa-blue/10">
