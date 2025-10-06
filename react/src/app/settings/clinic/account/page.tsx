@@ -13,8 +13,8 @@ import { useRegion } from '../../../../contexts/RegionContext';
 import { useTranslation } from '../../../../hooks/useTranslation';
 import translations from './translation.json';
 import { DocumentModal } from './DocumentModal';
-import lgpdTerms from './lgpd-terms.json';
-import adminTerms from './admin-responsibility-terms.json';
+// Importar termos das traduções em vez de arquivos separados
+// Os termos estão incluídos no translation.json
 
 const ContaClinica: React.FC = () => {
   const { currentRegion } = useRegion();
@@ -404,9 +404,9 @@ const ContaClinica: React.FC = () => {
         onClose={() => setDocumentModal({ isOpen: false, type: null })}
         document={
           documentModal.type === 'lgpd'
-            ? lgpdTerms[language as keyof typeof lgpdTerms] || lgpdTerms.PT
+            ? t?.lgpdTerms || null
             : documentModal.type === 'admin'
-            ? adminTerms[language as keyof typeof adminTerms] || adminTerms.PT
+            ? t?.adminTerms || null
             : null
         }
         onAccept={() => {
