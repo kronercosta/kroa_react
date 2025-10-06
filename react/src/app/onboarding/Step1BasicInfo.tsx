@@ -176,7 +176,7 @@ export function Step1BasicInfo({ onNext, initialData }: Step1Props) {
           onChange={(value) => {
             setFormData(prev => ({ ...prev, phone: value }));
           }}
-          placeholder={t?.step1?.phonePlaceholder || 'Digite seu telefone'}
+          placeholder=""
           error={errors.phone}
           required
           fullWidth
