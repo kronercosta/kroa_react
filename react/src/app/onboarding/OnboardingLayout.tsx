@@ -68,10 +68,10 @@ export function OnboardingLayout({
           <div className="max-w-lg text-white">
             <div className="mb-8">
               <h2 className="text-3xl font-bold mb-4">
-                Você está a alguns passos de transformar sua clínica
+                {t?.layout?.sidebarTitle || 'Você está a alguns passos de transformar sua clínica'}
               </h2>
               <p className="text-xl text-white/90 mb-8">
-                Junte-se a mais de 1.000 profissionais que já revolucionaram sua gestão odontológica.
+                {t?.layout?.sidebarSubtitle || 'Junte-se a mais de 1.000 profissionais que já revolucionaram sua gestão odontológica.'}
               </p>
             </div>
 
@@ -83,8 +83,8 @@ export function OnboardingLayout({
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Configuração em 5 minutos</h3>
-                  <p className="text-white/80">Configure sua clínica rapidamente com nosso processo guiado</p>
+                  <h3 className="font-semibold text-lg mb-2">{t?.layout?.feature1Title || 'Configuração em 5 minutos'}</h3>
+                  <p className="text-white/80">{t?.layout?.feature1Description || 'Configure sua clínica rapidamente com nosso processo guiado'}</p>
                 </div>
               </div>
 
@@ -95,8 +95,8 @@ export function OnboardingLayout({
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Resultados imediatos</h3>
-                  <p className="text-white/80">Comece a usar no mesmo dia com todas as funcionalidades</p>
+                  <h3 className="font-semibold text-lg mb-2">{t?.layout?.feature2Title || 'Resultados imediatos'}</h3>
+                  <p className="text-white/80">{t?.layout?.feature2Description || 'Comece a usar no mesmo dia com todas as funcionalidades'}</p>
                 </div>
               </div>
 
@@ -107,8 +107,8 @@ export function OnboardingLayout({
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Suporte especializado</h3>
-                  <p className="text-white/80">Equipe de especialistas em gestão odontológica à sua disposição</p>
+                  <h3 className="font-semibold text-lg mb-2">{t?.layout?.feature3Title || 'Suporte especializado'}</h3>
+                  <p className="text-white/80">{t?.layout?.feature3Description || 'Equipe de especialistas em gestão odontológica à sua disposição'}</p>
                 </div>
               </div>
             </div>
@@ -119,12 +119,12 @@ export function OnboardingLayout({
                   <span className="text-lg font-bold">🏆</span>
                 </div>
                 <div>
-                  <div className="font-semibold">Dr. Carlos Mendes</div>
-                  <div className="text-sm text-white/70">Clínica OdontoCare</div>
+                  <div className="font-semibold">{t?.layout?.testimonialAuthor || 'Dr. Carlos Mendes'}</div>
+                  <div className="text-sm text-white/70">{t?.layout?.testimonialClinic || 'Clínica OdontoCare'}</div>
                 </div>
               </div>
               <p className="text-white/90 italic">
-                "Em 3 meses com a KROA, nossa produtividade aumentou 40% e reduzimos os custos administrativos pela metade."
+                {t?.layout?.testimonialText || '"Em 3 meses com a KROA, nossa produtividade aumentou 40% e reduzimos os custos administrativos pela metade."'}
               </p>
             </div>
           </div>
