@@ -641,5 +641,21 @@
       "testimonialText": "\"In 3 months with KROA, our productivity increased 40% and we reduced administrative costs by half.\"",
       "footerText": "© 2025 KROA. All rights reserved."
     }
+  },
+  "ES": {
+    "layout": {
+      "sidebarTitle": "Estás a solo unos pasos de transformar tu clínica",
+      "sidebarSubtitle": "Únete a más de 1.000 profesionales que ya han revolucionado su gestión dental.",
+      "feature1Title": "Configuración en 5 minutos",
+      "feature1Description": "Configura tu clínica rápidamente con nuestro proceso guiado",
+      "feature2Title": "Resultados inmediatos",
+      "feature2Description": "Comienza a usar el mismo día con todas las funcionalidades",
+      "feature3Title": "Soporte especializado",
+      "feature3Description": "Equipo de especialistas en gestión dental a tu disposición",
+      "testimonialAuthor": "Dr. Carlos Mendes",
+      "testimonialClinic": "Clínica OdontoCare",
+      "testimonialText": "\"En 3 meses con KROA, nuestra productividad aumentó 40% y redujimos los costos administrativos a la mitad.\"",
+      "footerText": "© 2025 KROA. Todos los derechos reservados."
+    }
   }
 }
