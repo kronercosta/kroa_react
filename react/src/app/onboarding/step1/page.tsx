@@ -5,11 +5,13 @@ import { Input } from '../../../components/ui/Input';
 import { EnhancedInput } from '../../../components/ui/EnhancedInput';
 import { Button } from '../../../components/ui/Button';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { useRegion } from '../../../contexts/RegionContext';
 import translations from '../translation.json';
 
 export default function Step1Page() {
   const navigate = useNavigate();
   const { t } = useTranslation(translations);
+  const { currentRegion } = useRegion();
 
   const getInitialData = () => {
     const onboardingData = JSON.parse(sessionStorage.getItem('onboardingData') || '{}');
@@ -186,6 +188,7 @@ export default function Step1Page() {
           <EnhancedInput
             label={t?.step1?.phone || 'Telefone'}
             mask="internationalPhone"
+            defaultCountry={currentRegion}
             value={formData.phone}
             onChange={(value) => {
               setFormData(prev => ({ ...prev, phone: value }));
