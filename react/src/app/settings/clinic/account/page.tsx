@@ -17,8 +17,7 @@ import translations from './translation.json';
 const ContaClinica: React.FC = () => {
   const { multiplasUnidadesEnabled, setMultiplasUnidadesEnabled } = useClinic();
   const { currentRegion, config } = useRegion();
-  const { t, regionConfig, getFieldLabels } = useTranslation(translations);
-  const fieldLabels = getFieldLabels();
+  const { t } = useTranslation(translations);
 
   const [pessoaJuridica, setPessoaJuridica] = useState(true);
   const [editingUnit, setEditingUnit] = useState<number | null>(null);
@@ -126,24 +125,37 @@ const ContaClinica: React.FC = () => {
               required
             />
 
-            <Input
-              label={fieldLabels?.responsibleDocumentLabel || 'CPF do Responsável'}
-              value={formData.responsibleDocument}
-              onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
-              mask={regionConfig?.responsibleDocument?.secret ? 'password' : regionConfig?.responsibleDocument?.mask as any}
-              validation={regionConfig?.responsibleDocument?.validation as any}
-              placeholder={regionConfig?.responsibleDocument?.placeholder}
-              fullWidth
-              required={regionConfig?.responsibleDocument?.required}
-              showPasswordToggle={regionConfig?.responsibleDocument?.secret}
-            />
+            {/* Campo de documento varia por região */}
+            {currentRegion === 'BR' ? (
+              <Input
+                label={t?.regionLabels?.BR?.responsibleDocument || 'CPF do Responsável'}
+                value={formData.responsibleDocument}
+                onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
+                mask="cpf"
+                validation="cpf"
+                placeholder="000.000.000-00"
+                fullWidth
+                required
+              />
+            ) : (
+              <Input
+                label={t?.regionLabels?.US?.responsibleDocument || "Responsible's SSN"}
+                value={formData.responsibleDocument}
+                onChange={(value) => setFormData({ ...formData, responsibleDocument: value })}
+                mask="ssn"
+                validation="ssn"
+                placeholder="000-00-0000"
+                fullWidth
+                required
+              />
+            )}
 
             <Input
               label={t?.phone || 'Telefone'}
               value={formData.phone}
               onChange={(value) => setFormData({ ...formData, phone: value })}
               mask="internationalPhone"
-              defaultCountry={regionConfig.phone.defaultCountry}
+              defaultCountry={currentRegion === 'BR' ? 'BR' : 'US'}
               fullWidth
               required
             />
@@ -189,15 +201,28 @@ const ContaClinica: React.FC = () => {
                   fullWidth
                 />
 
-                <Input
-                  label={fieldLabels?.taxIdLabel || 'CNPJ'}
-                  value={formData.taxId}
-                  onChange={(value) => setFormData({ ...formData, taxId: value })}
-                  mask={regionConfig?.taxId?.mask as any}
-                  validation={regionConfig?.taxId?.validation as any}
-                  placeholder={regionConfig?.taxId?.placeholder}
-                  fullWidth
-                />
+                {/* Campo de CNPJ/EIN varia por região */}
+                {currentRegion === 'BR' ? (
+                  <Input
+                    label={t?.regionLabels?.BR?.taxId || 'CNPJ'}
+                    value={formData.taxId}
+                    onChange={(value) => setFormData({ ...formData, taxId: value })}
+                    mask="cnpj"
+                    validation="cnpj"
+                    placeholder="00.000.000/0000-00"
+                    fullWidth
+                  />
+                ) : (
+                  <Input
+                    label={t?.regionLabels?.US?.taxId || 'EIN'}
+                    value={formData.taxId}
+                    onChange={(value) => setFormData({ ...formData, taxId: value })}
+                    mask="ein"
+                    validation="ein"
+                    placeholder="00-0000000"
+                    fullWidth
+                  />
+                )}
               </div>
             )}
           </div>

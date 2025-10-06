@@ -121,29 +121,16 @@ const regionConfigs: Record<RegionType, RegionConfig> = {
 };
 
 export function RegionProvider({ children }: { children: React.ReactNode }) {
-  const [currentRegion, setCurrentRegion] = useState<RegionType>('BR');
-  const [config, setConfig] = useState<RegionConfig>(regionConfigs.BR);
+  // Busca região da variável de ambiente
+  const envRegion = (import.meta.env.VITE_CLINIC_REGION || 'BR') as RegionType;
+  const initialRegion = regionConfigs[envRegion] ? envRegion : 'BR';
 
-  useEffect(() => {
-    // Detectar região baseado no navegador ou localStorage
-    const savedRegion = localStorage.getItem('krooa_region') as RegionType;
-    if (savedRegion && regionConfigs[savedRegion]) {
-      setCurrentRegion(savedRegion);
-      setConfig(regionConfigs[savedRegion]);
-    } else {
-      // Detectar pelo idioma do navegador
-      const browserLang = navigator.language.toLowerCase();
-      if (browserLang.includes('en')) {
-        setCurrentRegion('US');
-        setConfig(regionConfigs.US);
-      }
-    }
-  }, []);
+  const [currentRegion] = useState<RegionType>(initialRegion);
+  const [config] = useState<RegionConfig>(regionConfigs[initialRegion]);
 
+  // Removido setRegion - região agora é fixa baseada no .env
   const setRegion = (region: RegionType) => {
-    setCurrentRegion(region);
-    setConfig(regionConfigs[region]);
-    localStorage.setItem('krooa_region', region);
+    console.warn('setRegion is deprecated. Region is now configured via VITE_CLINIC_REGION environment variable.');
   };
 
   const formatCurrency = (value: number): string => {

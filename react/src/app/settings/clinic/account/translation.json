@@ -11,7 +11,6 @@
     "legalEntity": "Pessoa Jurídica",
     "legalEntityDescription": "Habilite para adicionar dados da empresa",
     "legalName": "Razão Social",
-    "taxId": "CNPJ",
     "multipleUnits": "Múltiplas Unidades",
     "multipleUnitsDescription": "Gerencie múltiplas unidades da sua clínica",
     "units": "Unidades",
@@ -32,13 +31,30 @@
     "deleteAndTransfer": "Excluir e Transferir",
     "deletePermanently": "Excluir Permanentemente",
     "masterUnitCannotBeDeleted": "Unidade principal não pode ser excluída",
+    "regionLabels": {
+      "BR": {
+        "responsibleDocument": "CPF do Responsável",
+        "taxId": "CNPJ",
+        "zipCode": "CEP",
+        "state": "Estado",
+        "neighborhood": "Bairro"
+      },
+      "US": {
+        "responsibleDocument": "SSN do Responsável",
+        "taxId": "EIN",
+        "zipCode": "ZIP Code",
+        "state": "State",
+        "neighborhood": "Neighborhood"
+      }
+    },
     "placeholders": {
       "companyName": "Digite o nome da empresa",
       "responsibleName": "Nome completo",
       "selectMasterUser": "Selecione o usuário master",
       "selectCommunicationCenters": "Selecione as centrais",
       "selectCostCenters": "Selecione os centros",
-      "selectCollaborators": "Selecione colaboradores"
+      "selectCollaborators": "Selecione colaboradores",
+      "legalName": "Nome da empresa"
     }
   },
   "EN": {
@@ -53,7 +69,6 @@
     "legalEntity": "Corporation",
     "legalEntityDescription": "Enable to add company data",
     "legalName": "Legal Name",
-    "taxId": "EIN",
     "multipleUnits": "Multiple Units",
     "multipleUnitsDescription": "Manage multiple units of your clinic",
     "units": "Units",
@@ -74,13 +89,30 @@
     "deleteAndTransfer": "Delete and Transfer",
     "deletePermanently": "Delete Permanently",
     "masterUnitCannotBeDeleted": "Master unit cannot be deleted",
+    "regionLabels": {
+      "BR": {
+        "responsibleDocument": "Responsible's CPF",
+        "taxId": "CNPJ",
+        "zipCode": "CEP",
+        "state": "State",
+        "neighborhood": "Neighborhood"
+      },
+      "US": {
+        "responsibleDocument": "Responsible's SSN",
+        "taxId": "EIN",
+        "zipCode": "ZIP Code",
+        "state": "State",
+        "neighborhood": "Neighborhood"
+      }
+    },
     "placeholders": {
       "companyName": "Enter company name",
       "responsibleName": "Full name",
       "selectMasterUser": "Select administrator",
       "selectCommunicationCenters": "Select centers",
       "selectCostCenters": "Select cost centers",
-      "selectCollaborators": "Select collaborators"
+      "selectCollaborators": "Select collaborators",
+      "legalName": "Company legal name"
     }
   },
   "ES": {
@@ -95,7 +127,6 @@
     "legalEntity": "Persona Jurídica",
     "legalEntityDescription": "Habilite para agregar datos de la empresa",
     "legalName": "Razón Social",
-    "taxId": "Número Fiscal",
     "multipleUnits": "Múltiples Unidades",
     "multipleUnitsDescription": "Gestione múltiples unidades de su clínica",
     "units": "Unidades",
@@ -116,13 +147,30 @@
     "deleteAndTransfer": "Eliminar y Transferir",
     "deletePermanently": "Eliminar Permanentemente",
     "masterUnitCannotBeDeleted": "La unidad principal no puede ser eliminada",
+    "regionLabels": {
+      "BR": {
+        "responsibleDocument": "CPF del Responsable",
+        "taxId": "CNPJ",
+        "zipCode": "CEP",
+        "state": "Estado",
+        "neighborhood": "Barrio"
+      },
+      "US": {
+        "responsibleDocument": "SSN del Responsable",
+        "taxId": "EIN",
+        "zipCode": "Código Postal",
+        "state": "Estado",
+        "neighborhood": "Barrio"
+      }
+    },
     "placeholders": {
       "companyName": "Ingrese el nombre de la empresa",
       "responsibleName": "Nombre completo",
       "selectMasterUser": "Seleccione usuario master",
       "selectCommunicationCenters": "Seleccione centrales",
       "selectCostCenters": "Seleccione centros",
-      "selectCollaborators": "Seleccione colaboradores"
+      "selectCollaborators": "Seleccione colaboradores",
+      "legalName": "Nombre legal de la empresa"
     }
   }
 }
