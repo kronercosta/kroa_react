@@ -55,9 +55,9 @@
       "securityNote": "🔒 Seus dados estão seguros e criptografados",
       "paymentMethod": "Forma de pagamento",
       "creditCard": "Cartão de Crédito",
-      "creditCardDescription": "Débito imediato • Aprovação instantânea",
+      "creditCardDescription": "",
       "boleto": "Boleto Bancário",
-      "boletoDescription": "Vencimento 3 dias • Aprovação em 1-2 dias úteis",
+      "boletoDescription": "Aprovação em ate 48 horas • Não possui teste grátis",
       "boletoInfo": "Informações do boleto",
       "boletoDetails": [
         "O boleto será gerado após a confirmação",
@@ -78,6 +78,8 @@
       "couponPlaceholder": "Digite seu cupom",
       "applyCoupon": "Aplicar",
       "couponApplied": "Cupom aplicado com sucesso!",
+      "couponAppliedSuccess": "Cupom aplicado com sucesso!",
+      "discountText": "de desconto",
       "couponInvalid": "Cupom inválido ou expirado",
       "validCoupons": {
         "DESCONTO10": { "discount": 10, "type": "percentage" },
@@ -88,9 +90,13 @@
       "lgpdConsent": "Aceito os termos da LGPD",
       "lgpdDescription": "Declaro estar ciente e concordo com os termos da Lei Geral de Proteção de Dados (LGPD) e autorizo o tratamento dos dados pessoais conforme descrito na política de privacidade.",
       "viewLgpdDocument": "Ver documento completo",
+      "hipaaConsent": "Aceito os termos da HIPAA",
+      "hipaaDescription": "Reconheço e concordo em cumprir os requisitos da Lei de Portabilidade e Responsabilidade de Planos de Saúde (HIPAA) para proteger as informações de saúde dos pacientes.",
+      "viewHipaaDocument": "Ver documento completo",
       "adminResponsibility": "Aceito as responsabilidades de usuário administrador",
       "adminResponsibilityDescription": "Assumo total responsabilidade pelas configurações e dados inseridos no sistema, comprometendo-me a manter a segurança e confidencialidade das informações dos pacientes.",
       "viewResponsibilityDocument": "Ver termo de responsabilidade",
+      "acceptTerms": "Aceitar Termos",
       "plans": {
         "basic": {
           "name": "Básico",
@@ -175,7 +181,22 @@
       "almostDone": "Quase pronto!",
       "success": "Conta criada com sucesso!",
       "successMessage": "Sua clínica está pronta para uso. Você será redirecionado em alguns segundos.",
-      "accessNow": "Acessar agora"
+      "accessNow": "Acessar agora",
+      "redirectingIn5Seconds": "Redirecionando automaticamente em 5 segundos...",
+      "error": {
+        "title": "Ops! Algo deu errado",
+        "retry": "Tentar novamente",
+        "contact": "Entrar em contato com o suporte"
+      },
+      "finalizingDetails": "Finalizando os últimos detalhes da sua conta...",
+      "accountInfo": "Informações da conta:",
+      "progressLabel": "Progresso",
+      "labels": {
+        "clinic": "Clínica:",
+        "access": "Acesso:",
+        "domain": "Domínio:",
+        "email": "E-mail:"
+      }
     },
     "lgpdTerms": {
       "title": "TERMO DE CONSENTIMENTO PARA TRATAMENTO DE DADOS PESSOAIS - LGPD",
@@ -234,6 +255,44 @@
       "testimonialClinic": "Clínica OdontoCare",
       "testimonialText": "\"Em 3 meses com a KROA, nossa produtividade aumentou 40% e reduzimos os custos administrativos pela metade.\"",
       "footerText": "© 2025 KROA. Todos os direitos reservados."
+    },
+    "hipaaTerms": {
+      "title": "ACORDO DE CONFORMIDADE HIPAA",
+      "lastUpdated": "Última atualização: Janeiro de 2025",
+      "sections": [
+        {
+          "title": "VISÃO GERAL DA HIPAA",
+          "content": "A Lei de Portabilidade e Responsabilidade de Planos de Saúde (HIPAA) estabelece padrões nacionais para proteger registros médicos dos pacientes e outras informações pessoais de saúde. Como entidade coberta ou associado comercial usando o sistema de gestão odontológica KROA, você deve cumprir os requisitos da HIPAA."
+        },
+        {
+          "title": "INFORMAÇÕES DE SAÚDE PROTEGIDAS (PHI)",
+          "content": "PHI inclui qualquer informação de saúde individualmente identificável mantida ou transmitida por uma entidade coberta ou seus associados comerciais, incluindo:\n\n• Dados demográficos e informações de contato do paciente\n• Registros médicos e odontológicos\n• Planos de tratamento e anotações clínicas\n• Informações de faturamento e seguro\n• Agendamentos de consultas\n• Imagens digitais e radiografias\n• Qualquer informação que possa identificar um paciente"
+        },
+        {
+          "title": "PADRÃO MÍNIMO NECESSÁRIO",
+          "content": "Você deve limitar o acesso à PHI ao mínimo necessário para cumprir o propósito pretendido. Isso inclui:\n\n• Implementar controles de acesso baseados em funções\n• Limitar permissões de usuário baseadas em funções de trabalho\n• Revisar e atualizar regularmente as permissões de acesso\n• Treinar a equipe sobre princípios mínimos necessários\n• Documentar controles e procedimentos de acesso"
+        },
+        {
+          "title": "REQUISITOS DE SEGURANÇA",
+          "content": "Você deve implementar salvaguardas administrativas, físicas e técnicas:\n\n• Administrativas: Designar um oficial de segurança, conduzir avaliações de risco, treinar força de trabalho\n• Físicas: Controlar acesso às instalações, proteger estações de trabalho, proteger mídia e equipamentos\n• Técnicas: Implementar controles de acesso, logs de auditoria, criptografia e transmissão segura\n• Atualizações regulares de segurança e patches\n• Procedimentos de resposta a incidentes"
+        },
+        {
+          "title": "NOTIFICAÇÃO DE VIOLAÇÃO",
+          "content": "Em caso de incidente de segurança ou violação envolvendo PHI, você deve:\n\n• Conduzir avaliação imediata de risco\n• Notificar pacientes afetados dentro de 60 dias\n• Reportar ao HHS dentro de 60 dias\n• Notificar mídia se violação afetar mais de 500 indivíduos\n• Manter documentação da violação e resposta\n• Implementar medidas corretivas para prevenir futuras violações"
+        },
+        {
+          "title": "DIREITOS DO PACIENTE",
+          "content": "Os pacientes têm o direito de:\n\n• Acessar sua PHI e solicitar cópias\n• Solicitar alterações em seus registros\n• Solicitar restrições no uso e divulgação\n• Solicitar métodos alternativos de comunicação\n• Registrar reclamações sobre práticas de privacidade\n• Receber aviso sobre práticas de privacidade"
+        },
+        {
+          "title": "ACORDO DE ASSOCIADO COMERCIAL",
+          "content": "A KROA serve como associado comercial e se compromete a:\n\n• Usar PHI apenas conforme permitido por este acordo\n• Implementar salvaguardas apropriadas\n• Reportar incidentes de segurança prontamente\n• Retornar ou destruir PHI quando o contrato terminar\n• Permitir que a entidade coberta monitore a conformidade\n• Garantir que subcontratados atendam aos mesmos padrões"
+        },
+        {
+          "title": "RECONHECIMENTO DE CONFORMIDADE",
+          "content": "Ao aceitar este acordo, você reconhece:\n\n• Entendimento dos requisitos da HIPAA\n• Compromisso de implementar salvaguardas necessárias\n• Responsabilidade pelo treinamento da equipe e conformidade\n• Obrigação de reportar incidentes de segurança\n• Entendimento de que violações podem resultar em penalidades civis e criminais\n• Acordo de cooperar com auditorias e investigações de conformidade"
+        }
+      ]
     }
   },
   "EN": {
@@ -251,9 +310,11 @@
       "name": "Full name",
       "namePlaceholder": "Enter your full name",
       "email": "Email",
+      "emailUS": "Best Email",
       "emailPlaceholder": "Enter your best email",
       "emailPlaceholderUS": "Enter your best email",
       "phone": "Phone",
+      "phoneUS": "Best Phone",
       "phonePlaceholder": "Enter your phone number",
       "phonePlaceholderUS": "Enter your best phone number",
       "signInWithGoogle": "Sign in with Google",
@@ -268,7 +329,7 @@
       "security": {
         "sslSecure": "SSL Secure",
         "dataProtected": "Data Protected",
-        "lgpdCompliant": "GDPR Compliant",
+        "lgpdCompliant": "LGPD Compliant",
         "hipaaCompliant": "HIPAA Compliant"
       }
     },
@@ -304,19 +365,25 @@
       "couponPlaceholder": "Enter your coupon",
       "applyCoupon": "Apply",
       "couponApplied": "Coupon applied successfully!",
+      "couponAppliedSuccess": "Coupon applied successfully!",
+      "discountText": "discount",
       "couponInvalid": "Invalid or expired coupon",
       "validCoupons": {
         "DISCOUNT10": { "discount": 10, "type": "percentage" },
-        "FIRST50": { "discount": 50, "type": "fixed" },
+        "FIRST50": { "discount": 15, "type": "fixed" },
         "TEST30": { "discount": 30, "type": "percentage" }
       },
       "termsSection": "Terms Acceptance",
+      "lgpdConsent": "I accept the LGPD terms",
+      "lgpdDescription": "I declare that I am aware and agree with the terms of the General Data Protection Law (LGPD) and authorize the processing of personal data as described in the privacy policy.",
+      "viewLgpdDocument": "View full document",
       "hipaaConsent": "I accept the HIPAA terms",
       "hipaaDescription": "I acknowledge and agree to comply with the Health Insurance Portability and Accountability Act (HIPAA) requirements for protecting patient health information.",
       "viewHipaaDocument": "View full document",
       "adminResponsibility": "I accept the administrator user responsibilities",
       "adminResponsibilityDescription": "I assume full responsibility for the configurations and data entered in the system, committing to maintain the security and confidentiality of patient information.",
       "viewResponsibilityDocument": "View responsibility terms",
+      "acceptTerms": "Accept Terms",
       "plans": {
         "basic": {
           "name": "Starter",
@@ -402,7 +469,22 @@
       "almostDone": "Almost done!",
       "success": "Account created successfully!",
       "successMessage": "Your clinic is ready to use. You'll be redirected in a few seconds.",
-      "accessNow": "Access now"
+      "accessNow": "Access now",
+      "redirectingIn5Seconds": "Automatically redirecting in 5 seconds...",
+      "error": {
+        "title": "Oops! Something went wrong",
+        "retry": "Try again",
+        "contact": "Contact support"
+      },
+      "finalizingDetails": "Finalizing the last details of your account...",
+      "accountInfo": "Account information:",
+      "progressLabel": "Progress",
+      "labels": {
+        "clinic": "Clinic:",
+        "access": "Access:",
+        "domain": "Domain:",
+        "email": "Email:"
+      }
     },
     "hipaaTerms": {
       "title": "HIPAA COMPLIANCE AGREEMENT",
@@ -556,19 +638,25 @@
       "couponPlaceholder": "Ingrese su cupón",
       "applyCoupon": "Aplicar",
       "couponApplied": "¡Cupón aplicado con éxito!",
+      "couponAppliedSuccess": "¡Cupón aplicado con éxito!",
+      "discountText": "de descuento",
       "couponInvalid": "Cupón inválido o expirado",
       "validCoupons": {
         "DESCUENTO10": { "discount": 10, "type": "percentage" },
-        "PRIMERO50": { "discount": 50, "type": "fixed" },
+        "PRIMERO50": { "discount": 15, "type": "fixed" },
         "PRUEBA30": { "discount": 30, "type": "percentage" }
       },
       "termsSection": "Aceptación de Términos",
       "lgpdConsent": "Acepto los términos de LGPD",
       "lgpdDescription": "Declaro estar consciente y de acuerdo con los términos de la Ley General de Protección de Datos (LGPD) y autorizo el tratamiento de datos personales según se describe en la política de privacidad.",
       "viewLgpdDocument": "Ver documento completo",
+      "hipaaConsent": "Acepto los términos de HIPAA",
+      "hipaaDescription": "Reconozco y acepto cumplir con los requisitos de la Ley de Portabilidad y Responsabilidad de Seguros de Salud (HIPAA) para proteger la información de salud de los pacientes.",
+      "viewHipaaDocument": "Ver documento completo",
       "adminResponsibility": "Acepto las responsabilidades de usuario administrador",
       "adminResponsibilityDescription": "Asumo total responsabilidad por las configuraciones y datos ingresados en el sistema, comprometiéndome a mantener la seguridad y confidencialidad de la información de los pacientes.",
-      "viewResponsibilityDocument": "Ver términos de responsabilidad"
+      "viewResponsibilityDocument": "Ver términos de responsabilidad",
+      "acceptTerms": "Aceptar Términos"
     },
     "step3": {
       "title": "Configuraciones avanzadas",

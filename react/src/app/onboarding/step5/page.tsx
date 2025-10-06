@@ -95,7 +95,7 @@ export default function Step5Page() {
           </div>
 
           <h1 className="text-xl font-bold text-gray-900 mb-2">
-            Ops! Algo deu errado
+            {t?.step4?.error?.title || 'Ops! Algo deu errado'}
           </h1>
           <p className="text-gray-600 mb-6">
             {error}
@@ -107,14 +107,14 @@ export default function Step5Page() {
               onClick={retryCreation}
               fullWidth
             >
-              Tentar novamente
+              {t?.step4?.error?.retry || 'Tentar novamente'}
             </Button>
             <Button
               variant="outline"
               onClick={() => window.location.href = '/support'}
               fullWidth
             >
-              Entrar em contato com o suporte
+              {t?.step4?.error?.contact || 'Entrar em contato com o suporte'}
             </Button>
           </div>
         </div>
@@ -146,9 +146,9 @@ export default function Step5Page() {
 
           <div className="bg-gray-50 rounded-lg p-4 mb-6">
             <div className="text-sm text-gray-600 space-y-1">
-              <p><strong>Clínica:</strong> {accountData.clinicName}</p>
-              <p><strong>Acesso:</strong> https://{accountData.customDomain}.kroa.com.br</p>
-              <p><strong>E-mail:</strong> {accountData.email}</p>
+              <p><strong>{t?.step4?.labels?.clinic || 'Clínica:'}</strong> {accountData.clinicName}</p>
+              <p><strong>{t?.step4?.labels?.access || 'Acesso:'}</strong> https://{accountData.customDomain}.kroa.com.br</p>
+              <p><strong>{t?.step4?.labels?.email || 'E-mail:'}</strong> {accountData.email}</p>
             </div>
           </div>
 
@@ -167,7 +167,7 @@ export default function Step5Page() {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <span>Redirecionando automaticamente em 5 segundos...</span>
+              <span>{t?.step4?.redirectingIn5Seconds || 'Redirecionando automaticamente em 5 segundos...'}</span>
             </div>
           </div>
 
@@ -253,7 +253,7 @@ export default function Step5Page() {
         {/* Progress Bar */}
         <div className="mb-6">
           <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>Progresso</span>
+            <span>{t?.step4?.progressLabel || 'Progresso'}</span>
             <span>{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
@@ -271,18 +271,18 @@ export default function Step5Page() {
               {t?.step4?.almostDone || 'Quase pronto!'}
             </p>
             <p className="text-xs text-blue-600 mt-1">
-              Finalizando os últimos detalhes da sua conta...
+              {t?.step4?.finalizingDetails || 'Finalizando os últimos detalhes da sua conta...'}
             </p>
           </div>
         )}
 
         {/* Account Info Preview */}
         <div className="bg-gray-50 rounded-lg p-4 text-left">
-          <h3 className="font-medium text-gray-900 mb-2">Informações da conta:</h3>
+          <h3 className="font-medium text-gray-900 mb-2">{t?.step4?.accountInfo || 'Informações da conta:'}</h3>
           <div className="text-sm text-gray-600 space-y-1">
-            <p><strong>Clínica:</strong> {accountData.clinicName}</p>
-            <p><strong>Domínio:</strong> {accountData.customDomain}.kroa.com.br</p>
-            <p><strong>E-mail:</strong> {accountData.email}</p>
+            <p><strong>{t?.step4?.labels?.clinic || 'Clínica:'}</strong> {accountData.clinicName}</p>
+            <p><strong>{t?.step4?.labels?.domain || 'Domínio:'}</strong> {accountData.customDomain}.kroa.com.br</p>
+            <p><strong>{t?.step4?.labels?.email || 'E-mail:'}</strong> {accountData.email}</p>
           </div>
         </div>
       </div>
