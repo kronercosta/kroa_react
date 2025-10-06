@@ -224,7 +224,8 @@
       "feature3Description": "Equipe de especialistas em gestão odontológica à sua disposição",
       "testimonialAuthor": "Dr. Carlos Mendes",
       "testimonialClinic": "Clínica OdontoCare",
-      "testimonialText": "\"Em 3 meses com a KROA, nossa produtividade aumentou 40% e reduzimos os custos administrativos pela metade.\""
+      "testimonialText": "\"Em 3 meses com a KROA, nossa produtividade aumentou 40% e reduzimos os custos administrativos pela metade.\"",
+      "footerText": "© 2025 KROA. Todos os direitos reservados."
     }
   },
   "EN": {
@@ -637,7 +638,8 @@
       "feature3Description": "Team of dental management specialists at your disposal",
       "testimonialAuthor": "Dr. Carlos Mendes",
       "testimonialClinic": "OdontoCare Clinic",
-      "testimonialText": "\"In 3 months with KROA, our productivity increased 40% and we reduced administrative costs by half.\""
+      "testimonialText": "\"In 3 months with KROA, our productivity increased 40% and we reduced administrative costs by half.\"",
+      "footerText": "© 2025 KROA. All rights reserved."
     }
   }
 }

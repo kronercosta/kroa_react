@@ -16,12 +16,7 @@ export function OnboardingLayout({
   totalSteps,
   showProgress = true
 }: OnboardingLayoutProps) {
-  const { t, currentLanguage } = useTranslation(translations);
-
-  // Debug temporário
-  console.log('OnboardingLayout - Idioma atual:', currentLanguage);
-  console.log('OnboardingLayout - Traduções disponíveis:', Object.keys(translations));
-  console.log('OnboardingLayout - Tradução carregada:', t?.layout?.sidebarTitle);
+  const { t } = useTranslation(translations);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-krooa-green/5 to-blue-50 flex flex-col">
@@ -147,7 +142,7 @@ export function OnboardingLayout({
       <footer className="bg-white border-t border-gray-200 py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center items-center text-sm text-gray-500">
-            <p>© 2025 KROA. Todos os direitos reservados.</p>
+            <p>{t?.layout?.footerText || '© 2025 KROA. Todos os direitos reservados.'}</p>
           </div>
         </div>
       </footer>
