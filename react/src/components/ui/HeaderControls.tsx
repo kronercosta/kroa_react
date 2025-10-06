@@ -2,10 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Clock, ChevronDown } from 'lucide-react';
 import { useRegion } from '../../contexts/RegionContext';
 import { useGlobalLanguage } from '../../hooks/useGlobalLanguage';
+import { useUITranslation } from '../../hooks/useUITranslation';
 
 export function HeaderControls() {
   const { currentRegion, setRegion, formatCurrency } = useRegion();
   const { currentLanguage, changeLanguage } = useGlobalLanguage();
+  const uiTranslations = useUITranslation();
 
   const [selectedTimezone, setSelectedTimezone] = useState('São Paulo - Brasília');
   const [currentTime, setCurrentTime] = useState('--:--');
@@ -27,9 +29,9 @@ export function HeaderControls() {
   ];
 
   const languages = [
-    { code: 'PT', name: 'Português', flag: '🇧🇷' },
-    { code: 'EN', name: 'English', flag: '🇺🇸' },
-    { code: 'ES', name: 'Español', flag: '🇪🇸' }
+    { code: 'PT', name: uiTranslations?.headerControls?.languages?.PT || 'Português', flag: '🇧🇷' },
+    { code: 'EN', name: uiTranslations?.headerControls?.languages?.EN || 'English', flag: '🇺🇸' },
+    { code: 'ES', name: uiTranslations?.headerControls?.languages?.ES || 'Español', flag: '🇪🇸' }
   ];
 
   // Update time
@@ -71,6 +73,8 @@ export function HeaderControls() {
     if (newLanguage !== currentLanguage) {
       changeLanguage(newLanguage);
       setLanguageDropdownOpen(false);
+      // Refresh da página para aplicar as traduções
+      window.location.reload();
     }
   };
 
@@ -81,7 +85,7 @@ export function HeaderControls() {
         <button
           onClick={() => setTimezoneDropdownOpen(!timezoneDropdownOpen)}
           className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-xs sm:text-sm font-medium h-[34px] w-full sm:w-auto"
-          title="Alterar fuso horário"
+          title={uiTranslations?.headerControls?.changeTimezone || 'Alterar fuso horário'}
         >
           <Clock className="w-4 h-4" />
           <span>{currentTime}</span>
@@ -94,8 +98,8 @@ export function HeaderControls() {
         {timezoneDropdownOpen && (
           <div className="absolute left-0 sm:right-0 sm:left-auto mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 max-h-96 overflow-y-auto">
             <div className="px-3 py-2 border-b border-gray-200">
-              <h3 className="text-xs font-semibold text-gray-600">Fuso Horário</h3>
-              <p className="text-xs text-gray-500 mt-1">Selecione o fuso horário da clínica</p>
+              <h3 className="text-xs font-semibold text-gray-600">{uiTranslations?.headerControls?.timezoneTitle || 'Fuso Horário'}</h3>
+              <p className="text-xs text-gray-500 mt-1">{uiTranslations?.headerControls?.timezoneDescription || 'Selecione o fuso horário da clínica'}</p>
             </div>
             {timezones.map((timezone) => (
               <button
@@ -123,7 +127,7 @@ export function HeaderControls() {
         <button
           onClick={() => setRegionDropdownOpen(!regionDropdownOpen)}
           className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-xs sm:text-sm font-medium h-[34px] w-full sm:w-auto"
-          title="Alterar região"
+          title={uiTranslations?.headerControls?.changeRegion || 'Alterar região'}
         >
           <span className="text-base">{currentRegion === 'BR' ? '🇧🇷' : '🇺🇸'}</span>
           <span className="hidden sm:inline">{currentRegion}</span>
@@ -133,8 +137,8 @@ export function HeaderControls() {
         {regionDropdownOpen && (
           <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
             <div className="px-3 py-2 border-b border-gray-200">
-              <h3 className="text-xs font-semibold text-gray-600">Região</h3>
-              <p className="text-xs text-gray-500 mt-1">Selecione a região da clínica</p>
+              <h3 className="text-xs font-semibold text-gray-600">{uiTranslations?.headerControls?.regionTitle || 'Região'}</h3>
+              <p className="text-xs text-gray-500 mt-1">{uiTranslations?.headerControls?.regionDescription || 'Selecione a região da clínica'}</p>
             </div>
             <button
               onClick={() => {
@@ -147,8 +151,8 @@ export function HeaderControls() {
             >
               <span className="text-lg">🇧🇷</span>
               <div className="flex-1">
-                <div>Brasil</div>
-                <div className="text-xs text-gray-500">Moeda: {formatCurrency(0).split(' ')[0]}</div>
+                <div>{uiTranslations?.headerControls?.regions?.BR || 'Brasil'}</div>
+                <div className="text-xs text-gray-500">{uiTranslations?.headerControls?.currency || 'Moeda'}: {formatCurrency(0).split(' ')[0]}</div>
               </div>
             </button>
             <button
@@ -162,8 +166,8 @@ export function HeaderControls() {
             >
               <span className="text-lg">🇺🇸</span>
               <div className="flex-1">
-                <div>United States</div>
-                <div className="text-xs text-gray-500">Currency: {formatCurrency(0).split(' ')[0]}</div>
+                <div>{uiTranslations?.headerControls?.regions?.US || 'United States'}</div>
+                <div className="text-xs text-gray-500">{uiTranslations?.headerControls?.currency || 'Currency'}: {formatCurrency(0).split(' ')[0]}</div>
               </div>
             </button>
           </div>
@@ -175,7 +179,7 @@ export function HeaderControls() {
         <button
           onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
           className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-xs sm:text-sm font-medium h-[34px] w-full sm:w-auto"
-          title="Alterar idioma"
+          title={uiTranslations?.headerControls?.changeLanguage || 'Alterar idioma'}
         >
           <span className="text-base">{languages.find(l => l.code === currentLanguage)?.flag}</span>
           <span className="hidden sm:inline">{currentLanguage}</span>
@@ -185,8 +189,8 @@ export function HeaderControls() {
         {languageDropdownOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
             <div className="px-3 py-2 border-b border-gray-200">
-              <h3 className="text-xs font-semibold text-gray-600">Idioma</h3>
-              <p className="text-xs text-gray-500 mt-1">Selecione o idioma</p>
+              <h3 className="text-xs font-semibold text-gray-600">{uiTranslations?.headerControls?.languageTitle || 'Idioma'}</h3>
+              <p className="text-xs text-gray-500 mt-1">{uiTranslations?.headerControls?.languageDescription || 'Selecione o idioma'}</p>
             </div>
             {languages.map((language) => (
               <button

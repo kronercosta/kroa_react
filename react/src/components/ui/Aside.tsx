@@ -1,6 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Button, IconButton } from './Button';
+import { useUITranslation } from '../../hooks/useUITranslation';
 
 interface AsideProps {
   isOpen: boolean;
@@ -18,9 +19,12 @@ export const Aside: React.FC<AsideProps> = ({
   onSave,
   title,
   children,
-  saveButtonText = 'Salvar',
+  saveButtonText,
   showSaveButton = true
 }) => {
+  const uiTranslations = useUITranslation();
+  const buttonText = saveButtonText || uiTranslations?.aside?.save || 'Salvar';
+
   if (!isOpen) return null;
 
   return (
@@ -50,7 +54,7 @@ export const Aside: React.FC<AsideProps> = ({
                 onClick={onSave}
                 variant="primary"
               >
-                {saveButtonText}
+                {buttonText}
               </Button>
             )}
           </div>

@@ -1,0 +1,167 @@
+{
+  "PT": {
+    "systemAccess": {
+      "title": "Acesso ao Sistema",
+      "description": "Configure o acesso geral do colaborador",
+      "label": "Acesso ao Sistema Web",
+      "webDescription": "Permite login no sistema através do navegador",
+      "mobileTitle": "Acesso ao Aplicativo Mobile",
+      "mobileDescription": "Permite login através do aplicativo móvel"
+    },
+    "modules": {
+      "title": "Permissões por Módulo",
+      "subtitle": "Configure o nível de acesso para cada módulo do sistema",
+      "agenda": "Agenda",
+      "agendaDescription": "Gerenciar agendamentos e horários",
+      "pacientes": "Pacientes",
+      "pacientesDescription": "Cadastro e histórico de pacientes",
+      "financeiro": "Financeiro",
+      "financeiroDescription": "Controle financeiro e pagamentos",
+      "crm": "CRM",
+      "crmDescription": "Relacionamento com clientes",
+      "configuracoes": "Configurações",
+      "configuracoesDescription": "Configurações do sistema",
+      "relatorios": "Relatórios",
+      "relatoriosDescription": "Visualização de relatórios"
+    },
+    "permissionLevels": {
+      "semAcesso": "Sem Acesso",
+      "visualizar": "Visualizar",
+      "editar": "Editar",
+      "total": "Total"
+    },
+    "unitsAndCostCenters": {
+      "title": "Unidades e Centros de Custo",
+      "description": "Selecione as unidades e centros de custo que este colaborador pode acessar",
+      "units": "Unidades Permitidas",
+      "unitsPlaceholder": "Selecione as unidades",
+      "unitsHelp": "Deixe vazio para permitir acesso a todas as unidades",
+      "costCenters": "Centros de Custo Permitidos",
+      "costCentersPlaceholder": "Selecione os centros de custo",
+      "costCentersHelp": "Deixe vazio para permitir acesso a todos os centros de custo"
+    },
+    "specialPermissions": {
+      "title": "Permissões Especiais",
+      "financialData": "Visualizar Dados Financeiros Sensíveis",
+      "financialDataDescription": "Acesso a valores, custos e margens de lucro",
+      "editOthers": "Alterar Dados de Outros Profissionais",
+      "editOthersDescription": "Permite editar agendamentos e dados de outros colaboradores",
+      "deleteRecords": "Excluir Registros Permanentemente",
+      "deleteRecordsDescription": "Permite exclusão definitiva de dados do sistema"
+    },
+    "buttons": {
+      "save": "Salvar",
+      "cancel": "Cancelar"
+    }
+  },
+  "EN": {
+    "systemAccess": {
+      "title": "System Access",
+      "description": "Configure general employee access",
+      "label": "Web System Access",
+      "webDescription": "Allows login to the system through the browser",
+      "mobileTitle": "Mobile App Access",
+      "mobileDescription": "Allows login through the mobile application"
+    },
+    "modules": {
+      "title": "Module Permissions",
+      "subtitle": "Configure access level for each system module",
+      "agenda": "Schedule",
+      "agendaDescription": "Manage appointments and schedules",
+      "pacientes": "Patients",
+      "pacientesDescription": "Patient registration and history",
+      "financeiro": "Financial",
+      "financeiroDescription": "Financial control and payments",
+      "crm": "CRM",
+      "crmDescription": "Customer relationship",
+      "configuracoes": "Settings",
+      "configuracoesDescription": "System settings",
+      "relatorios": "Reports",
+      "relatoriosDescription": "Report viewing"
+    },
+    "permissionLevels": {
+      "semAcesso": "No Access",
+      "visualizar": "View",
+      "editar": "Edit",
+      "total": "Full"
+    },
+    "unitsAndCostCenters": {
+      "title": "Units and Cost Centers",
+      "description": "Select the units and cost centers this employee can access",
+      "units": "Allowed Units",
+      "unitsPlaceholder": "Select units",
+      "unitsHelp": "Leave empty to allow access to all units",
+      "costCenters": "Allowed Cost Centers",
+      "costCentersPlaceholder": "Select cost centers",
+      "costCentersHelp": "Leave empty to allow access to all cost centers"
+    },
+    "specialPermissions": {
+      "title": "Special Permissions",
+      "financialData": "View Sensitive Financial Data",
+      "financialDataDescription": "Access to values, costs and profit margins",
+      "editOthers": "Modify Other Professionals' Data",
+      "editOthersDescription": "Allows editing appointments and data of other employees",
+      "deleteRecords": "Permanently Delete Records",
+      "deleteRecordsDescription": "Allows permanent deletion of system data"
+    },
+    "buttons": {
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "ES": {
+    "systemAccess": {
+      "title": "Acceso al Sistema",
+      "description": "Configure el acceso general del empleado",
+      "label": "Acceso al Sistema Web",
+      "webDescription": "Permite iniciar sesión en el sistema a través del navegador",
+      "mobileTitle": "Acceso a la Aplicación Móvil",
+      "mobileDescription": "Permite iniciar sesión a través de la aplicación móvil"
+    },
+    "modules": {
+      "title": "Permisos por Módulo",
+      "subtitle": "Configure el nivel de acceso para cada módulo del sistema",
+      "agenda": "Agenda",
+      "agendaDescription": "Gestionar citas y horarios",
+      "pacientes": "Pacientes",
+      "pacientesDescription": "Registro e historial de pacientes",
+      "financeiro": "Financiero",
+      "financeiroDescription": "Control financiero y pagos",
+      "crm": "CRM",
+      "crmDescription": "Relación con clientes",
+      "configuracoes": "Configuraciones",
+      "configuracoesDescription": "Configuraciones del sistema",
+      "relatorios": "Informes",
+      "relatoriosDescription": "Visualización de informes"
+    },
+    "permissionLevels": {
+      "semAcesso": "Sin Acceso",
+      "visualizar": "Visualizar",
+      "editar": "Editar",
+      "total": "Total"
+    },
+    "unitsAndCostCenters": {
+      "title": "Unidades y Centros de Costo",
+      "description": "Seleccione las unidades y centros de costo a los que este empleado puede acceder",
+      "units": "Unidades Permitidas",
+      "unitsPlaceholder": "Seleccione las unidades",
+      "unitsHelp": "Deje vacío para permitir acceso a todas las unidades",
+      "costCenters": "Centros de Costo Permitidos",
+      "costCentersPlaceholder": "Seleccione los centros de costo",
+      "costCentersHelp": "Deje vacío para permitir acceso a todos los centros de costo"
+    },
+    "specialPermissions": {
+      "title": "Permisos Especiales",
+      "financialData": "Ver Datos Financieros Sensibles",
+      "financialDataDescription": "Acceso a valores, costos y márgenes de ganancia",
+      "editOthers": "Modificar Datos de Otros Profesionales",
+      "editOthersDescription": "Permite editar citas y datos de otros empleados",
+      "deleteRecords": "Eliminar Registros Permanentemente",
+      "deleteRecordsDescription": "Permite eliminación definitiva de datos del sistema"
+    },
+    "buttons": {
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    }
+  }
+}

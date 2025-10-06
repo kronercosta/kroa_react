@@ -4,6 +4,7 @@ import { Icon } from '@iconify/react';
 import { SketchPicker } from 'react-color';
 import { CustomCalendar } from './CustomCalendar';
 import { Button, IconButton } from './Button';
+import { useUITranslation } from '../../hooks/useUITranslation';
 
 // Tipos expandidos de máscara
 export type MaskType =
@@ -12,18 +13,18 @@ export type MaskType =
 
 export type ValidationType = 'email' | 'cpf' | 'cnpj' | 'ssn' | 'ein' | 'creditCard' | 'none';
 
-// Países com códigos e máscaras de telefone
-const countries = [
-  { code: 'BR', name: 'Brasil', flag: '🇧🇷', phoneCode: '+55', mask: '(00) 00000-0000' },
-  { code: 'US', name: 'Estados Unidos', flag: '🇺🇸', phoneCode: '+1', mask: '(000) 000-0000' },
-  { code: 'PT', name: 'Portugal', flag: '🇵🇹', phoneCode: '+351', mask: '000 000 000' },
-  { code: 'ES', name: 'Espanha', flag: '🇪🇸', phoneCode: '+34', mask: '000 00 00 00' },
-  { code: 'FR', name: 'França', flag: '🇫🇷', phoneCode: '+33', mask: '0 00 00 00 00' },
-  { code: 'DE', name: 'Alemanha', flag: '🇩🇪', phoneCode: '+49', mask: '000 00000000' },
-  { code: 'IT', name: 'Itália', flag: '🇮🇹', phoneCode: '+39', mask: '000 000 0000' },
-  { code: 'UK', name: 'Reino Unido', flag: '🇬🇧', phoneCode: '+44', mask: '0000 000000' },
-  { code: 'AR', name: 'Argentina', flag: '🇦🇷', phoneCode: '+54', mask: '00 0000-0000' },
-  { code: 'MX', name: 'México', flag: '🇲🇽', phoneCode: '+52', mask: '00 0000 0000' },
+// Função para obter nomes de países traduzidos
+const getCountries = (translations?: any) => [
+  { code: 'BR', name: translations?.input?.countries?.BR || 'Brasil', flag: '🇧🇷', phoneCode: '+55', mask: '(00) 00000-0000' },
+  { code: 'US', name: translations?.input?.countries?.US || 'Estados Unidos', flag: '🇺🇸', phoneCode: '+1', mask: '(000) 000-0000' },
+  { code: 'PT', name: translations?.input?.countries?.PT || 'Portugal', flag: '🇵🇹', phoneCode: '+351', mask: '000 000 000' },
+  { code: 'ES', name: translations?.input?.countries?.ES || 'Espanha', flag: '🇪🇸', phoneCode: '+34', mask: '000 00 00 00' },
+  { code: 'FR', name: translations?.input?.countries?.FR || 'França', flag: '🇫🇷', phoneCode: '+33', mask: '0 00 00 00 00' },
+  { code: 'DE', name: translations?.input?.countries?.DE || 'Alemanha', flag: '🇩🇪', phoneCode: '+49', mask: '000 00000000' },
+  { code: 'IT', name: translations?.input?.countries?.IT || 'Itália', flag: '🇮🇹', phoneCode: '+39', mask: '000 000 0000' },
+  { code: 'UK', name: translations?.input?.countries?.UK || 'Reino Unido', flag: '🇬🇧', phoneCode: '+44', mask: '0000 000000' },
+  { code: 'AR', name: translations?.input?.countries?.AR || 'Argentina', flag: '🇦🇷', phoneCode: '+54', mask: '00 0000-0000' },
+  { code: 'MX', name: translations?.input?.countries?.MX || 'México', flag: '🇲🇽', phoneCode: '+52', mask: '00 0000 0000' },
 ];
 
 // Bandeiras de cartão de crédito
@@ -496,6 +497,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
   timeEnd = '23:59',
   ...props
 }, ref) => {
+  const uiTranslations = useUITranslation();
+  const countries = getCountries(uiTranslations);
   const [internalValue, setInternalValue] = React.useState(value || '');
   const [isFocused, setIsFocused] = React.useState(false);
   const [isValid, setIsValid] = React.useState(true);
@@ -737,60 +740,56 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
   const getValidationErrorMessage = () => {
     // Verificar se é data incompleta
     if (isIncomplete && mask === 'date') {
-      return 'Data incompleta';
+      return uiTranslations?.input?.validation?.incompleteDate || 'Data incompleta';
     }
 
     // Verificar se é data inválida
     if (!isValid && mask === 'date') {
-      return 'Data inválida';
+      return uiTranslations?.input?.validation?.invalidDate || 'Data inválida';
     }
 
     // Verificar se é horário incompleto
     if (isIncomplete && mask === 'time') {
-      return 'Horário incompleto';
+      return uiTranslations?.input?.validation?.incompleteTime || 'Horário incompleto';
     }
 
     // Verificar se é horário inválido
     if (!isValid && mask === 'time') {
-      return 'Horário inválido';
+      return uiTranslations?.input?.validation?.invalidTime || 'Horário inválido';
     }
 
     if (isIncomplete && validation !== 'none') {
       switch (validation) {
         case 'cpf':
-          return 'CPF incompleto';
+          return uiTranslations?.input?.validation?.incompleteCPF || 'CPF incompleto';
         case 'cnpj':
-          return 'CNPJ incompleto';
+          return uiTranslations?.input?.validation?.incompleteCNPJ || 'CNPJ incompleto';
         case 'ssn':
-          return 'SSN incompleto';
+          return uiTranslations?.input?.validation?.incompleteSSN || 'SSN incompleto';
         case 'ein':
-          return 'EIN incompleto';
+          return uiTranslations?.input?.validation?.incompleteEIN || 'EIN incompleto';
         case 'creditCard':
-          return 'Número do cartão incompleto';
+          return uiTranslations?.input?.validation?.incompleteCard || 'Número do cartão incompleto';
         default:
-          return `${label || 'Campo'} incompleto`;
+          return `${label || uiTranslations?.input?.validation?.incompleteField || 'Campo'} ${uiTranslations?.input?.validation?.incompleteField || 'incompleto'}`;
       }
     }
     if (!isValid && validation !== 'none') {
       switch (validation) {
         case 'cpf':
-          return 'CPF inválido';
+          return uiTranslations?.input?.validation?.invalidCPF || 'CPF inválido';
         case 'cnpj':
-          return 'CNPJ inválido';
+          return uiTranslations?.input?.validation?.invalidCNPJ || 'CNPJ inválido';
         case 'email':
-          return 'E-mail inválido';
+          return uiTranslations?.input?.validation?.invalidEmail || 'E-mail inválido';
         case 'ssn':
-          return 'SSN inválido';
+          return uiTranslations?.input?.validation?.invalidSSN || 'SSN inválido';
         case 'ein':
-          return 'EIN inválido';
+          return uiTranslations?.input?.validation?.invalidEIN || 'EIN inválido';
         case 'creditCard':
-          return 'Número do cartão inválido';
-        // case 'url':
-        //   return 'URL inválida';
-        // case 'number':
-        //   return 'Deve ser um número válido';
+          return uiTranslations?.input?.validation?.invalidCard || 'Número do cartão inválido';
         default:
-          return `${label || 'Campo'} inválido`;
+          return `${label || uiTranslations?.input?.validation?.invalidField || 'Campo'} ${uiTranslations?.input?.validation?.invalidField || 'inválido'}`;
       }
     }
     return '';
@@ -863,7 +862,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
                           hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
                           relative overflow-hidden group"
                 style={{ backgroundColor: localValue || '#000000' }}
-                title="Escolher cor"
+                title={uiTranslations?.input?.colorPicker || 'Escolher cor'}
               >
                 {/* Efeito de brilho/gradiente sutil */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-black/10 rounded"></div>

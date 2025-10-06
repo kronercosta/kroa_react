@@ -1,0 +1,32 @@
+{
+  "PT": {
+    "title": "Configurações da Clínica",
+    "subtitle": "Gerencie as informações e configurações da sua clínica",
+    "tabs": {
+      "conta": "Conta",
+      "cadeiras": "Cadeiras",
+      "centroCusto": "Centro de Custo",
+      "parametros": "Parâmetros"
+    }
+  },
+  "EN": {
+    "title": "Clinic Settings",
+    "subtitle": "Manage your clinic information and settings",
+    "tabs": {
+      "conta": "Account",
+      "cadeiras": "Chairs",
+      "centroCusto": "Cost Center",
+      "parametros": "Parameters"
+    }
+  },
+  "ES": {
+    "title": "Configuraciones de la Clínica",
+    "subtitle": "Gestione la información y configuraciones de su clínica",
+    "tabs": {
+      "conta": "Cuenta",
+      "cadeiras": "Sillas",
+      "centroCusto": "Centro de Costo",
+      "parametros": "Parámetros"
+    }
+  }
+}

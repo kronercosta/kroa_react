@@ -1,0 +1,323 @@
+{
+  "PT": {
+    "input": {
+      "colorPicker": "Escolher cor",
+      "noNumber": "Sem número",
+      "countries": {
+        "BR": "Brasil",
+        "US": "Estados Unidos",
+        "PT": "Portugal",
+        "ES": "Espanha",
+        "FR": "França",
+        "DE": "Alemanha",
+        "IT": "Itália",
+        "UK": "Reino Unido",
+        "AR": "Argentina",
+        "MX": "México"
+      },
+      "cards": {
+        "visa": "Visa",
+        "mastercard": "Mastercard",
+        "amex": "Amex",
+        "elo": "Elo",
+        "discover": "Discover",
+        "diners": "Diners"
+      },
+      "validation": {
+        "incompleteDate": "Data incompleta",
+        "invalidDate": "Data inválida",
+        "incompleteTime": "Horário incompleto",
+        "invalidTime": "Horário inválido",
+        "incompleteCPF": "CPF incompleto",
+        "incompleteCNPJ": "CNPJ incompleto",
+        "incompleteSSN": "SSN incompleto",
+        "incompleteEIN": "EIN incompleto",
+        "incompleteCard": "Número do cartão incompleto",
+        "incompleteField": "Campo incompleto",
+        "invalidCPF": "CPF inválido",
+        "invalidCNPJ": "CNPJ inválido",
+        "invalidEmail": "E-mail inválido",
+        "invalidSSN": "SSN inválido",
+        "invalidEIN": "EIN inválido",
+        "invalidCard": "Número do cartão inválido",
+        "invalidField": "Campo inválido"
+      },
+      "placeholders": {
+        "time": "HH:MM",
+        "address": "Digite o endereço..."
+      },
+      "errors": {
+        "invalidImage": "Por favor, selecione uma imagem válida"
+      }
+    },
+    "dropdown": {
+      "moreOptions": "Mais opções"
+    },
+    "select": {
+      "cancel": "Cancelar",
+      "search": "Buscar...",
+      "noResults": "Nenhum resultado encontrado",
+      "noOptions": "Sem opções disponíveis",
+      "edit": "Editar",
+      "advancedEdit": "Edição avançada",
+      "newItemPlaceholder": "Nome do novo item...",
+      "deleteOption": "Não transferir (excluir permanentemente)"
+    },
+    "filter": {
+      "filters": "Filtros",
+      "filter": "Filtrar"
+    },
+    "table": {
+      "emptyMessage": "Nenhum dado encontrado"
+    },
+    "calendar": {
+      "months": ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
+      "days": ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"]
+    },
+    "aside": {
+      "save": "Salvar"
+    },
+    "button": {
+      "loading": "Carregando..."
+    },
+    "enhancedInput": {
+      "noNumber": "Sem número",
+      "invalidField": "Campo inválido"
+    },
+    "headerControls": {
+      "changeTimezone": "Alterar fuso horário",
+      "changeRegion": "Alterar região",
+      "changeLanguage": "Alterar idioma",
+      "timezoneTitle": "Fuso Horário",
+      "timezoneDescription": "Selecione o fuso horário da clínica",
+      "regionTitle": "Região",
+      "regionDescription": "Selecione a região da clínica",
+      "languageTitle": "Idioma",
+      "languageDescription": "Selecione o idioma",
+      "currency": "Moeda",
+      "regions": {
+        "BR": "Brasil",
+        "US": "United States"
+      },
+      "languages": {
+        "PT": "Português",
+        "EN": "English",
+        "ES": "Español"
+      }
+    }
+  },
+  "EN": {
+    "input": {
+      "colorPicker": "Choose color",
+      "noNumber": "No number",
+      "countries": {
+        "BR": "Brazil",
+        "US": "United States",
+        "PT": "Portugal",
+        "ES": "Spain",
+        "FR": "France",
+        "DE": "Germany",
+        "IT": "Italy",
+        "UK": "United Kingdom",
+        "AR": "Argentina",
+        "MX": "Mexico"
+      },
+      "cards": {
+        "visa": "Visa",
+        "mastercard": "Mastercard",
+        "amex": "Amex",
+        "elo": "Elo",
+        "discover": "Discover",
+        "diners": "Diners"
+      },
+      "validation": {
+        "incompleteDate": "Incomplete date",
+        "invalidDate": "Invalid date",
+        "incompleteTime": "Incomplete time",
+        "invalidTime": "Invalid time",
+        "incompleteCPF": "Incomplete CPF",
+        "incompleteCNPJ": "Incomplete CNPJ",
+        "incompleteSSN": "Incomplete SSN",
+        "incompleteEIN": "Incomplete EIN",
+        "incompleteCard": "Incomplete card number",
+        "incompleteField": "Incomplete field",
+        "invalidCPF": "Invalid CPF",
+        "invalidCNPJ": "Invalid CNPJ",
+        "invalidEmail": "Invalid email",
+        "invalidSSN": "Invalid SSN",
+        "invalidEIN": "Invalid EIN",
+        "invalidCard": "Invalid card number",
+        "invalidField": "Invalid field"
+      },
+      "placeholders": {
+        "time": "HH:MM",
+        "address": "Enter address..."
+      },
+      "errors": {
+        "invalidImage": "Please select a valid image"
+      }
+    },
+    "dropdown": {
+      "moreOptions": "More options"
+    },
+    "select": {
+      "cancel": "Cancel",
+      "search": "Search...",
+      "noResults": "No results found",
+      "noOptions": "No options available",
+      "edit": "Edit",
+      "advancedEdit": "Advanced edit",
+      "newItemPlaceholder": "New item name...",
+      "deleteOption": "Do not transfer (delete permanently)"
+    },
+    "filter": {
+      "filters": "Filters",
+      "filter": "Filter"
+    },
+    "table": {
+      "emptyMessage": "No data found"
+    },
+    "calendar": {
+      "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+      "days": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    },
+    "aside": {
+      "save": "Save"
+    },
+    "button": {
+      "loading": "Loading..."
+    },
+    "enhancedInput": {
+      "noNumber": "No number",
+      "invalidField": "Invalid field"
+    },
+    "headerControls": {
+      "changeTimezone": "Change timezone",
+      "changeRegion": "Change region",
+      "changeLanguage": "Change language",
+      "timezoneTitle": "Timezone",
+      "timezoneDescription": "Select clinic timezone",
+      "regionTitle": "Region",
+      "regionDescription": "Select clinic region",
+      "languageTitle": "Language",
+      "languageDescription": "Select language",
+      "currency": "Currency",
+      "regions": {
+        "BR": "Brazil",
+        "US": "United States"
+      },
+      "languages": {
+        "PT": "Portuguese",
+        "EN": "English",
+        "ES": "Spanish"
+      }
+    }
+  },
+  "ES": {
+    "input": {
+      "colorPicker": "Elegir color",
+      "noNumber": "Sin número",
+      "countries": {
+        "BR": "Brasil",
+        "US": "Estados Unidos",
+        "PT": "Portugal",
+        "ES": "España",
+        "FR": "Francia",
+        "DE": "Alemania",
+        "IT": "Italia",
+        "UK": "Reino Unido",
+        "AR": "Argentina",
+        "MX": "México"
+      },
+      "cards": {
+        "visa": "Visa",
+        "mastercard": "Mastercard",
+        "amex": "Amex",
+        "elo": "Elo",
+        "discover": "Discover",
+        "diners": "Diners"
+      },
+      "validation": {
+        "incompleteDate": "Fecha incompleta",
+        "invalidDate": "Fecha inválida",
+        "incompleteTime": "Hora incompleta",
+        "invalidTime": "Hora inválida",
+        "incompleteCPF": "CPF incompleto",
+        "incompleteCNPJ": "CNPJ incompleto",
+        "incompleteSSN": "SSN incompleto",
+        "incompleteEIN": "EIN incompleto",
+        "incompleteCard": "Número de tarjeta incompleto",
+        "incompleteField": "Campo incompleto",
+        "invalidCPF": "CPF inválido",
+        "invalidCNPJ": "CNPJ inválido",
+        "invalidEmail": "Correo inválido",
+        "invalidSSN": "SSN inválido",
+        "invalidEIN": "EIN inválido",
+        "invalidCard": "Número de tarjeta inválido",
+        "invalidField": "Campo inválido"
+      },
+      "placeholders": {
+        "time": "HH:MM",
+        "address": "Ingrese dirección..."
+      },
+      "errors": {
+        "invalidImage": "Por favor seleccione una imagen válida"
+      }
+    },
+    "dropdown": {
+      "moreOptions": "Más opciones"
+    },
+    "select": {
+      "cancel": "Cancelar",
+      "search": "Buscar...",
+      "noResults": "No se encontraron resultados",
+      "noOptions": "No hay opciones disponibles",
+      "edit": "Editar",
+      "advancedEdit": "Edición avanzada",
+      "newItemPlaceholder": "Nombre del nuevo elemento...",
+      "deleteOption": "No transferir (eliminar permanentemente)"
+    },
+    "filter": {
+      "filters": "Filtros",
+      "filter": "Filtrar"
+    },
+    "table": {
+      "emptyMessage": "No se encontraron datos"
+    },
+    "calendar": {
+      "months": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+      "days": ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
+    },
+    "aside": {
+      "save": "Guardar"
+    },
+    "button": {
+      "loading": "Cargando..."
+    },
+    "enhancedInput": {
+      "noNumber": "Sin número",
+      "invalidField": "Campo inválido"
+    },
+    "headerControls": {
+      "changeTimezone": "Cambiar zona horaria",
+      "changeRegion": "Cambiar región",
+      "changeLanguage": "Cambiar idioma",
+      "timezoneTitle": "Zona Horaria",
+      "timezoneDescription": "Seleccione la zona horaria de la clínica",
+      "regionTitle": "Región",
+      "regionDescription": "Seleccione la región de la clínica",
+      "languageTitle": "Idioma",
+      "languageDescription": "Seleccione el idioma",
+      "currency": "Moneda",
+      "regions": {
+        "BR": "Brasil",
+        "US": "Estados Unidos"
+      },
+      "languages": {
+        "PT": "Portugués",
+        "EN": "Inglés",
+        "ES": "Español"
+      }
+    }
+  }
+}

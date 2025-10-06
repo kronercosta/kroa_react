@@ -1,4 +1,5 @@
 import React from 'react';
+import { useUITranslation } from '../../hooks/useUITranslation';
 
 interface TableColumn {
   key: string;
@@ -25,8 +26,9 @@ export const Table: React.FC<TableProps> = ({
   hoverable = true,
   striped = false,
   sticky = false,
-  emptyMessage = 'Nenhum dado encontrado'
+  emptyMessage
 }) => {
+  const uiTranslations = useUITranslation();
   const getAlignmentClass = (align: 'left' | 'center' | 'right' = 'left') => {
     switch (align) {
       case 'center': return 'text-center';
@@ -64,7 +66,7 @@ export const Table: React.FC<TableProps> = ({
                   colSpan={columns.length}
                   className="py-12 text-center text-gray-500"
                 >
-                  {emptyMessage}
+                  {emptyMessage || uiTranslations?.table?.emptyMessage || 'Nenhum dado encontrado'}
                 </td>
               </tr>
             ) : (

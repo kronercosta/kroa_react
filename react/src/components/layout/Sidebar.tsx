@@ -18,17 +18,17 @@ const navItems: NavItem[] = [
   },
   {
     title: 'Agenda',
-    url: '/agenda',
+    url: '/schedule',
     icon: 'mdi:calendar-outline',
   },
   {
     title: 'Pacientes',
-    url: '/pacientes',
+    url: '/patients',
     icon: 'mdi:account-group-outline',
   },
   {
     title: 'Financeiro',
-    url: '/financeiro',
+    url: '/financial',
     icon: 'mdi:currency-usd',
   },
   {

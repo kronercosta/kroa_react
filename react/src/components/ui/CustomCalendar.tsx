@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { Button } from './Button';
+import { useUITranslation } from '../../hooks/useUITranslation';
 
 interface CustomCalendarProps {
   value?: Date | null;
@@ -18,13 +19,6 @@ interface CustomCalendarProps {
   error?: boolean;
   warning?: boolean;
 }
-
-const monthNames = [
-  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-];
-
-const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
 
 const generateYears = () => {
   const currentYear = new Date().getFullYear();
@@ -75,6 +69,16 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
   error = false,
   warning = false
 }) => {
+  const uiTranslations = useUITranslation();
+
+  // Fallback values for months and days
+  const monthNames = uiTranslations?.calendar?.months || [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  ];
+
+  const dayNames = uiTranslations?.calendar?.days || ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(value?.getMonth() ?? new Date().getMonth());

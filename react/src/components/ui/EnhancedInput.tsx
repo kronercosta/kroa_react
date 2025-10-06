@@ -1,5 +1,6 @@
 import React, { forwardRef, useState, useRef, useEffect } from 'react';
 import { Eye, EyeOff, ChevronDown, CreditCard, Phone, MapPin, Check } from 'lucide-react';
+import { useUITranslation } from '../../hooks/useUITranslation';
 
 // Tipos de máscara expandidos
 export type MaskType =
@@ -217,9 +218,10 @@ export const EnhancedInput = forwardRef<HTMLInputElement, EnhancedInputProps>(({
   defaultCountry = 'BR',
   showPasswordToggle = true,
   allowNoNumber = false,
-  noNumberText = 'Sem número',
+  noNumberText,
   ...props
 }, ref) => {
+  const uiTranslations = useUITranslation();
   const [internalValue, setInternalValue] = useState(value || '');
   const [isFocused, setIsFocused] = useState(false);
   const [isValid, setIsValid] = useState(true);
@@ -409,7 +411,7 @@ export const EnhancedInput = forwardRef<HTMLInputElement, EnhancedInputProps>(({
 
         {/* Mensagem de erro */}
         {(error || (!isValid && !isFocused && hasValue)) && (
-          <p className="mt-1 text-xs text-red-500">{error || `${label || 'Campo'} inválido`}</p>
+          <p className="mt-1 text-xs text-red-500">{error || uiTranslations?.enhancedInput?.invalidField || `${label || 'Campo'} inválido`}</p>
         )}
       </div>
     );
@@ -473,7 +475,7 @@ export const EnhancedInput = forwardRef<HTMLInputElement, EnhancedInputProps>(({
                 disabled={disabled}
                 className="w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
               />
-              <span className="text-gray-600">{noNumberText}</span>
+              <span className="text-gray-600">{noNumberText || uiTranslations?.enhancedInput?.noNumber || 'Sem número'}</span>
             </label>
           </div>
         )}
@@ -501,7 +503,7 @@ export const EnhancedInput = forwardRef<HTMLInputElement, EnhancedInputProps>(({
 
       {/* Mensagem de erro */}
       {(error || (!isValid && !isFocused && hasValue)) && (
-        <p className="mt-1 text-xs text-red-500">{error || `${label || 'Campo'} inválido`}</p>
+        <p className="mt-1 text-xs text-red-500">{error || uiTranslations?.enhancedInput?.invalidField || `${label || 'Campo'} inválido`}</p>
       )}
     </div>
   );

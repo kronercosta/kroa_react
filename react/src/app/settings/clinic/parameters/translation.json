@@ -1,0 +1,128 @@
+{
+  "PT": {
+    "scheduleParameters": {
+      "title": "Parâmetros de Agenda",
+      "subtitle": "Configure o comportamento do sistema de agendamentos",
+      "monitorChairTime": {
+        "title": "Monitorar tempo de cadeira",
+        "description": "Acompanha detalhadamente o tempo de sala de espera e duração real dos atendimentos",
+        "tagControl": "+ Controle",
+        "tagUsability": "- Usabilidade"
+      },
+      "identifyConflicts": {
+        "title": "Identificar conflitos de horários",
+        "description": "O sistema exibe alertas automáticos ao detectar sobreposição de agendamentos",
+        "tagRecommended": "Recomendado"
+      },
+      "identifyNoShowsAndCancellations": {
+        "title": "Identificar quem desmarcou ou faltou",
+        "description": "Mantém histórico detalhado de cancelamentos e faltas para melhor gestão de pacientes",
+        "tagRecommended": "Recomendado",
+        "tagControl": "+ Controle",
+        "tagUsability": "- Usabilidade"
+      }
+    },
+    "financialParameters": {
+      "title": "Parâmetros Financeiros",
+      "subtitle": "Configure recursos avançados de controle financeiro e contábil",
+      "accountingControl": {
+        "title": "Habilitar controle contábil detalhado",
+        "description": "Permite adicionar subcategorias ao lançar contas a pagar e receber, especificando a categoria contábil de cada pagamento para melhor controle financeiro",
+        "tagContability": "Contabilidade",
+        "tagControl": "+ Controle"
+      },
+      "taxSimulation": {
+        "title": "Simulação de impostos no DRE",
+        "description": "Habilita simulações de impostos para planejamento tributário. Permite calcular quanto seria pago em impostos sem gerar lançamentos reais, apenas projeções no DRE",
+        "tagPlanning": "Planejamento",
+        "tagSimulation": "Simulação",
+        "taxRateLabel": "Alíquota de imposto (%)",
+        "taxRatePlaceholder": "Ex: 11.33"
+      }
+    }
+  },
+  "EN": {
+    "scheduleParameters": {
+      "title": "Schedule Parameters",
+      "subtitle": "Configure appointment system behavior",
+      "monitorChairTime": {
+        "title": "Monitor chair time",
+        "description": "Tracks waiting room time and actual appointment duration in detail",
+        "tagControl": "+ Control",
+        "tagUsability": "- Usability"
+      },
+      "identifyConflicts": {
+        "title": "Identify schedule conflicts",
+        "description": "System displays automatic alerts when detecting overlapping appointments",
+        "tagRecommended": "Recommended"
+      },
+      "identifyNoShowsAndCancellations": {
+        "title": "Identify who canceled or missed",
+        "description": "Maintains detailed history of cancellations and no-shows for better patient management",
+        "tagRecommended": "Recommended",
+        "tagControl": "+ Control",
+        "tagUsability": "- Usability"
+      }
+    },
+    "financialParameters": {
+      "title": "Financial Parameters",
+      "subtitle": "Configure advanced financial and accounting control features",
+      "accountingControl": {
+        "title": "Enable detailed accounting control",
+        "description": "Allows adding subcategories when posting accounts payable and receivable, specifying the accounting category of each payment for better financial control",
+        "tagContability": "Accounting",
+        "tagControl": "+ Control"
+      },
+      "taxSimulation": {
+        "title": "Tax simulation in Income Statement",
+        "description": "Enables tax simulations for tax planning. Allows calculating how much would be paid in taxes without generating actual entries, only projections in the Income Statement",
+        "tagPlanning": "Planning",
+        "tagSimulation": "Simulation",
+        "taxRateLabel": "Tax rate (%)",
+        "taxRatePlaceholder": "Ex: 11.33"
+      }
+    }
+  },
+  "ES": {
+    "scheduleParameters": {
+      "title": "Parámetros de Agenda",
+      "subtitle": "Configure el comportamiento del sistema de citas",
+      "monitorChairTime": {
+        "title": "Monitorear tiempo de silla",
+        "description": "Rastrea en detalle el tiempo de sala de espera y duración real de las citas",
+        "tagControl": "+ Control",
+        "tagUsability": "- Usabilidad"
+      },
+      "identifyConflicts": {
+        "title": "Identificar conflictos de horarios",
+        "description": "El sistema muestra alertas automáticas al detectar superposición de citas",
+        "tagRecommended": "Recomendado"
+      },
+      "identifyNoShowsAndCancellations": {
+        "title": "Identificar quién canceló o faltó",
+        "description": "Mantiene historial detallado de cancelaciones y ausencias para mejor gestión de pacientes",
+        "tagRecommended": "Recomendado",
+        "tagControl": "+ Control",
+        "tagUsability": "- Usabilidad"
+      }
+    },
+    "financialParameters": {
+      "title": "Parámetros Financieros",
+      "subtitle": "Configure funciones avanzadas de control financiero y contable",
+      "accountingControl": {
+        "title": "Habilitar control contable detallado",
+        "description": "Permite agregar subcategorías al registrar cuentas por pagar y cobrar, especificando la categoría contable de cada pago para mejor control financiero",
+        "tagContability": "Contabilidad",
+        "tagControl": "+ Control"
+      },
+      "taxSimulation": {
+        "title": "Simulación de impuestos en el Estado de Resultados",
+        "description": "Habilita simulaciones de impuestos para planificación tributaria. Permite calcular cuánto se pagaría en impuestos sin generar asientos reales, solo proyecciones en el Estado de Resultados",
+        "tagPlanning": "Planificación",
+        "tagSimulation": "Simulación",
+        "taxRateLabel": "Tasa de impuesto (%)",
+        "taxRatePlaceholder": "Ej: 11.33"
+      }
+    }
+  }
+}

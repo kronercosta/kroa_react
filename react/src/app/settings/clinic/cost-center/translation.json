@@ -1,0 +1,80 @@
+{
+  "PT": {
+    "pageTitle": "Centros de Custo",
+    "toggleTitle": "Centro de Custo",
+    "toggleDescription": "Habilite para organizar receitas e despesas por centro",
+    "newCenter": "Novo Centro",
+    "defaultCenterName": "Novo Centro",
+    "defaultCenterDescription": "Descrição do centro",
+    "masterCenterName": "Centro de Custo Principal",
+    "masterCenterDescription": "Centro de custo padrão do sistema",
+    "table": {
+      "name": "Nome",
+      "description": "Descrição",
+      "actions": "Ações"
+    },
+    "buttons": {
+      "edit": "Editar",
+      "save": "Salvar",
+      "delete": "Excluir",
+      "cancel": "Cancelar"
+    },
+    "messages": {
+      "confirmDelete": "Tem certeza que deseja excluir este centro de custo?",
+      "recordsLinked": "registros vinculados",
+      "masterCannotDelete": "Centro de custo principal não pode ser excluído"
+    }
+  },
+  "EN": {
+    "pageTitle": "Cost Centers",
+    "toggleTitle": "Cost Center",
+    "toggleDescription": "Enable to organize revenue and expenses by center",
+    "newCenter": "New Center",
+    "defaultCenterName": "New Center",
+    "defaultCenterDescription": "Center description",
+    "masterCenterName": "Main Cost Center",
+    "masterCenterDescription": "Default system cost center",
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "actions": "Actions"
+    },
+    "buttons": {
+      "edit": "Edit",
+      "save": "Save",
+      "delete": "Delete",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "confirmDelete": "Are you sure you want to delete this cost center?",
+      "recordsLinked": "linked records",
+      "masterCannotDelete": "Main cost center cannot be deleted"
+    }
+  },
+  "ES": {
+    "pageTitle": "Centros de Costo",
+    "toggleTitle": "Centro de Costo",
+    "toggleDescription": "Habilite para organizar ingresos y gastos por centro",
+    "newCenter": "Nuevo Centro",
+    "defaultCenterName": "Nuevo Centro",
+    "defaultCenterDescription": "Descripción del centro",
+    "masterCenterName": "Centro de Costo Principal",
+    "masterCenterDescription": "Centro de costo predeterminado del sistema",
+    "table": {
+      "name": "Nombre",
+      "description": "Descripción",
+      "actions": "Acciones"
+    },
+    "buttons": {
+      "edit": "Editar",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "cancel": "Cancelar"
+    },
+    "messages": {
+      "confirmDelete": "¿Está seguro de que desea eliminar este centro de costo?",
+      "recordsLinked": "registros vinculados",
+      "masterCannotDelete": "El centro de costo principal no puede ser eliminado"
+    }
+  }
+}

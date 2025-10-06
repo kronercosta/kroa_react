@@ -78,42 +78,42 @@ export function MainLayout({ children }: LayoutProps) {
   const configItems = [
     {
       title: 'Clínica',
-      href: '/configuracoes/clinica',
+      href: '/settings/clinic',
       icon: 'mdi:office-building-outline',
     },
     {
       title: 'Colaborador',
-      href: '/configuracoes/colaborador',
+      href: '/settings/collaborator',
       icon: 'mdi:account-group-outline',
     },
     {
       title: 'Parceiros e Serviços',
-      href: '/configuracoes/parceiros',
+      href: '/settings/partners',
       icon: 'mdi:briefcase-outline',
     },
     {
       title: 'Evolução',
-      href: '/configuracoes/evolucao',
+      href: '/settings/evolution',
       icon: 'mdi:file-document-outline',
     },
     {
       title: 'Assinatura Digital',
-      href: '/configuracoes/assinatura',
+      href: '/settings/signature',
       icon: 'mdi:draw-pen',
     },
     {
       title: 'Financeiro',
-      href: '/configuracoes/financeiro',
+      href: '/settings/financial',
       icon: 'mdi:currency-usd',
     },
     {
       title: 'Landing Page',
-      href: '/configuracoes/landing',
+      href: '/settings/landing',
       icon: 'mdi:web',
     },
     {
       title: 'Central de Comunicação',
-      href: '/configuracoes/comunicacao',
+      href: '/settings/communication',
       icon: 'mdi:chat-outline',
     },
   ];
@@ -127,17 +127,17 @@ export function MainLayout({ children }: LayoutProps) {
     },
     {
       title: 'Agenda',
-      href: '/agenda',
+      href: '/schedule',
       icon: 'mdi:calendar-outline',
     },
     {
       title: 'Pacientes',
-      href: '/pacientes',
+      href: '/patients',
       icon: 'mdi:account-group-outline',
     },
     {
       title: 'Financeiro',
-      href: '/financeiro',
+      href: '/financial',
       icon: 'mdi:currency-usd',
     },
     {
@@ -147,7 +147,7 @@ export function MainLayout({ children }: LayoutProps) {
     },
     {
       title: 'Central de Comunicação',
-      href: '/comunicacao',
+      href: '/communication',
       icon: 'mdi:chat-outline',
     },
     {

@@ -1,0 +1,278 @@
+{
+  "PT": {
+    "pageTitle": "Configuração de Cadeiras",
+    "pageSubtitle": "Configure horários e profissionais para cada cadeira",
+    "statusCard": {
+      "title": "Status da Configuração",
+      "subtitle": "Baseado nos agendamentos das últimas 4 semanas",
+      "chairsAnalyzed": "cadeiras analisadas",
+      "status": {
+        "good": "Adequada",
+        "warning": "Atenção",
+        "critical": "Crítica",
+        "noData": "Sem dados"
+      }
+    },
+    "analysis": {
+      "title": "Análise dos Dados",
+      "lowUtilization": "com baixa utilização",
+      "basedOnLast4Weeks": "Baseado nos agendamentos das últimas 4 semanas",
+      "appointmentsPerWeek": "agendamentos/semana",
+      "for": "para",
+      "slotsAvailable": "slots disponíveis",
+      "occupancy": "de ocupação",
+      "suggestion": "💡 Sugestão: Considere reduzir os horários disponíveis desta cadeira."
+    },
+    "buttons": {
+      "newChair": "Nova Cadeira",
+      "addSchedule": "Adicionar Horário",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "add": "Adicionar"
+    },
+    "table": {
+      "columns": {
+        "order": "Ordem",
+        "name": "Nome",
+        "mon": "Seg",
+        "tue": "Ter",
+        "wed": "Qua",
+        "thu": "Qui",
+        "fri": "Sex",
+        "sat": "Sáb",
+        "sun": "Dom"
+      }
+    },
+    "aside": {
+      "titleNew": "Nova Cadeira",
+      "titleEdit": "Editar Cadeira",
+      "configureSchedules": "Configurar Horários",
+      "chairName": "Nome da Cadeira",
+      "chairNamePlaceholder": "Nome da Cadeira",
+      "specificDates": "Datas Específicas",
+      "specificDatesDescription": "Configurar para datas específicas ao invés de dias da semana",
+      "daysOfWeek": "Dias da Semana",
+      "specificDatesList": "Datas Específicas",
+      "selectDate": "Selecione uma data",
+      "startTime": "Início",
+      "endTime": "Fim",
+      "duration": "Duração dos Atendimentos",
+      "durationPlaceholder": "h:min",
+      "professionals": "Profissionais",
+      "selectProfessionals": "Selecione os profissionais",
+      "schedulesConfigured": "Horários Configurados",
+      "noSchedules": "Nenhum horário configurado",
+      "noSchedulesDescription": "Configure os campos acima e clique em \"Adicionar Horário\"",
+      "confirmDelete": "Tem certeza que deseja excluir esta cadeira?",
+      "pleaseEnterName": "Por favor, preencha o nome da cadeira"
+    },
+    "schedulesTable": {
+      "dayDate": "Dia/Data",
+      "time": "Horário",
+      "duration": "Duração",
+      "professionals": "Profissionais",
+      "actions": "Ações"
+    },
+    "days": {
+      "mon": "Segunda",
+      "tue": "Terça",
+      "wed": "Quarta",
+      "thu": "Quinta",
+      "fri": "Sexta",
+      "sat": "Sábado",
+      "sun": "Domingo"
+    },
+    "statusIndicator": {
+      "good": "Adequada",
+      "warning": "Diminuir",
+      "critical": "Aumentar",
+      "noData": "Sem dados"
+    }
+  },
+  "EN": {
+    "pageTitle": "Chair Configuration",
+    "pageSubtitle": "Configure schedules and professionals for each chair",
+    "statusCard": {
+      "title": "Configuration Status",
+      "subtitle": "Based on appointments from the last 4 weeks",
+      "chairsAnalyzed": "chairs analyzed",
+      "status": {
+        "good": "Adequate",
+        "warning": "Warning",
+        "critical": "Critical",
+        "noData": "No data"
+      }
+    },
+    "analysis": {
+      "title": "Data Analysis",
+      "lowUtilization": "with low utilization",
+      "basedOnLast4Weeks": "Based on appointments from the last 4 weeks",
+      "appointmentsPerWeek": "appointments/week",
+      "for": "for",
+      "slotsAvailable": "available slots",
+      "occupancy": "occupancy",
+      "suggestion": "💡 Suggestion: Consider reducing the available hours for this chair."
+    },
+    "buttons": {
+      "newChair": "New Chair",
+      "addSchedule": "Add Schedule",
+      "save": "Save",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete",
+      "add": "Add"
+    },
+    "table": {
+      "columns": {
+        "order": "Order",
+        "name": "Name",
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      }
+    },
+    "aside": {
+      "titleNew": "New Chair",
+      "titleEdit": "Edit Chair",
+      "configureSchedules": "Configure Schedules",
+      "chairName": "Chair Name",
+      "chairNamePlaceholder": "Chair Name",
+      "specificDates": "Specific Dates",
+      "specificDatesDescription": "Configure for specific dates instead of weekdays",
+      "daysOfWeek": "Days of the Week",
+      "specificDatesList": "Specific Dates",
+      "selectDate": "Select a date",
+      "startTime": "Start",
+      "endTime": "End",
+      "duration": "Appointment Duration",
+      "durationPlaceholder": "h:min",
+      "professionals": "Professionals",
+      "selectProfessionals": "Select professionals",
+      "schedulesConfigured": "Configured Schedules",
+      "noSchedules": "No schedules configured",
+      "noSchedulesDescription": "Configure the fields above and click \"Add Schedule\"",
+      "confirmDelete": "Are you sure you want to delete this chair?",
+      "pleaseEnterName": "Please enter the chair name"
+    },
+    "schedulesTable": {
+      "dayDate": "Day/Date",
+      "time": "Time",
+      "duration": "Duration",
+      "professionals": "Professionals",
+      "actions": "Actions"
+    },
+    "days": {
+      "mon": "Monday",
+      "tue": "Tuesday",
+      "wed": "Wednesday",
+      "thu": "Thursday",
+      "fri": "Friday",
+      "sat": "Saturday",
+      "sun": "Sunday"
+    },
+    "statusIndicator": {
+      "good": "Adequate",
+      "warning": "Decrease",
+      "critical": "Increase",
+      "noData": "No data"
+    }
+  },
+  "ES": {
+    "pageTitle": "Configuración de Sillas",
+    "pageSubtitle": "Configure horarios y profesionales para cada silla",
+    "statusCard": {
+      "title": "Estado de Configuración",
+      "subtitle": "Basado en citas de las últimas 4 semanas",
+      "chairsAnalyzed": "sillas analizadas",
+      "status": {
+        "good": "Adecuada",
+        "warning": "Advertencia",
+        "critical": "Crítica",
+        "noData": "Sin datos"
+      }
+    },
+    "analysis": {
+      "title": "Análisis de Datos",
+      "lowUtilization": "con baja utilización",
+      "basedOnLast4Weeks": "Basado en citas de las últimas 4 semanas",
+      "appointmentsPerWeek": "citas/semana",
+      "for": "para",
+      "slotsAvailable": "espacios disponibles",
+      "occupancy": "de ocupación",
+      "suggestion": "💡 Sugerencia: Considere reducir las horas disponibles de esta silla."
+    },
+    "buttons": {
+      "newChair": "Nueva Silla",
+      "addSchedule": "Agregar Horario",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "add": "Agregar"
+    },
+    "table": {
+      "columns": {
+        "order": "Orden",
+        "name": "Nombre",
+        "mon": "Lun",
+        "tue": "Mar",
+        "wed": "Mié",
+        "thu": "Jue",
+        "fri": "Vie",
+        "sat": "Sáb",
+        "sun": "Dom"
+      }
+    },
+    "aside": {
+      "titleNew": "Nueva Silla",
+      "titleEdit": "Editar Silla",
+      "configureSchedules": "Configurar Horarios",
+      "chairName": "Nombre de la Silla",
+      "chairNamePlaceholder": "Nombre de la Silla",
+      "specificDates": "Fechas Específicas",
+      "specificDatesDescription": "Configurar para fechas específicas en lugar de días de la semana",
+      "daysOfWeek": "Días de la Semana",
+      "specificDatesList": "Fechas Específicas",
+      "selectDate": "Seleccione una fecha",
+      "startTime": "Inicio",
+      "endTime": "Fin",
+      "duration": "Duración de las Citas",
+      "durationPlaceholder": "h:min",
+      "professionals": "Profesionales",
+      "selectProfessionals": "Seleccione profesionales",
+      "schedulesConfigured": "Horarios Configurados",
+      "noSchedules": "Ningún horario configurado",
+      "noSchedulesDescription": "Configure los campos arriba y haga clic en \"Agregar Horario\"",
+      "confirmDelete": "¿Está seguro de que desea eliminar esta silla?",
+      "pleaseEnterName": "Por favor ingrese el nombre de la silla"
+    },
+    "schedulesTable": {
+      "dayDate": "Día/Fecha",
+      "time": "Hora",
+      "duration": "Duración",
+      "professionals": "Profesionales",
+      "actions": "Acciones"
+    },
+    "days": {
+      "mon": "Lunes",
+      "tue": "Martes",
+      "wed": "Miércoles",
+      "thu": "Jueves",
+      "fri": "Viernes",
+      "sat": "Sábado",
+      "sun": "Domingo"
+    },
+    "statusIndicator": {
+      "good": "Adecuada",
+      "warning": "Disminuir",
+      "critical": "Aumentar",
+      "noData": "Sin datos"
+    }
+  }
+}

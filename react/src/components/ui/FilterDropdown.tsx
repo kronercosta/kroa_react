@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Filter } from 'lucide-react';
+import { useUITranslation } from '../../hooks/useUITranslation';
 
 interface FilterOption {
   id: string;
@@ -29,6 +30,7 @@ export function FilterDropdown({
   showCount = true,
   label
 }: FilterDropdownProps) {
+  const uiTranslations = useUITranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +61,7 @@ export function FilterDropdown({
           flex items-center gap-2
           ${buttonClassName}
         `}
-        title={label || "Filtrar"}
+        title={label || uiTranslations?.filter?.filter || "Filtrar"}
       >
         {showIcon && <Filter className="w-4 h-4" />}
         {label && <span className="text-sm font-medium">{label}</span>}
@@ -131,6 +133,7 @@ export function MultiFilterDropdown({
   buttonClassName = '',
   dropdownClassName = ''
 }: MultiFilterDropdownProps) {
+  const uiTranslations = useUITranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [expandedFilter, setExpandedFilter] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -163,7 +166,7 @@ export function MultiFilterDropdown({
           flex items-center gap-2
           ${buttonClassName}
         `}
-        title="Filtros"
+        title={uiTranslations?.filter?.filters || "Filtros"}
       >
         <Filter className="w-4 h-4" />
         {hasActiveFilters && (

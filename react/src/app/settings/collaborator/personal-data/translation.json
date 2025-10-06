@@ -1,0 +1,104 @@
+{
+  "PT": {
+    "personalInfo": {
+      "title": "Informações Pessoais",
+      "fullName": "Nome Completo",
+      "cpf": "CPF",
+      "birthDate": "Data de Nascimento",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "whatsapp": "WhatsApp"
+    },
+    "professionalInfo": {
+      "title": "Dados Profissionais",
+      "position": "Cargo/Função",
+      "positionPlaceholder": "Digite ou selecione um cargo",
+      "specialty": "Especialidade",
+      "council": "Conselho de Classe",
+      "councilPlaceholder": "Selecione...",
+      "councilState": "Estado do Conselho",
+      "councilStatePlaceholder": "Selecione o estado...",
+      "councilNumber": "Número"
+    },
+    "photo": {
+      "title": "Foto do Perfil",
+      "identificationTitle": "Foto de Identificação",
+      "description": "Esta foto será usada no perfil do colaborador e documentos internos.",
+      "upload": "Escolher Foto",
+      "remove": "Remover",
+      "formats": "Formatos aceitos: JPG, PNG ou GIF. Tamanho máximo: 2MB."
+    },
+    "buttons": {
+      "save": "Salvar",
+      "cancel": "Cancelar"
+    }
+  },
+  "EN": {
+    "personalInfo": {
+      "title": "Personal Information",
+      "fullName": "Full Name",
+      "cpf": "CPF",
+      "birthDate": "Date of Birth",
+      "email": "Email",
+      "phone": "Phone",
+      "whatsapp": "WhatsApp"
+    },
+    "professionalInfo": {
+      "title": "Professional Data",
+      "position": "Position/Role",
+      "positionPlaceholder": "Type or select a position",
+      "specialty": "Specialty",
+      "council": "Professional Council",
+      "councilPlaceholder": "Select...",
+      "councilState": "Council State",
+      "councilStatePlaceholder": "Select state...",
+      "councilNumber": "Number"
+    },
+    "photo": {
+      "title": "Profile Photo",
+      "identificationTitle": "Identification Photo",
+      "description": "This photo will be used in the employee profile and internal documents.",
+      "upload": "Choose Photo",
+      "remove": "Remove",
+      "formats": "Accepted formats: JPG, PNG or GIF. Maximum size: 2MB."
+    },
+    "buttons": {
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "ES": {
+    "personalInfo": {
+      "title": "Información Personal",
+      "fullName": "Nombre Completo",
+      "cpf": "CPF",
+      "birthDate": "Fecha de Nacimiento",
+      "email": "Correo",
+      "phone": "Teléfono",
+      "whatsapp": "WhatsApp"
+    },
+    "professionalInfo": {
+      "title": "Datos Profesionales",
+      "position": "Cargo/Función",
+      "positionPlaceholder": "Escriba o seleccione un cargo",
+      "specialty": "Especialidad",
+      "council": "Consejo de Clase",
+      "councilPlaceholder": "Seleccione...",
+      "councilState": "Estado del Consejo",
+      "councilStatePlaceholder": "Seleccione el estado...",
+      "councilNumber": "Número"
+    },
+    "photo": {
+      "title": "Foto de Perfil",
+      "identificationTitle": "Foto de Identificación",
+      "description": "Esta foto se utilizará en el perfil del empleado y documentos internos.",
+      "upload": "Elegir Foto",
+      "remove": "Eliminar",
+      "formats": "Formatos aceptados: JPG, PNG o GIF. Tamaño máximo: 2MB."
+    },
+    "buttons": {
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    }
+  }
+}

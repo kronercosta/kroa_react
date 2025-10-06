@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useUITranslation } from '../../hooks/useUITranslation';
 
 interface DropdownMenuItem {
   label: string;
@@ -24,6 +25,7 @@ export function DropdownMenu({
   className = '',
   triggerOnHover = false
 }: DropdownMenuProps) {
+  const uiTranslations = useUITranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<number | null>(null);
@@ -153,7 +155,7 @@ export function ActionMenu({
         bg-gray-100 text-gray-600 hover:bg-gray-200
         ${buttonClassName}
       `}
-      title="Mais opções"
+      title={uiTranslations?.dropdown?.moreOptions || 'Mais opções'}
     >
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

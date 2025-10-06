@@ -1,0 +1,152 @@
+{
+  "PT": {
+    "pageTitle": "Configurações de Colaboradores",
+    "pageSubtitle": "Gerencie colaboradores, permissões e parâmetros",
+    "buttons": {
+      "newCollaborator": "Novo Colaborador",
+      "export": "Exportar",
+      "filters": "Filtros"
+    },
+    "filters": {
+      "all": "Todos",
+      "active": "Ativos",
+      "inactive": "Inativos",
+      "professionals": "Profissionais",
+      "administrative": "Administrativo"
+    },
+    "table": {
+      "name": "Nome",
+      "specialty": "Especialidade",
+      "status": "Status",
+      "systemAccess": "Acesso ao Sistema",
+      "permissions": "Permissões",
+      "defaultUnit": "Unidade Padrão",
+      "scheduling": "Agendamento",
+      "actions": "Ações"
+    },
+    "status": {
+      "active": "Ativo",
+      "inactive": "Inativo"
+    },
+    "access": {
+      "yes": "Sim",
+      "no": "Não"
+    },
+    "scheduling": {
+      "enabled": "Habilitado",
+      "disabled": "Desabilitado"
+    },
+    "export": {
+      "filename": "colaboradores.csv",
+      "headers": {
+        "name": "Nome",
+        "specialty": "Especialidade",
+        "status": "Status",
+        "systemAccess": "Acesso ao Sistema",
+        "permissions": "Permissões",
+        "unit": "Unidade",
+        "scheduling": "Agendamento"
+      }
+    }
+  },
+  "EN": {
+    "pageTitle": "Staff Settings",
+    "pageSubtitle": "Manage staff, permissions and parameters",
+    "buttons": {
+      "newCollaborator": "New Staff Member",
+      "export": "Export",
+      "filters": "Filters"
+    },
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive",
+      "professionals": "Professionals",
+      "administrative": "Administrative"
+    },
+    "table": {
+      "name": "Name",
+      "specialty": "Specialty",
+      "status": "Status",
+      "systemAccess": "System Access",
+      "permissions": "Permissions",
+      "defaultUnit": "Default Unit",
+      "scheduling": "Scheduling",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "access": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "scheduling": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "export": {
+      "filename": "staff.csv",
+      "headers": {
+        "name": "Name",
+        "specialty": "Specialty",
+        "status": "Status",
+        "systemAccess": "System Access",
+        "permissions": "Permissions",
+        "unit": "Unit",
+        "scheduling": "Scheduling"
+      }
+    }
+  },
+  "ES": {
+    "pageTitle": "Configuraciones de Colaboradores",
+    "pageSubtitle": "Gestione colaboradores, permisos y parámetros",
+    "buttons": {
+      "newCollaborator": "Nuevo Colaborador",
+      "export": "Exportar",
+      "filters": "Filtros"
+    },
+    "filters": {
+      "all": "Todos",
+      "active": "Activos",
+      "inactive": "Inactivos",
+      "professionals": "Profesionales",
+      "administrative": "Administrativo"
+    },
+    "table": {
+      "name": "Nombre",
+      "specialty": "Especialidad",
+      "status": "Estado",
+      "systemAccess": "Acceso al Sistema",
+      "permissions": "Permisos",
+      "defaultUnit": "Unidad Predeterminada",
+      "scheduling": "Agendamiento",
+      "actions": "Acciones"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "access": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "scheduling": {
+      "enabled": "Habilitado",
+      "disabled": "Deshabilitado"
+    },
+    "export": {
+      "filename": "colaboradores.csv",
+      "headers": {
+        "name": "Nombre",
+        "specialty": "Especialidad",
+        "status": "Estado",
+        "systemAccess": "Acceso al Sistema",
+        "permissions": "Permisos",
+        "unit": "Unidad",
+        "scheduling": "Agendamiento"
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, ChevronDown, Plus, Edit2, Trash2, X, Check, AlertTriangle, ChevronRight } from 'lucide-react';
 import { Button, IconButton } from './Button';
+import { useUITranslation } from '../../hooks/useUITranslation';
 
 interface Option {
   value: string;
@@ -87,6 +88,7 @@ export function Select({
   getAffectedRecordsCount,
   ...props
 }: SelectProps) {
+  const uiTranslations = useUITranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -531,7 +533,7 @@ export function Select({
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Buscar..."
+                    placeholder={uiTranslations?.select?.search || "Buscar..."}
                     className="w-full pl-10 pr-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-krooa-green"
                   />
                 </div>
@@ -542,7 +544,7 @@ export function Select({
             <div className="py-1">
               {filteredOptions.length === 0 ? (
                 <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                  {searchTerm ? 'Nenhum resultado encontrado' : 'Sem opções disponíveis'}
+                  {searchTerm ? (uiTranslations?.select?.noResults || 'Nenhum resultado encontrado') : (uiTranslations?.select?.noOptions || 'Sem opções disponíveis')}
                   {editable && searchTerm && (
                     <button
                       onClick={handleAddNew}
@@ -656,7 +658,7 @@ export function Select({
                                       setEditValue(option.label);
                                     }
                                   }}
-                                  title={advancedEdit ? "Edição avançada" : "Editar"}
+                                  title={advancedEdit ? (uiTranslations?.select?.advancedEdit || "Edição avançada") : (uiTranslations?.select?.edit || "Editar")}
                                 />
                               )}
                               {editable && (
@@ -721,7 +723,7 @@ export function Select({
                             setSelectedParent('');
                           }
                         }}
-                        placeholder="Nome do novo item..."
+                        placeholder={uiTranslations?.select?.newItemPlaceholder || "Nome do novo item..."}
                         className="flex-1 px-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-krooa-green"
                         autoFocus={!hierarchical}
                       />
@@ -742,7 +744,7 @@ export function Select({
                       }}
                       variant="ghost"
                       size="sm"
-                      title="Cancelar"
+                      title={uiTranslations?.select?.cancel || "Cancelar"}
                     >
                       <X className="w-4 h-4" />
                     </IconButton>
@@ -819,7 +821,7 @@ export function Select({
                         <span className={replacementOption ? '' : 'text-gray-500'}>
                           {replacementOption
                             ? options.find(opt => opt.value === replacementOption)?.label
-                            : 'Não transferir (excluir permanentemente)'
+                            : (uiTranslations?.select?.deleteOption || 'Não transferir (excluir permanentemente)')
                           }
                         </span>
                       </div>
@@ -832,7 +834,7 @@ export function Select({
                       onChange={(e) => setReplacementOption(e.target.value)}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     >
-                      <option value="">Não transferir (excluir permanentemente)</option>
+                      <option value="">{uiTranslations?.select?.deleteOption || 'Não transferir (excluir permanentemente)'}</option>
                       {options
                         .filter(opt => opt.value !== deleteConfirmation.option.value)
                         .map(opt => (

@@ -1,0 +1,119 @@
+{
+  "PT": {
+    "defaultValues": {
+      "title": "Valores Padrão",
+      "description": "Configure valores padrão para melhorar a usabilidade no dia a dia",
+      "defaultUnit": "Unidade Padrão",
+      "defaultUnitPlaceholder": "Selecione a unidade padrão",
+      "defaultCostCenter": "Centro de Custo Padrão",
+      "defaultCostCenterPlaceholder": "Selecione o centro de custo padrão",
+      "linkedProfessional": "Profissional Vinculado",
+      "linkedProfessionalPlaceholder": "Selecione o profissional",
+      "defaultBank": "Banco/Conta Padrão",
+      "defaultBankPlaceholder": "Selecione o banco/conta"
+    },
+    "workSettings": {
+      "title": "Configurações de Trabalho",
+      "budgetResponsible": "Responsável por Orçamentos",
+      "budgetResponsibleDescription": "Pode criar e aprovar orçamentos",
+      "scheduleResponsible": "Responsável por Agendamentos",
+      "scheduleResponsibleDescription": "Pode gerenciar agenda de pacientes",
+      "whatsappNotifications": "Notificações via WhatsApp",
+      "whatsappNotificationsDescription": "Recebe notificações importantes no WhatsApp",
+      "onlineScheduling": "Permite Agendamento Online",
+      "onlineSchedulingDescription": "Pacientes podem agendar online com este profissional"
+    },
+    "commission": {
+      "title": "Comissão",
+      "description": "Configure as regras de comissão para este colaborador",
+      "type": "Tipo de Comissão",
+      "percentage": "Percentual (%)",
+      "percentageLabel": "Percentual (%)",
+      "fixed": "Valor Fixo (R$)",
+      "fixedLabel": "Valor (R$)",
+      "none": "Sem Comissão"
+    },
+    "buttons": {
+      "save": "Salvar",
+      "cancel": "Cancelar"
+    }
+  },
+  "EN": {
+    "defaultValues": {
+      "title": "Default Values",
+      "description": "Configure default values to improve daily usability",
+      "defaultUnit": "Default Unit",
+      "defaultUnitPlaceholder": "Select default unit",
+      "defaultCostCenter": "Default Cost Center",
+      "defaultCostCenterPlaceholder": "Select default cost center",
+      "linkedProfessional": "Linked Professional",
+      "linkedProfessionalPlaceholder": "Select professional",
+      "defaultBank": "Default Bank/Account",
+      "defaultBankPlaceholder": "Select bank/account"
+    },
+    "workSettings": {
+      "title": "Work Settings",
+      "budgetResponsible": "Budget Responsible",
+      "budgetResponsibleDescription": "Can create and approve budgets",
+      "scheduleResponsible": "Schedule Responsible",
+      "scheduleResponsibleDescription": "Can manage patient schedules",
+      "whatsappNotifications": "WhatsApp Notifications",
+      "whatsappNotificationsDescription": "Receives important notifications via WhatsApp",
+      "onlineScheduling": "Allow Online Scheduling",
+      "onlineSchedulingDescription": "Patients can schedule online with this professional"
+    },
+    "commission": {
+      "title": "Commission",
+      "description": "Configure commission rules for this employee",
+      "type": "Commission Type",
+      "percentage": "Percentage (%)",
+      "percentageLabel": "Percentage (%)",
+      "fixed": "Fixed Value (R$)",
+      "fixedLabel": "Value (R$)",
+      "none": "No Commission"
+    },
+    "buttons": {
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "ES": {
+    "defaultValues": {
+      "title": "Valores Predeterminados",
+      "description": "Configure valores predeterminados para mejorar la usabilidad diaria",
+      "defaultUnit": "Unidad Predeterminada",
+      "defaultUnitPlaceholder": "Seleccione la unidad predeterminada",
+      "defaultCostCenter": "Centro de Costo Predeterminado",
+      "defaultCostCenterPlaceholder": "Seleccione el centro de costo predeterminado",
+      "linkedProfessional": "Profesional Vinculado",
+      "linkedProfessionalPlaceholder": "Seleccione el profesional",
+      "defaultBank": "Banco/Cuenta Predeterminado",
+      "defaultBankPlaceholder": "Seleccione el banco/cuenta"
+    },
+    "workSettings": {
+      "title": "Configuraciones de Trabajo",
+      "budgetResponsible": "Responsable de Presupuestos",
+      "budgetResponsibleDescription": "Puede crear y aprobar presupuestos",
+      "scheduleResponsible": "Responsable de Citas",
+      "scheduleResponsibleDescription": "Puede gestionar agenda de pacientes",
+      "whatsappNotifications": "Notificaciones vía WhatsApp",
+      "whatsappNotificationsDescription": "Recibe notificaciones importantes en WhatsApp",
+      "onlineScheduling": "Permite Agendamiento Online",
+      "onlineSchedulingDescription": "Los pacientes pueden agendar online con este profesional"
+    },
+    "commission": {
+      "title": "Comisión",
+      "description": "Configure las reglas de comisión para este empleado",
+      "type": "Tipo de Comisión",
+      "percentage": "Porcentual (%)",
+      "percentageLabel": "Porcentual (%)",
+      "fixed": "Valor Fijo (R$)",
+      "fixedLabel": "Valor (R$)",
+      "none": "Sin Comisión"
+    },
+    "buttons": {
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    }
+  }
+}

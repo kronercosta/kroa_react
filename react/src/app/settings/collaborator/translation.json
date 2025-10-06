@@ -1,0 +1,29 @@
+{
+  "PT": {
+    "title": "Configurações de Colaboradores",
+    "subtitle": "Gerencie colaboradores, permissões e parâmetros",
+    "tabs": {
+      "dadosPessoais": "Dados Pessoais",
+      "permissoes": "Permissões",
+      "parametros": "Parâmetros"
+    }
+  },
+  "EN": {
+    "title": "Staff Settings",
+    "subtitle": "Manage staff, permissions and parameters",
+    "tabs": {
+      "dadosPessoais": "Personal Data",
+      "permissoes": "Permissions",
+      "parametros": "Parameters"
+    }
+  },
+  "ES": {
+    "title": "Configuraciones de Colaboradores",
+    "subtitle": "Gestione colaboradores, permisos y parámetros",
+    "tabs": {
+      "dadosPessoais": "Datos Personales",
+      "permissoes": "Permisos",
+      "parametros": "Parámetros"
+    }
+  }
+}

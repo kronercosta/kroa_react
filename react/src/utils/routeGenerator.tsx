@@ -8,9 +8,9 @@ import { lazy, ReactElement } from 'react';
  * src/app/
  *   dashboard/
  *     page.tsx    -> /dashboard
- *   configuracoes/
- *     usuario/
- *       page.tsx  -> /configuracoes/usuario
+ *   settings/
+ *     user/
+ *       page.tsx  -> /settings/user
  *
  * Nota: O layout é gerenciado pelos componentes PrivateRoutes e AppRouter
  */
@@ -23,7 +23,7 @@ export function generateRoutes() {
   for (const path in pages) {
     // Extrai o caminho da rota do caminho do arquivo
     // '../app/dashboard/page.tsx' -> '/dashboard'
-    // '../app/configuracoes/usuario/page.tsx' -> '/configuracoes/usuario'
+    // '../app/settings/user/page.tsx' -> '/settings/user'
     const routePath = path
       .replace('../app', '')
       .replace('/page.tsx', '')

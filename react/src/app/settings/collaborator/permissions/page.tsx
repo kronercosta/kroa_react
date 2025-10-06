@@ -1,0 +1,250 @@
+import { useState } from 'react';
+import { Card } from '../../../../components/ui/Card';
+import { Switch } from '../../../../components/ui/Switch';
+import { Select } from '../../../../components/ui/Select';
+import { Button } from '../../../../components/ui/Button';
+import { ColaboradorLayout } from '../ColaboradorLayout';
+import { useTranslation } from '../../../../hooks/useTranslation';
+import translations from './translation.json';
+
+export default function PermissoesColaborador() {
+  const { t } = useTranslation(translations);
+  const [colaboradorData] = useState({
+    nome: 'Dr. João Silva',
+    cargo: 'Ortodontista',
+    foto: ''
+  });
+
+  const [formData, setFormData] = useState({
+    acessoSistema: true,
+    acessoMobile: false,
+    permissoes: {
+      agenda: 'total',
+      pacientes: 'visualizar',
+      financeiro: 'sem-acesso',
+      crm: 'sem-acesso',
+      configuracoes: 'sem-acesso',
+      relatorios: 'visualizar'
+    },
+    unidadesPermitidas: [],
+    centrosCustoPermitidos: []
+  });
+
+  const handleSave = () => {
+    console.log('Salvando permissões:', formData);
+  };
+
+  const handlePermissionChange = (module: string, level: string) => {
+    setFormData(prev => ({
+      ...prev,
+      permissoes: {
+        ...prev.permissoes,
+        [module]: level
+      }
+    }));
+  };
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const permissionLevels = [
+    { value: 'sem-acesso', label: t?.permissionLevels?.semAcesso || 'Sem Acesso', color: 'gray' },
+    { value: 'visualizar', label: t?.permissionLevels?.visualizar || 'Visualizar', color: 'blue' },
+    { value: 'editar', label: t?.permissionLevels?.editar || 'Editar', color: 'yellow' },
+    { value: 'total', label: t?.permissionLevels?.total || 'Total', color: 'green' }
+  ];
+
+  const modules = [
+    { key: 'agenda', label: t?.modules?.agenda || 'Agenda', description: t?.modules?.agendaDescription || 'Gerenciar agendamentos e horários' },
+    { key: 'pacientes', label: t?.modules?.pacientes || 'Pacientes', description: t?.modules?.pacientesDescription || 'Cadastro e histórico de pacientes' },
+    { key: 'financeiro', label: t?.modules?.financeiro || 'Financeiro', description: t?.modules?.financeiroDescription || 'Controle financeiro e pagamentos' },
+    { key: 'crm', label: t?.modules?.crm || 'CRM', description: t?.modules?.crmDescription || 'Relacionamento com clientes' },
+    { key: 'configuracoes', label: t?.modules?.configuracoes || 'Configurações', description: t?.modules?.configuracoesDescription || 'Configurações do sistema' },
+    { key: 'relatorios', label: t?.modules?.relatorios || 'Relatórios', description: t?.modules?.relatoriosDescription || 'Visualização de relatórios' }
+  ];
+
+  const unidadeOptions = [
+    { value: '1', label: 'Unidade Principal' },
+    { value: '2', label: 'Unidade Centro' },
+    { value: '3', label: 'Unidade Sul' }
+  ];
+
+  const centroCustoOptions = [
+    { value: '1', label: 'Centro de Custo Principal' },
+    { value: '2', label: 'Centro de Custo Ortodontia' },
+    { value: '3', label: 'Centro de Custo Endodontia' }
+  ];
+
+  const getButtonColor = (level: string) => {
+    switch (level) {
+      case 'total': return 'bg-green-500 text-white';
+      case 'editar': return 'bg-yellow-500 text-white';
+      case 'visualizar': return 'bg-blue-500 text-white';
+      default: return 'bg-gray-200 text-gray-600';
+    }
+  };
+
+  return (
+    <ColaboradorLayout
+      colaboradorData={colaboradorData}
+      headerControls={
+        <>
+          <Button variant="outline">{t?.buttons?.cancel || 'Cancelar'}</Button>
+          <Button variant="primary" onClick={handleSave}>{t?.buttons?.save || 'Salvar'}</Button>
+        </>
+      }
+    >
+      <div className="space-y-6">
+        <Card>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">{t?.systemAccess?.title || 'Acesso ao Sistema'}</h2>
+              <p className="text-sm text-gray-600 mt-1">{t?.systemAccess?.description || 'Configure o acesso geral do colaborador'}</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div>
+                <p className="font-medium text-gray-900">{t?.systemAccess?.label || 'Acesso ao Sistema Web'}</p>
+                <p className="text-sm text-gray-600">{t?.systemAccess?.webDescription || 'Permite login no sistema através do navegador'}</p>
+              </div>
+              <Switch
+                checked={formData.acessoSistema}
+                onChange={(checked) => handleInputChange('acessoSistema', checked)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div>
+                <p className="font-medium text-gray-900">{t?.systemAccess?.mobileTitle || 'Acesso ao Aplicativo Mobile'}</p>
+                <p className="text-sm text-gray-600">{t?.systemAccess?.mobileDescription || 'Permite login através do aplicativo móvel'}</p>
+              </div>
+              <Switch
+                checked={formData.acessoMobile}
+                onChange={(checked) => handleInputChange('acessoMobile', checked)}
+              />
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-gray-900">{t?.modules?.title || 'Permissões por Módulo'}</h2>
+            <p className="text-sm text-gray-600 mt-1">{t?.modules?.subtitle || 'Configure o nível de acesso para cada módulo do sistema'}</p>
+          </div>
+
+          <div className="space-y-4">
+            {modules.map(module => (
+              <div key={module.key} className="p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">{module.label}</p>
+                    <p className="text-sm text-gray-600">{module.description}</p>
+                  </div>
+
+                  <div className="flex gap-1">
+                    {permissionLevels.map(level => {
+                      const isActive = formData.permissoes[module.key as keyof typeof formData.permissoes] === level.value;
+                      return (
+                        <button
+                          key={level.value}
+                          onClick={() => handlePermissionChange(module.key, level.value)}
+                          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                            isActive
+                              ? getButtonColor(level.value)
+                              : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                          }`}
+                          disabled={!formData.acessoSistema}
+                        >
+                          {level.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <h2 className="text-lg font-bold text-gray-900 mb-4">{t?.unitsAndCostCenters?.title || 'Unidades e Centros de Custo'}</h2>
+          <p className="text-sm text-gray-600 mb-6">
+            {t?.unitsAndCostCenters?.description || 'Selecione as unidades e centros de custo que este colaborador pode acessar'}
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <Select
+                label={t?.unitsAndCostCenters?.units || 'Unidades Permitidas'}
+                placeholder={t?.unitsAndCostCenters?.unitsPlaceholder || 'Selecione as unidades'}
+                options={unidadeOptions}
+                value={formData.unidadesPermitidas}
+                onChange={(e) => handleInputChange('unidadesPermitidas', Array.isArray(e.target.value) ? e.target.value : [])}
+                multiple={true}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {t?.unitsAndCostCenters?.unitsHelp || 'Deixe vazio para permitir acesso a todas as unidades'}
+              </p>
+            </div>
+
+            <div>
+              <Select
+                label={t?.unitsAndCostCenters?.costCenters || 'Centros de Custo Permitidos'}
+                placeholder={t?.unitsAndCostCenters?.costCentersPlaceholder || 'Selecione os centros de custo'}
+                options={centroCustoOptions}
+                value={formData.centrosCustoPermitidos}
+                onChange={(e) => handleInputChange('centrosCustoPermitidos', Array.isArray(e.target.value) ? e.target.value : [])}
+                multiple={true}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {t?.unitsAndCostCenters?.costCentersHelp || 'Deixe vazio para permitir acesso a todos os centros de custo'}
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <h2 className="text-lg font-bold text-gray-900 mb-4">{t?.specialPermissions?.title || 'Permissões Especiais'}</h2>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-amber-50 rounded-lg border border-amber-200">
+              <div>
+                <p className="font-medium text-gray-900">{t?.specialPermissions?.financialData || 'Visualizar Dados Financeiros Sensíveis'}</p>
+                <p className="text-sm text-gray-600">{t?.specialPermissions?.financialDataDescription || 'Acesso a valores, custos e margens de lucro'}</p>
+              </div>
+              <Switch
+                checked={false}
+                onChange={() => {}}
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-amber-50 rounded-lg border border-amber-200">
+              <div>
+                <p className="font-medium text-gray-900">{t?.specialPermissions?.editOthers || 'Alterar Dados de Outros Profissionais'}</p>
+                <p className="text-sm text-gray-600">{t?.specialPermissions?.editOthersDescription || 'Permite editar agendamentos e dados de outros colaboradores'}</p>
+              </div>
+              <Switch
+                checked={false}
+                onChange={() => {}}
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-amber-50 rounded-lg border border-amber-200">
+              <div>
+                <p className="font-medium text-gray-900">{t?.specialPermissions?.deleteRecords || 'Excluir Registros Permanentemente'}</p>
+                <p className="text-sm text-gray-600">{t?.specialPermissions?.deleteRecordsDescription || 'Permite exclusão definitiva de dados do sistema'}</p>
+              </div>
+              <Switch
+                checked={false}
+                onChange={() => {}}
+              />
+            </div>
+          </div>
+        </Card>
+      </div>
+    </ColaboradorLayout>
+  );
+}
