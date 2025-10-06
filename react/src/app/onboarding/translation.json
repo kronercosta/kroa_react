@@ -25,6 +25,11 @@
         "emailInvalid": "E-mail inválido",
         "phoneRequired": "Telefone é obrigatório",
         "phoneInvalid": "Telefone inválido"
+      },
+      "security": {
+        "sslSecure": "SSL Seguro",
+        "dataProtected": "Dados Protegidos",
+        "lgpdCompliant": "LGPD Conformidade"
       }
     },
     "step2": {
@@ -254,6 +259,11 @@
         "emailInvalid": "Invalid email",
         "phoneRequired": "Phone is required",
         "phoneInvalid": "Invalid phone"
+      },
+      "security": {
+        "sslSecure": "SSL Secure",
+        "dataProtected": "Data Protected",
+        "lgpdCompliant": "GDPR Compliant"
       }
     },
     "step2": {
