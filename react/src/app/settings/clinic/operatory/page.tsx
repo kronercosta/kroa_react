@@ -293,7 +293,7 @@ const CadeirasClinica: React.FC = () => {
   };
 
   return (
-    <ConfiguracoesClinicaLayout headerControls={<HeaderControls />}>
+    <ConfiguracoesClinicaLayout>
       <div className="w-full max-w-full space-y-6">
         {/* Status da Configuração */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">

@@ -1,13 +1,17 @@
 import React from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
+import translations from './translation.json';
 
 const Dashboard: React.FC = () => {
+  const { t } = useTranslation(translations);
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard Pessoal</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t?.title || 'Dashboard Pessoal'}</h1>
         <p className="mt-1 text-sm text-gray-600">
-          Visão geral da sua clínica odontológica
+          {t?.subtitle || 'Visão geral da sua clínica odontológica'}
         </p>
       </div>
 
@@ -17,7 +21,7 @@ const Dashboard: React.FC = () => {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Pacientes Hoje</p>
+              <p className="text-sm text-gray-600">{t?.stats?.patientsToday || 'Pacientes Hoje'}</p>
               <p className="text-2xl font-bold text-gray-900">12</p>
             </div>
             <div className="bg-krooa-green/10 p-3 rounded-full">
@@ -32,7 +36,7 @@ const Dashboard: React.FC = () => {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Faturamento Mensal</p>
+              <p className="text-sm text-gray-600">{t?.stats?.monthlyRevenue || 'Faturamento Mensal'}</p>
               <p className="text-2xl font-bold text-gray-900">R$ 45.230</p>
             </div>
             <div className="bg-krooa-green/10 p-3 rounded-full">
@@ -47,7 +51,7 @@ const Dashboard: React.FC = () => {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Agendamentos</p>
+              <p className="text-sm text-gray-600">{t?.stats?.appointments || 'Agendamentos'}</p>
               <p className="text-2xl font-bold text-gray-900">38</p>
             </div>
             <div className="bg-krooa-green/10 p-3 rounded-full">
@@ -62,7 +66,7 @@ const Dashboard: React.FC = () => {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Taxa de Ocupação</p>
+              <p className="text-sm text-gray-600">{t?.stats?.occupancyRate || 'Taxa de Ocupação'}</p>
               <p className="text-2xl font-bold text-gray-900">78%</p>
             </div>
             <div className="bg-krooa-green/10 p-3 rounded-full">
@@ -76,7 +80,7 @@ const Dashboard: React.FC = () => {
 
       {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Ações Rápidas</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t?.quickActions?.title || 'Ações Rápidas'}</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <button className="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-krooa-green rounded-lg border border-gray-300 hover:border-krooa-green transition-colors">
             <div>
@@ -88,10 +92,10 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="mt-4">
               <h3 className="text-lg font-medium text-gray-900">
-                Novo Paciente
+                {t?.quickActions?.newPatient || 'Novo Paciente'}
               </h3>
               <p className="mt-2 text-sm text-gray-500">
-                Cadastrar um novo paciente no sistema
+                {t?.quickActions?.newPatientDesc || 'Cadastrar um novo paciente no sistema'}
               </p>
             </div>
           </button>
@@ -106,10 +110,10 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="mt-4">
               <h3 className="text-lg font-medium text-gray-900">
-                Agendar Consulta
+                {t?.quickActions?.scheduleAppointment || 'Agendar Consulta'}
               </h3>
               <p className="mt-2 text-sm text-gray-500">
-                Agendar uma nova consulta
+                {t?.quickActions?.scheduleAppointmentDesc || 'Agendar uma nova consulta'}
               </p>
             </div>
           </button>
@@ -124,10 +128,10 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="mt-4">
               <h3 className="text-lg font-medium text-gray-900">
-                Relatórios
+                {t?.quickActions?.reports || 'Relatórios'}
               </h3>
               <p className="mt-2 text-sm text-gray-500">
-                Visualizar relatórios da clínica
+                {t?.quickActions?.reportsDesc || 'Visualizar relatórios da clínica'}
               </p>
             </div>
           </button>
@@ -136,9 +140,9 @@ const Dashboard: React.FC = () => {
 
       {/* Gráfico placeholder */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Atendimentos da Semana</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t?.charts?.weeklyAttendance || 'Atendimentos da Semana'}</h2>
         <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg">
-          <p className="text-gray-500">Gráfico de atendimentos</p>
+          <p className="text-gray-500">{t?.charts?.chartPlaceholder || 'Gráfico de atendimentos'}</p>
         </div>
       </div>
     </div>

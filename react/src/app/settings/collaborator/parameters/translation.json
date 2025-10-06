@@ -10,7 +10,9 @@
       "linkedProfessional": "Profissional Vinculado",
       "linkedProfessionalPlaceholder": "Selecione o profissional",
       "defaultBank": "Banco/Conta Padrão",
-      "defaultBankPlaceholder": "Selecione o banco/conta"
+      "defaultBankPlaceholder": "Selecione o banco/conta",
+      "language": "Idioma Preferido",
+      "languagePlaceholder": "Selecione o idioma"
     },
     "workSettings": {
       "title": "Configurações de Trabalho",
@@ -49,7 +51,9 @@
       "linkedProfessional": "Linked Professional",
       "linkedProfessionalPlaceholder": "Select professional",
       "defaultBank": "Default Bank/Account",
-      "defaultBankPlaceholder": "Select bank/account"
+      "defaultBankPlaceholder": "Select bank/account",
+      "language": "Preferred Language",
+      "languagePlaceholder": "Select language"
     },
     "workSettings": {
       "title": "Work Settings",
@@ -88,7 +92,9 @@
       "linkedProfessional": "Profesional Vinculado",
       "linkedProfessionalPlaceholder": "Seleccione el profesional",
       "defaultBank": "Banco/Cuenta Predeterminado",
-      "defaultBankPlaceholder": "Seleccione el banco/cuenta"
+      "defaultBankPlaceholder": "Seleccione el banco/cuenta",
+      "language": "Idioma Preferido",
+      "languagePlaceholder": "Seleccione el idioma"
     },
     "workSettings": {
       "title": "Configuraciones de Trabajo",

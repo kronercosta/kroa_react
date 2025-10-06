@@ -45,9 +45,18 @@
   },
   "EN": {
     "title": "Multiple Units",
-    "description": "Manage multiple units of your clinic",
+    "description": "Enable to manage additional units of your clinic",
     "units": "Units",
     "newUnit": "New Unit",
+    "masterUnit": {
+      "title": "Master Unit",
+      "description": "Configure the main unit of your clinic. This unit will always be available and cannot be deleted.",
+      "name": "Unit Name",
+      "timezone": "Timezone"
+    },
+    "additionalUnits": {
+      "title": "Additional Units"
+    },
     "tableHeaders": {
       "title": "Title",
       "communicationCenter": "Communication Center",
@@ -80,9 +89,18 @@
   },
   "ES": {
     "title": "Múltiples Unidades",
-    "description": "Gestione múltiples unidades de su clínica",
+    "description": "Habilite para gestionar unidades adicionales de su clínica",
     "units": "Unidades",
     "newUnit": "Nueva Unidad",
+    "masterUnit": {
+      "title": "Unidad Principal",
+      "description": "Configure la unidad principal de su clínica. Esta unidad siempre estará disponible y no puede ser eliminada.",
+      "name": "Nombre de la Unidad",
+      "timezone": "Zona Horaria"
+    },
+    "additionalUnits": {
+      "title": "Unidades Adicionales"
+    },
     "tableHeaders": {
       "title": "Título",
       "communicationCenter": "Centro de Comunicación",

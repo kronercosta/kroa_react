@@ -5,6 +5,8 @@ import { Logo } from './Logo';
 import { Navigation } from './Navigation';
 import { Select } from './ui/Select';
 import { useClinic } from '../contexts/ClinicContext';
+import { useTranslation } from '../hooks/useTranslation';
+import layoutTranslations from './layout-translation.json';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,6 +14,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const { multiplasUnidadesEnabled, centroCustoEnabled } = useClinic();
+  const { t } = useTranslation(layoutTranslations);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [configMenuOpen, setConfigMenuOpen] = useState(false);
@@ -77,42 +80,42 @@ export function Layout({ children }: LayoutProps) {
   // Menu de configurações - Array simples com Iconify
   const configItems = [
     {
-      title: 'Clínica',
+      title: t?.menu?.clinic || 'Clínica',
       href: '/configuracoes/clinica',
       icon: 'mdi:office-building-outline',
     },
     {
-      title: 'Colaborador',
+      title: t?.menu?.collaborator || 'Colaborador',
       href: '/configuracoes/colaborador',
       icon: 'mdi:account-group-outline',
     },
     {
-      title: 'Parceiros e Serviços',
+      title: t?.menu?.partnersServices || 'Parceiros e Serviços',
       href: '/configuracoes/parceiros',
       icon: 'mdi:briefcase-outline',
     },
     {
-      title: 'Evolução',
+      title: t?.menu?.evolution || 'Evolução',
       href: '/configuracoes/evolucao',
       icon: 'mdi:file-document-outline',
     },
     {
-      title: 'Assinatura Digital',
+      title: t?.menu?.digitalSignature || 'Assinatura Digital',
       href: '/configuracoes/assinatura',
       icon: 'mdi:draw-pen',
     },
     {
-      title: 'Financeiro',
+      title: t?.menu?.financial || 'Financeiro',
       href: '/configuracoes/financeiro',
       icon: 'mdi:currency-usd',
     },
     {
-      title: 'Landing Page',
+      title: t?.menu?.landingPage || 'Landing Page',
       href: '/configuracoes/landing',
       icon: 'mdi:web',
     },
     {
-      title: 'Central de Comunicação',
+      title: t?.menu?.communicationCenter || 'Central de Comunicação',
       href: '/configuracoes/comunicacao',
       icon: 'mdi:chat-outline',
     },
@@ -121,37 +124,37 @@ export function Layout({ children }: LayoutProps) {
   // Menu mobile - Array simples com Iconify
   const menuItems = [
     {
-      title: 'Dashboard Pessoal',
+      title: t?.mainMenu?.personalDashboard || 'Dashboard Pessoal',
       href: '/dashboard',
       icon: 'mdi:home-outline',
     },
     {
-      title: 'Agenda',
+      title: t?.mainMenu?.schedule || 'Agenda',
       href: '/agenda',
       icon: 'mdi:calendar-outline',
     },
     {
-      title: 'Pacientes',
+      title: t?.mainMenu?.patients || 'Pacientes',
       href: '/pacientes',
       icon: 'mdi:account-group-outline',
     },
     {
-      title: 'Financeiro',
+      title: t?.mainMenu?.financial || 'Financeiro',
       href: '/financeiro',
       icon: 'mdi:currency-usd',
     },
     {
-      title: 'CRM',
+      title: t?.mainMenu?.crm || 'CRM',
       href: '/crm',
       icon: 'mdi:message-text-outline',
     },
     {
-      title: 'Central de Comunicação',
+      title: t?.mainMenu?.communicationCenter || 'Central de Comunicação',
       href: '/comunicacao',
       icon: 'mdi:chat-outline',
     },
     {
-      title: 'BirdID',
+      title: t?.mainMenu?.birdId || 'BirdID',
       href: '/birdid',
       icon: 'mdi:shield-check-outline',
       badge: true,
@@ -193,7 +196,7 @@ export function Layout({ children }: LayoutProps) {
             </div>
             {sidebarOpen && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">Usuário</p>
+                <p className="text-sm font-medium text-gray-900 truncate">{t?.actions?.user || 'Usuário'}</p>
                 <p className="text-xs text-gray-500 truncate">usuario@krooa.com</p>
               </div>
             )}
@@ -203,10 +206,10 @@ export function Layout({ children }: LayoutProps) {
           <button
             onClick={handleLogout}
             className={`w-full flex items-center ${sidebarOpen ? 'space-x-3 px-3' : 'justify-center'} py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors group`}
-            title="Sair"
+            title={t?.actions?.logout || 'Sair'}
           >
             <Icon icon="mdi:logout" className="w-5 h-5" />
-            {sidebarOpen && <span className="text-sm">Sair</span>}
+            {sidebarOpen && <span className="text-sm">{t?.actions?.logout || 'Sair'}</span>}
           </button>
         </div>
       </div>
@@ -233,10 +236,10 @@ export function Layout({ children }: LayoutProps) {
                     {/* Superfiltros no mobile */}
                     {(multiplasUnidadesEnabled || centroCustoEnabled) && (
                       <div className="p-4 border-b border-gray-200 space-y-3">
-                        <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Filtros</h3>
+                        <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider">{t?.actions?.filters || 'Filtros'}</h3>
                         {multiplasUnidadesEnabled && (
                           <Select
-                            placeholder="Todas as Unidades"
+                            placeholder={t?.actions?.allUnits || 'Todas as Unidades'}
                             options={unidadesOptions}
                             value={selectedUnidades}
                             onChange={(e) => setSelectedUnidades(Array.isArray(e.target.value) ? e.target.value : [])}
@@ -245,7 +248,7 @@ export function Layout({ children }: LayoutProps) {
                         )}
                         {centroCustoEnabled && (
                           <Select
-                            placeholder="Todos os Centros"
+                            placeholder={t?.actions?.allCenters || 'Todos os Centros'}
                             options={centrosOptions}
                             value={selectedCentros}
                             onChange={(e) => setSelectedCentros(Array.isArray(e.target.value) ? e.target.value : [])}
@@ -257,7 +260,7 @@ export function Layout({ children }: LayoutProps) {
 
                     <div className="py-2">
                       <div className="px-4 py-2">
-                        <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Menu Principal</h3>
+                        <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider">{t?.actions?.mainMenu || 'Menu Principal'}</h3>
                       </div>
 
                       {menuItems.map((item, index) => (
@@ -286,7 +289,7 @@ export function Layout({ children }: LayoutProps) {
                         className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
                         <Icon icon="mdi:logout" className="w-5 h-5" />
-                        <span>Sair</span>
+                        <span>{t?.actions?.logout || 'Sair'}</span>
                       </button>
                     </div>
                   </div>
@@ -314,7 +317,7 @@ export function Layout({ children }: LayoutProps) {
                   {/* Seletor de Unidades (Múltipla Seleção) */}
                   {multiplasUnidadesEnabled && (
                     <Select
-                      placeholder="Todas as Unidades2"
+                      placeholder={t?.actions?.allUnits || 'Todas as Unidades'}
                       options={unidadesOptions}
                       value={selectedUnidades}
                       onChange={(e) => setSelectedUnidades(Array.isArray(e.target.value) ? e.target.value : [])}
@@ -325,7 +328,7 @@ export function Layout({ children }: LayoutProps) {
                   {/* Seletor de Centro de Custo (Seleção Múltipla) */}
                   {centroCustoEnabled && (
                     <Select
-                      placeholder="Todos os Centros"
+                      placeholder={t?.actions?.allCenters || 'Todos os Centros'}
                       options={centrosOptions}
                       value={selectedCentros}
                       onChange={(e) => setSelectedCentros(Array.isArray(e.target.value) ? e.target.value : [])}
@@ -364,7 +367,7 @@ export function Layout({ children }: LayoutProps) {
                 {configMenuOpen && (
                   <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                     <div className="px-4 py-2 border-b border-gray-200">
-                      <h3 className="text-sm font-semibold text-gray-700">Configurações</h3>
+                      <h3 className="text-sm font-semibold text-gray-700">{t?.menu?.settings || 'Configurações'}</h3>
                     </div>
 
                     {configItems.map((item, index) => (

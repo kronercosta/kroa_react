@@ -8,7 +8,7 @@ import { useTranslation } from '../../../../hooks/useTranslation';
 import translations from './translation.json';
 
 export default function ParametrosColaborador() {
-  const { t } = useTranslation(translations);
+  const { t, currentLanguage, changeLanguage } = useTranslation(translations);
   const [colaboradorData] = useState({
     nome: 'Dr. João Silva',
     cargo: 'Ortodontista',
@@ -20,7 +20,7 @@ export default function ParametrosColaborador() {
     centroCustoPadrao: '',
     profissionalPadrao: '',
     bancoPadrao: '',
-    idioma: 'pt',
+    idioma: currentLanguage.toLowerCase(),
     responsavelOrcamento: false,
     responsavelAgendamento: false,
     notificacoesWhatsapp: true,
@@ -35,6 +35,25 @@ export default function ParametrosColaborador() {
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+
+    // Se o campo alterado for idioma, atualiza o sistema global de traduções
+    if (field === 'idioma') {
+      const languageMap: { [key: string]: 'PT' | 'EN' | 'ES' } = {
+        'pt': 'PT',
+        'en': 'EN',
+        'es': 'ES'
+      };
+
+      const newLanguage = languageMap[value];
+      if (newLanguage) {
+        changeLanguage(newLanguage);
+
+        // Force refresh after a small delay to ensure translations are updated
+        setTimeout(() => {
+          window.location.reload();
+        }, 200);
+      }
+    }
   };
 
   // Opções para os selects

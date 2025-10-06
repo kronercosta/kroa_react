@@ -73,7 +73,7 @@ const ContaClinica: React.FC = () => {
   ];
 
   return (
-    <ConfiguracoesClinicaLayout headerControls={<HeaderControls />}>
+    <ConfiguracoesClinicaLayout>
       <div className="space-y-6 w-full max-w-full">
         {/* Dados da Conta Section */}
         <Card className="w-full max-w-full overflow-hidden">
@@ -174,7 +174,7 @@ const ContaClinica: React.FC = () => {
           </div>
 
           {/* Pessoa Jurídica Toggle */}
-          <div className="mt-4 pt-4 border-t border-gray-200">
+          <div className="mt-6 pt-6 border-t border-gray-200">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h3 className="text-base font-medium text-gray-900">{t?.legalEntity || 'Pessoa Jurídica'}</h3>
@@ -187,37 +187,150 @@ const ContaClinica: React.FC = () => {
             </div>
 
             {pessoaJuridica && (
-              <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4">
-                <div className="w-full">
-                  <Input
-                    label={t?.legalName || 'Razão Social'}
-                    value={formData.legalName}
-                    onChange={(value) => setFormData({ ...formData, legalName: value })}
-                    placeholder={t?.placeholders?.legalName || 'Nome da empresa'}
-                  />
+              <div className="space-y-6">
+                {/* Dados da Empresa */}
+                <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4">
+                  <div className="w-full">
+                    <Input
+                      label={t?.legalName || 'Razão Social'}
+                      value={formData.legalName}
+                      onChange={(value) => setFormData({ ...formData, legalName: value })}
+                      placeholder={t?.placeholders?.legalName || 'Nome da empresa'}
+                    />
+                  </div>
+
+                  {/* Campo de CNPJ/EIN varia por região */}
+                  <div className="w-full">
+                    {currentRegion === 'BR' ? (
+                      <Input
+                        label={t?.regionLabels?.BR?.taxId || 'CNPJ'}
+                        value={formData.taxId}
+                        onChange={(value) => setFormData({ ...formData, taxId: value })}
+                        mask="cnpj"
+                        validation="cnpj"
+                        placeholder="00.000.000/0000-00"
+                      />
+                    ) : (
+                      <Input
+                        label={t?.regionLabels?.US?.taxId || 'EIN'}
+                        value={formData.taxId}
+                        onChange={(value) => setFormData({ ...formData, taxId: value })}
+                        mask="ein"
+                        validation="ein"
+                        placeholder="00-0000000"
+                      />
+                    )}
+                  </div>
                 </div>
 
-                {/* Campo de CNPJ/EIN varia por região */}
-                <div className="w-full">
-                  {currentRegion === 'BR' ? (
-                    <Input
-                      label={t?.regionLabels?.BR?.taxId || 'CNPJ'}
-                      value={formData.taxId}
-                      onChange={(value) => setFormData({ ...formData, taxId: value })}
-                      mask="cnpj"
-                      validation="cnpj"
-                      placeholder="00.000.000/0000-00"
-                    />
-                  ) : (
-                    <Input
-                      label={t?.regionLabels?.US?.taxId || 'EIN'}
-                      value={formData.taxId}
-                      onChange={(value) => setFormData({ ...formData, taxId: value })}
-                      mask="ein"
-                      validation="ein"
-                      placeholder="00-0000000"
-                    />
-                  )}
+                {/* Endereço da Empresa */}
+                <div className="pt-4 border-t border-gray-100">
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium text-gray-900">
+                      {currentRegion === 'BR'
+                        ? (t?.address?.title || 'Endereço da Empresa')
+                        : (t?.address?.title || 'Business Address')
+                      }
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {currentRegion === 'BR'
+                        ? (t?.address?.description || 'Informe o endereço da empresa')
+                        : (t?.address?.description || 'Enter the business address')
+                      }
+                    </p>
+                  </div>
+
+                  <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4">
+                    <div className="w-full">
+                      <Input
+                        label={currentRegion === 'BR'
+                          ? (t?.address?.street || 'Logradouro')
+                          : (t?.address?.street || 'Street Address')
+                        }
+                        value={formData.street}
+                        onChange={(value) => setFormData({ ...formData, street: value })}
+                        placeholder={currentRegion === 'BR' ? 'Ex: Rua das Flores' : 'Ex: 123 Main Street'}
+                        required
+                      />
+                    </div>
+
+                    <div className="w-full">
+                      <Input
+                        label={currentRegion === 'BR'
+                          ? (t?.address?.number || 'Número')
+                          : (t?.address?.number || 'Suite/Unit')
+                        }
+                        value={formData.number}
+                        onChange={(value) => setFormData({ ...formData, number: value })}
+                        placeholder={currentRegion === 'BR' ? 'Ex: 123' : 'Ex: Suite 456'}
+                        required
+                      />
+                    </div>
+
+                    <div className="w-full">
+                      <Input
+                        label={currentRegion === 'BR'
+                          ? (t?.address?.complement || 'Complemento')
+                          : (t?.address?.complement || 'Additional Info')
+                        }
+                        value={formData.complement}
+                        onChange={(value) => setFormData({ ...formData, complement: value })}
+                        placeholder={currentRegion === 'BR' ? 'Ex: Apto 101, Bloco A' : 'Ex: Floor 2, Building A'}
+                      />
+                    </div>
+
+                    {currentRegion === 'BR' && (
+                      <div className="w-full">
+                        <Input
+                          label={t?.address?.neighborhood || 'Bairro'}
+                          value={formData.neighborhood}
+                          onChange={(value) => setFormData({ ...formData, neighborhood: value })}
+                          placeholder="Ex: Centro"
+                          required
+                        />
+                      </div>
+                    )}
+
+                    <div className="w-full">
+                      <Input
+                        label={currentRegion === 'BR'
+                          ? (t?.address?.city || 'Cidade')
+                          : (t?.address?.city || 'City')
+                        }
+                        value={formData.city}
+                        onChange={(value) => setFormData({ ...formData, city: value })}
+                        placeholder={currentRegion === 'BR' ? 'Ex: São Paulo' : 'Ex: New York'}
+                        required
+                      />
+                    </div>
+
+                    <div className="w-full">
+                      <Input
+                        label={currentRegion === 'BR'
+                          ? (t?.regionLabels?.BR?.zipCode || 'CEP')
+                          : (t?.regionLabels?.US?.zipCode || 'ZIP Code')
+                        }
+                        value={formData.zipCode}
+                        onChange={(value) => setFormData({ ...formData, zipCode: value })}
+                        mask={currentRegion === 'BR' ? 'cep' : undefined}
+                        placeholder={currentRegion === 'BR' ? '00000-000' : '12345'}
+                        required
+                      />
+                    </div>
+
+                    <div className="w-full">
+                      <Input
+                        label={currentRegion === 'BR'
+                          ? (t?.regionLabels?.BR?.state || 'Estado')
+                          : (t?.regionLabels?.US?.state || 'State')
+                        }
+                        value={formData.state}
+                        onChange={(value) => setFormData({ ...formData, state: value })}
+                        placeholder={currentRegion === 'BR' ? 'Ex: SP' : 'Ex: NY'}
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

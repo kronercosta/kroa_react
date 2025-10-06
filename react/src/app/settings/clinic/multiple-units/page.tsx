@@ -70,7 +70,7 @@ const MultiplasUnidades: React.FC = () => {
   ]);
 
   return (
-    <ConfiguracoesClinicaLayout headerControls={<HeaderControls />}>
+    <ConfiguracoesClinicaLayout>
       <div className="space-y-6">
         {/* Unidade Principal - Sempre Disponível */}
         <Card>

@@ -3,10 +3,13 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { Logo } from '../Logo';
 import { useClinic } from '../../contexts/ClinicContext';
+import { useTranslation } from '../../hooks/useTranslation';
+import layoutTranslations from '../layout-translation.json';
 
 const AppLayout: React.FC = () => {
   const location = useLocation();
   const pathname = location.pathname;
+  const { t } = useTranslation(layoutTranslations);
   const [crmSubmenuOpen, setCrmSubmenuOpen] = useState(false);
   const [configSubmenuOpen, setConfigSubmenuOpen] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
@@ -55,7 +58,7 @@ const AppLayout: React.FC = () => {
         </svg>
       ),
       href: '/dashboard',
-      title: 'Dashboard Pessoal'
+      title: t?.mainMenu?.personalDashboard || 'Dashboard Pessoal'
     },
     {
       icon: (
@@ -64,7 +67,7 @@ const AppLayout: React.FC = () => {
         </svg>
       ),
       href: '/agenda',
-      title: 'Agenda'
+      title: t?.mainMenu?.schedule || 'Agenda'
     },
     {
       icon: (
@@ -73,7 +76,7 @@ const AppLayout: React.FC = () => {
         </svg>
       ),
       href: '/pacientes',
-      title: 'Pacientes'
+      title: t?.mainMenu?.patients || 'Pacientes'
     },
     {
       icon: (
@@ -82,7 +85,7 @@ const AppLayout: React.FC = () => {
         </svg>
       ),
       href: '/financeiro',
-      title: 'Financeiro'
+      title: t?.mainMenu?.financial || 'Financeiro'
     },
     {
       icon: (
@@ -91,10 +94,10 @@ const AppLayout: React.FC = () => {
         </svg>
       ),
       href: '/crm',
-      title: 'CRM',
+      title: t?.mainMenu?.crm || 'CRM',
       hasSubmenu: true,
       submenu: [
-        { href: '/crm', label: 'CRM' },
+        { href: '/crm', label: t?.mainMenu?.crm || 'CRM' },
         { href: '/crm/whatsapp', label: 'WhatsApp' }
       ]
     },
@@ -106,11 +109,11 @@ const AppLayout: React.FC = () => {
         </svg>
       ),
       href: '/configuracoes/clinica',
-      title: 'Configurações',
+      title: t?.menu?.settings || 'Configurações',
       hasSubmenu: true,
       submenu: [
-        { href: '/configuracoes/clinica', label: 'Clínica' },
-        { href: '/configuracoes/colaborador', label: 'Colaborador' }
+        { href: '/configuracoes/clinica', label: t?.menu?.clinic || 'Clínica' },
+        { href: '/configuracoes/colaborador', label: t?.menu?.collaborator || 'Colaborador' }
       ]
     },
   ];
@@ -170,12 +173,12 @@ const AppLayout: React.FC = () => {
                 }`}
                 title={!sidebarExpanded ? item.title : undefined}
                 onMouseEnter={() => {
-                  if (item.title === 'CRM') setCrmSubmenuOpen(true);
-                  if (item.title === 'Configurações') setConfigSubmenuOpen(true);
+                  if (item.title === (t?.mainMenu?.crm || 'CRM')) setCrmSubmenuOpen(true);
+                  if (item.title === (t?.menu?.settings || 'Configurações')) setConfigSubmenuOpen(true);
                 }}
                 onMouseLeave={() => {
-                  if (item.title === 'CRM') setCrmSubmenuOpen(false);
-                  if (item.title === 'Configurações') setConfigSubmenuOpen(false);
+                  if (item.title === (t?.mainMenu?.crm || 'CRM')) setCrmSubmenuOpen(false);
+                  if (item.title === (t?.menu?.settings || 'Configurações')) setConfigSubmenuOpen(false);
                 }}
               >
                 <div className="relative flex items-center">
@@ -196,7 +199,7 @@ const AppLayout: React.FC = () => {
               </Link>
 
               {/* Submenu do CRM */}
-              {item.title === 'CRM' && item.hasSubmenu && crmSubmenuOpen && (
+              {item.title === (t?.mainMenu?.crm || 'CRM') && item.hasSubmenu && crmSubmenuOpen && (
                 <div
                   className={`absolute ${sidebarExpanded ? 'left-full' : 'left-full'} ml-1 top-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50`}
                   onMouseEnter={() => setCrmSubmenuOpen(true)}
@@ -217,7 +220,7 @@ const AppLayout: React.FC = () => {
               )}
 
               {/* Submenu de Configurações */}
-              {item.title === 'Configurações' && item.hasSubmenu && configSubmenuOpen && (
+              {item.title === (t?.menu?.settings || 'Configurações') && item.hasSubmenu && configSubmenuOpen && (
                 <div
                   className={`absolute ${sidebarExpanded ? 'left-full' : 'left-full'} ml-1 top-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50`}
                   onMouseEnter={() => setConfigSubmenuOpen(true)}
@@ -256,12 +259,12 @@ const AppLayout: React.FC = () => {
           <Link
             to="/login"
             className={`flex items-center ${sidebarExpanded ? 'justify-start gap-3 px-3 py-2' : 'justify-center h-10'} text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors`}
-            title="Sair"
+            title={t?.actions?.logout || 'Sair'}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            {sidebarExpanded && <span>Sair</span>}
+            {sidebarExpanded && <span>{t?.actions?.logout || 'Sair'}</span>}
           </Link>
         </div>
       </div>
@@ -284,7 +287,7 @@ const AppLayout: React.FC = () => {
               {mobileMenuOpen && (
                 <div className="absolute left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                   <div className="px-4 py-2 border-b border-gray-200">
-                    <h3 className="text-sm font-semibold text-gray-700">Menu</h3>
+                    <h3 className="text-sm font-semibold text-gray-700">{t?.actions?.mainMenu || 'Menu'}</h3>
                   </div>
 
                   {menuItems.map((item, index) => (
@@ -312,7 +315,7 @@ const AppLayout: React.FC = () => {
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                       </svg>
-                      <span>Sair</span>
+                      <span>{t?.actions?.logout || 'Sair'}</span>
                     </Link>
                   </div>
                 </div>
@@ -333,7 +336,7 @@ const AppLayout: React.FC = () => {
                 >
                   <span className="flex-1 text-left">
                     {selectedUnidades.length === 0
-                      ? 'Todas as Unidades'
+                      ? (t?.actions?.allUnits || 'Todas as Unidades')
                       : selectedUnidades.length === 1
                       ? unidades.find(u => u.id === selectedUnidades[0])?.name
                       : `${selectedUnidades.length} selecionadas`
@@ -358,7 +361,7 @@ const AppLayout: React.FC = () => {
                       }}
                       className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 text-gray-700"
                     >
-                      Todas as Unidades
+                      {t?.actions?.allUnits || 'Todas as Unidades'}
                     </button>
                     {unidades.map(unidade => (
                       <label
@@ -394,7 +397,7 @@ const AppLayout: React.FC = () => {
                 >
                   <span className="flex-1 text-left">
                     {selectedCentros.length === 0
-                      ? 'Todos os Centros'
+                      ? (t?.actions?.allCenters || 'Todos os Centros')
                       : selectedCentros.length === 1
                       ? centrosCusto.find(c => c.id === selectedCentros[0])?.name
                       : `${selectedCentros.length} selecionados`
@@ -419,7 +422,7 @@ const AppLayout: React.FC = () => {
                       }}
                       className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 text-gray-700"
                     >
-                      Todos os Centros
+                      {t?.actions?.allCenters || 'Todos os Centros'}
                     </button>
                     {centrosCusto.map(centro => (
                       <label
@@ -482,7 +485,7 @@ const AppLayout: React.FC = () => {
               {configMenuOpen && (
                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                   <div className="px-4 py-2 border-b border-gray-200">
-                    <h3 className="text-sm font-semibold text-gray-700">Configurações</h3>
+                    <h3 className="text-sm font-semibold text-gray-700">{t?.menu?.settings || 'Configurações'}</h3>
                   </div>
 
                   <Link
@@ -493,7 +496,7 @@ const AppLayout: React.FC = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
-                    <span>Clínica</span>
+                    <span>{t?.menu?.clinic || 'Clínica'}</span>
                   </Link>
 
                   <Link
@@ -504,7 +507,7 @@ const AppLayout: React.FC = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
-                    <span>Colaborador</span>
+                    <span>{t?.menu?.collaborator || 'Colaborador'}</span>
                   </Link>
                 </div>
               )}

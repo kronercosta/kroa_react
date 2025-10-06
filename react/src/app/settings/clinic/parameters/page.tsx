@@ -19,7 +19,7 @@ const ParametrosClinica: React.FC = () => {
   const [aliquotaImposto, setAliquotaImposto] = useState('');
 
   return (
-    <ConfiguracoesClinicaLayout headerControls={<HeaderControls />}>
+    <ConfiguracoesClinicaLayout>
       <div className="space-y-6">
         {/* Parâmetros de Agenda */}
         <Card>
@@ -57,14 +57,14 @@ const ParametrosClinica: React.FC = () => {
             <div className="flex items-start justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
               <div className="flex-1 pr-4">
                 <h3 className="text-base font-medium text-gray-900 mb-1">
-                  Identificar conflitos de horários
+                  {t.scheduleParameters?.identifyConflicts?.title || 'Identificar conflitos de horários'}
                 </h3>
                 <p className="text-sm text-gray-600 mb-2">
-                  O sistema exibe alertas automáticos ao detectar sobreposição de agendamentos
+                  {t.scheduleParameters?.identifyConflicts?.description || 'O sistema exibe alertas automáticos ao detectar sobreposição de agendamentos'}
                 </p>
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Recomendado
+                    {t.scheduleParameters?.identifyConflicts?.tagRecommended || 'Recomendado'}
                   </span>
                 </div>
               </div>
@@ -162,7 +162,7 @@ const ParametrosClinica: React.FC = () => {
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="max-w-xs">
                     <label htmlFor="aliquota" className="block text-sm font-medium text-gray-700 mb-2">
-                      Alíquota de imposto para simulação
+                      {t.financialParameters?.taxSimulation?.taxRateLabel || 'Alíquota de imposto para simulação'}
                     </label>
                     <div className="relative">
                       <input
@@ -194,7 +194,7 @@ const ParametrosClinica: React.FC = () => {
 
                           setAliquotaImposto(value);
                         }}
-                        placeholder="Ex: 15.50"
+                        placeholder={t.financialParameters?.taxSimulation?.taxRatePlaceholder || 'Ex: 15.50'}
                         className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-krooa-green/20 focus:border-krooa-green"
                         maxLength={6}
                       />
@@ -203,7 +203,7 @@ const ParametrosClinica: React.FC = () => {
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-gray-500">
-                      Digite a porcentagem para calcular simulações de imposto
+                      {t.financialParameters?.taxSimulation?.description || 'Digite a porcentagem para calcular simulações de imposto'}
                     </p>
                   </div>
                 </div>

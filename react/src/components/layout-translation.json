@@ -1,0 +1,98 @@
+{
+  "PT": {
+    "menu": {
+      "settings": "Configurações",
+      "clinic": "Clínica",
+      "collaborator": "Colaborador",
+      "partnersServices": "Parceiros e Serviços",
+      "evolution": "Evolução",
+      "digitalSignature": "Assinatura Digital",
+      "financial": "Financeiro",
+      "landingPage": "Landing Page",
+      "communicationCenter": "Central de Comunicação"
+    },
+    "mainMenu": {
+      "personalDashboard": "Dashboard Pessoal",
+      "schedule": "Agenda",
+      "patients": "Pacientes",
+      "financial": "Financeiro",
+      "crm": "CRM",
+      "communicationCenter": "Central de Comunicação",
+      "birdId": "BirdID",
+      "active": "Ativo",
+      "components": "Componentes"
+    },
+    "actions": {
+      "logout": "Sair",
+      "user": "Usuário",
+      "mainMenu": "Menu Principal",
+      "filters": "Filtros",
+      "allUnits": "Todas as Unidades",
+      "allCenters": "Todos os Centros"
+    }
+  },
+  "EN": {
+    "menu": {
+      "settings": "Settings",
+      "clinic": "Clinic",
+      "collaborator": "Collaborator",
+      "partnersServices": "Partners & Services",
+      "evolution": "Evolution",
+      "digitalSignature": "Digital Signature",
+      "financial": "Financial",
+      "landingPage": "Landing Page",
+      "communicationCenter": "Communication Center"
+    },
+    "mainMenu": {
+      "personalDashboard": "Personal Dashboard",
+      "schedule": "Schedule",
+      "patients": "Patients",
+      "financial": "Financial",
+      "crm": "CRM",
+      "communicationCenter": "Communication Center",
+      "birdId": "BirdID",
+      "active": "Active",
+      "components": "Components"
+    },
+    "actions": {
+      "logout": "Logout",
+      "user": "User",
+      "mainMenu": "Main Menu",
+      "filters": "Filters",
+      "allUnits": "All Units",
+      "allCenters": "All Centers"
+    }
+  },
+  "ES": {
+    "menu": {
+      "settings": "Configuraciones",
+      "clinic": "Clínica",
+      "collaborator": "Colaborador",
+      "partnersServices": "Socios y Servicios",
+      "evolution": "Evolución",
+      "digitalSignature": "Firma Digital",
+      "financial": "Financiero",
+      "landingPage": "Página de Destino",
+      "communicationCenter": "Centro de Comunicación"
+    },
+    "mainMenu": {
+      "personalDashboard": "Panel Personal",
+      "schedule": "Agenda",
+      "patients": "Pacientes",
+      "financial": "Financiero",
+      "crm": "CRM",
+      "communicationCenter": "Centro de Comunicación",
+      "birdId": "BirdID",
+      "active": "Activo",
+      "components": "Componentes"
+    },
+    "actions": {
+      "logout": "Salir",
+      "user": "Usuario",
+      "mainMenu": "Menú Principal",
+      "filters": "Filtros",
+      "allUnits": "Todas las Unidades",
+      "allCenters": "Todos los Centros"
+    }
+  }
+}

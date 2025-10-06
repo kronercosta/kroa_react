@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 export type RegionType = 'BR' | 'US';
 
@@ -121,16 +121,25 @@ const regionConfigs: Record<RegionType, RegionConfig> = {
 };
 
 export function RegionProvider({ children }: { children: React.ReactNode }) {
-  // Busca região da variável de ambiente
+  // Busca região da variável de ambiente ou localStorage
   const envRegion = (import.meta.env.VITE_CLINIC_REGION || 'BR') as RegionType;
-  const initialRegion = regionConfigs[envRegion] ? envRegion : 'BR';
+  const storedRegion = localStorage.getItem('clinic_region') as RegionType;
+  const initialRegion = storedRegion || (regionConfigs[envRegion] ? envRegion : 'BR');
 
-  const [currentRegion] = useState<RegionType>(initialRegion);
-  const [config] = useState<RegionConfig>(regionConfigs[initialRegion]);
+  const [currentRegion, setCurrentRegion] = useState<RegionType>(initialRegion);
+  const [config, setConfig] = useState<RegionConfig>(regionConfigs[initialRegion]);
 
-  // Removido setRegion - região agora é fixa baseada no .env
   const setRegion = (region: RegionType) => {
-    console.warn('setRegion is deprecated. Region is now configured via VITE_CLINIC_REGION environment variable.');
+    if (regionConfigs[region]) {
+      setCurrentRegion(region);
+      setConfig(regionConfigs[region]);
+      localStorage.setItem('clinic_region', region);
+
+      // Force page refresh to ensure all components update with new region
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    }
   };
 
   const formatCurrency = (value: number): string => {

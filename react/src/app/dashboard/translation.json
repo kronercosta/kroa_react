@@ -1,0 +1,71 @@
+{
+  "PT": {
+    "title": "Dashboard Pessoal",
+    "subtitle": "Visão geral da sua clínica odontológica",
+    "stats": {
+      "patientsToday": "Pacientes Hoje",
+      "monthlyRevenue": "Faturamento Mensal",
+      "appointments": "Agendamentos",
+      "occupancyRate": "Taxa de Ocupação"
+    },
+    "quickActions": {
+      "title": "Ações Rápidas",
+      "newPatient": "Novo Paciente",
+      "newPatientDesc": "Cadastrar um novo paciente no sistema",
+      "scheduleAppointment": "Agendar Consulta",
+      "scheduleAppointmentDesc": "Agendar uma nova consulta",
+      "reports": "Relatórios",
+      "reportsDesc": "Visualizar relatórios da clínica"
+    },
+    "charts": {
+      "weeklyAttendance": "Atendimentos da Semana",
+      "chartPlaceholder": "Gráfico de atendimentos"
+    }
+  },
+  "EN": {
+    "title": "Personal Dashboard",
+    "subtitle": "Overview of your dental clinic",
+    "stats": {
+      "patientsToday": "Patients Today",
+      "monthlyRevenue": "Monthly Revenue",
+      "appointments": "Appointments",
+      "occupancyRate": "Occupancy Rate"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "newPatient": "New Patient",
+      "newPatientDesc": "Register a new patient in the system",
+      "scheduleAppointment": "Schedule Appointment",
+      "scheduleAppointmentDesc": "Schedule a new appointment",
+      "reports": "Reports",
+      "reportsDesc": "View clinic reports"
+    },
+    "charts": {
+      "weeklyAttendance": "Weekly Attendance",
+      "chartPlaceholder": "Attendance chart"
+    }
+  },
+  "ES": {
+    "title": "Panel Personal",
+    "subtitle": "Resumen de tu clínica dental",
+    "stats": {
+      "patientsToday": "Pacientes Hoy",
+      "monthlyRevenue": "Facturación Mensual",
+      "appointments": "Citas",
+      "occupancyRate": "Tasa de Ocupación"
+    },
+    "quickActions": {
+      "title": "Acciones Rápidas",
+      "newPatient": "Nuevo Paciente",
+      "newPatientDesc": "Registrar un nuevo paciente en el sistema",
+      "scheduleAppointment": "Agendar Cita",
+      "scheduleAppointmentDesc": "Agendar una nueva cita",
+      "reports": "Reportes",
+      "reportsDesc": "Ver reportes de la clínica"
+    },
+    "charts": {
+      "weeklyAttendance": "Atención Semanal",
+      "chartPlaceholder": "Gráfico de atención"
+    }
+  }
+}

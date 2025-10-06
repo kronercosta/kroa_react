@@ -62,20 +62,31 @@
       "selectCostCenters": "Selecione os centros",
       "selectCollaborators": "Selecione colaboradores",
       "legalName": "Nome da empresa"
+    },
+    "address": {
+      "title": "Endereço da Clínica",
+      "description": "Informe o endereço principal da clínica",
+      "street": "Logradouro",
+      "number": "Número",
+      "complement": "Complemento",
+      "city": "Cidade",
+      "zipCode": "CEP",
+      "state": "Estado",
+      "neighborhood": "Bairro"
     }
   },
   "EN": {
-    "account": "Account",
+    "account": "Administrative Settings",
     "save": "Save",
-    "companyName": "Company Name",
-    "email": "Email",
-    "responsibleName": "Responsible Person",
-    "phone": "Phone",
-    "masterUser": "Administrator",
-    "masterUserDescription": "The administrator has full access to the system",
-    "legalEntity": "Corporation",
-    "legalEntityDescription": "Enable to add company data",
-    "legalName": "Legal Name",
+    "companyName": "Doing Business As (DBA)",
+    "email": "Best E-mail",
+    "responsibleName": "Full Name",
+    "phone": "Best Phone",
+    "masterUser": "Link Admin User",
+    "masterUserDescription": "The admin user has full access to the system",
+    "legalEntity": "Business Entity",
+    "legalEntityDescription": "Enable to add business entity data",
+    "legalName": "Legal Business Name",
     "multipleUnits": "Multiple Units",
     "multipleUnitsDescription": "Manage multiple units of your clinic",
     "units": "Units",
@@ -112,21 +123,31 @@
         "neighborhood": "Neighborhood"
       },
       "US": {
-        "responsibleDocument": "Responsible's SSN",
-        "taxId": "EIN",
+        "responsibleDocument": "Government ID (SSN / ITIN)",
+        "taxId": "EIN (Employer Identification Number)",
         "zipCode": "ZIP Code",
         "state": "State",
         "neighborhood": "Neighborhood"
       }
     },
     "placeholders": {
-      "companyName": "Enter company name",
-      "responsibleName": "Full name",
-      "selectMasterUser": "Select administrator",
+      "companyName": "Enter business name (DBA)",
+      "responsibleName": "Enter full name",
+      "selectMasterUser": "Select admin user",
       "selectCommunicationCenters": "Select centers",
       "selectCostCenters": "Select cost centers",
       "selectCollaborators": "Select collaborators",
-      "legalName": "Company legal name"
+      "legalName": "Enter legal business name"
+    },
+    "address": {
+      "title": "Business Address",
+      "description": "Enter the primary business address",
+      "street": "Street Address",
+      "number": "Suite/Unit",
+      "complement": "Additional Info",
+      "city": "City",
+      "zipCode": "ZIP Code",
+      "state": "State"
     }
   },
   "ES": {

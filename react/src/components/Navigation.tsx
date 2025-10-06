@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Icon } from '@iconify/react';
+import { useTranslation } from '../hooks/useTranslation';
+import layoutTranslations from './layout-translation.json';
 
 interface NavItem {
   title: string;
@@ -9,50 +11,7 @@ interface NavItem {
   badge?: string;
 }
 
-// Array de navegação - apenas adicione/edite aqui para mudar o menu
-const navItems: NavItem[] = [
-  {
-    title: 'Dashboard Pessoal',
-    url: '/dashboard',
-    icon: 'mdi:home-outline',
-  },
-  {
-    title: 'Agenda',
-    url: '/agenda',
-    icon: 'mdi:calendar-outline',
-  },
-  {
-    title: 'Pacientes',
-    url: '/pacientes',
-    icon: 'mdi:account-group-outline',
-  },
-  {
-    title: 'Financeiro',
-    url: '/financeiro',
-    icon: 'mdi:currency-usd',
-  },
-  {
-    title: 'CRM',
-    url: '/crm',
-    icon: 'mdi:message-text-outline',
-  },
-  {
-    title: 'Central de Comunicação',
-    url: '/comunicacao',
-    icon: 'mdi:chat-outline',
-  },
-  {
-    title: 'BirdID',
-    url: '/birdid',
-    icon: 'mdi:shield-check-outline',
-    badge: 'Ativo',
-  },
-  {
-    title: 'Componentes',
-    url: '/components',
-    icon: 'mdi:view-dashboard-outline',
-  },
-];
+// Array de navegação - movido para dentro do componente para usar traduções
 
 interface NavigationProps {
   sidebarOpen: boolean;
@@ -60,6 +19,52 @@ interface NavigationProps {
 
 export function Navigation({ sidebarOpen }: NavigationProps) {
   const location = useLocation();
+  const { t } = useTranslation(layoutTranslations);
+
+  // Array de navegação com traduções
+  const navItems: NavItem[] = [
+    {
+      title: t?.mainMenu?.personalDashboard || 'Dashboard Pessoal',
+      url: '/dashboard',
+      icon: 'mdi:home-outline',
+    },
+    {
+      title: t?.mainMenu?.schedule || 'Agenda',
+      url: '/agenda',
+      icon: 'mdi:calendar-outline',
+    },
+    {
+      title: t?.mainMenu?.patients || 'Pacientes',
+      url: '/pacientes',
+      icon: 'mdi:account-group-outline',
+    },
+    {
+      title: t?.mainMenu?.financial || 'Financeiro',
+      url: '/financeiro',
+      icon: 'mdi:currency-usd',
+    },
+    {
+      title: t?.mainMenu?.crm || 'CRM',
+      url: '/crm',
+      icon: 'mdi:message-text-outline',
+    },
+    {
+      title: t?.mainMenu?.communicationCenter || 'Central de Comunicação',
+      url: '/comunicacao',
+      icon: 'mdi:chat-outline',
+    },
+    {
+      title: t?.mainMenu?.birdId || 'BirdID',
+      url: '/birdid',
+      icon: 'mdi:shield-check-outline',
+      badge: t?.mainMenu?.active || 'Ativo',
+    },
+    {
+      title: t?.mainMenu?.components || 'Componentes',
+      url: '/components',
+      icon: 'mdi:view-dashboard-outline',
+    },
+  ];
 
   return (
     <nav className="flex-1 py-4 space-y-1 px-2">
