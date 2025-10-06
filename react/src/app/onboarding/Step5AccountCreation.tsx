@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../../components/ui/Button';
 import { useTranslation } from '../../hooks/useTranslation';
 import translations from './translation.json';
@@ -184,7 +184,7 @@ export function Step5AccountCreation({ onComplete, accountData }: Step4Props) {
 
       {/* Progress Steps */}
       <div className="space-y-4 mb-8">
-        {steps.map((step, index) => (
+        {steps.map((step: string, index: number) => (
           <div key={index} className="flex items-center gap-3">
             <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
               index < currentStep

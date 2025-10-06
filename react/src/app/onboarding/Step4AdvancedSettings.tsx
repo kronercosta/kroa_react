@@ -34,7 +34,7 @@ export function Step4AdvancedSettings({ onNext, onBack, userData }: Step3Props) 
   const [isCheckingDomain, setIsCheckingDomain] = useState(false);
 
   // Email verification
-  const [needsEmailVerification, setNeedsEmailVerification] = useState(!userData.isGoogleAuth);
+  const [needsEmailVerification] = useState(!userData.isGoogleAuth);
   const [verificationCode, setVerificationCode] = useState('');
   const [isEmailVerified, setIsEmailVerified] = useState(userData.isGoogleAuth || false);
   const [verificationSent, setVerificationSent] = useState(false);
@@ -261,7 +261,7 @@ export function Step4AdvancedSettings({ onNext, onBack, userData }: Step3Props) 
                   'Pelo menos 1 letra maiúscula',
                   'Pelo menos 1 número',
                   'Pelo menos 1 caractere especial'
-                ]).map((requirement, index) => {
+                ]).map((requirement: string, index: number) => {
                   const checks = [
                     passwordStrength.hasLength,
                     passwordStrength.hasUppercase,

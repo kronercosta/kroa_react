@@ -9,7 +9,9 @@ export default function Step2Page() {
     selectedPlan: string;
     couponCode?: string;
     termsAccepted: boolean;
-    lgpdAccepted: boolean;
+    lgpdAccepted?: boolean;
+    hipaaAccepted?: boolean;
+    adminAccepted: boolean;
   }) => {
     // Armazenar dados no sessionStorage
     const onboardingData = JSON.parse(sessionStorage.getItem('onboardingData') || '{}');

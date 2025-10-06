@@ -46,6 +46,24 @@
       "cardCvv": "CVV",
       "securityNote": "🔒 Seus dados estão seguros e criptografados",
       "startTrial": "Iniciar teste grátis",
+      "termsRequired": "Você deve aceitar os termos para continuar",
+      "coupon": "Cupom de desconto (opcional)",
+      "couponPlaceholder": "Digite seu cupom",
+      "applyCoupon": "Aplicar",
+      "couponApplied": "Cupom aplicado com sucesso!",
+      "couponInvalid": "Cupom inválido ou expirado",
+      "validCoupons": {
+        "DESCONTO10": { "discount": 10, "type": "percentage" },
+        "PRIMEIRA50": { "discount": 50, "type": "fixed" },
+        "TESTE30": { "discount": 30, "type": "percentage" }
+      },
+      "termsSection": "Aceite de Termos",
+      "lgpdConsent": "Aceito os termos da LGPD",
+      "lgpdDescription": "Declaro estar ciente e concordo com os termos da Lei Geral de Proteção de Dados (LGPD) e autorizo o tratamento dos dados pessoais conforme descrito na política de privacidade.",
+      "viewLgpdDocument": "Ver documento completo",
+      "adminResponsibility": "Aceito as responsabilidades de usuário administrador",
+      "adminResponsibilityDescription": "Assumo total responsabilidade pelas configurações e dados inseridos no sistema, comprometendo-me a manter a segurança e confidencialidade das informações dos pacientes.",
+      "viewResponsibilityDocument": "Ver termo de responsabilidade",
       "plans": {
         "basic": {
           "name": "Básico",
@@ -131,6 +149,50 @@
       "success": "Conta criada com sucesso!",
       "successMessage": "Sua clínica está pronta para uso. Você será redirecionado em alguns segundos.",
       "accessNow": "Acessar agora"
+    },
+    "lgpdTerms": {
+      "title": "TERMO DE CONSENTIMENTO PARA TRATAMENTO DE DADOS PESSOAIS - LGPD",
+      "lastUpdated": "Última atualização: Janeiro de 2025",
+      "sections": [
+        {
+          "title": "IDENTIFICAÇÃO DO CONTROLADOR",
+          "content": "Este documento é emitido pela plataforma KROA, sistema de gestão odontológica, desenvolvido para auxiliar clínicas e consultórios odontológicos na gestão de pacientes, agendamentos e procedimentos."
+        },
+        {
+          "title": "FINALIDADE DO TRATAMENTO",
+          "content": "Os dados pessoais coletados serão utilizados exclusivamente para:\n\n• Gestão administrativa da clínica odontológica\n• Cadastro e controle de pacientes\n• Agendamento de consultas e procedimentos\n• Emissão de relatórios gerenciais\n• Comunicação com pacientes (lembretes, confirmações)\n• Histórico médico-odontológico\n• Faturamento e controle financeiro\n• Cumprimento de obrigações legais e regulamentares"
+        },
+        {
+          "title": "TIPOS DE DADOS COLETADOS",
+          "content": "Poderão ser tratados os seguintes dados pessoais:\n\n• Dados de identificação (nome, CPF, RG, data de nascimento)\n• Dados de contato (telefone, e-mail, endereço)\n• Dados de saúde (histórico odontológico, procedimentos realizados)\n• Dados financeiros (forma de pagamento, histórico de pagamentos)\n• Imagens (radiografias, fotografias clínicas, quando aplicável)\n• Dados de navegação e uso do sistema"
+        },
+        {
+          "title": "CONSENTIMENTO",
+          "content": "Ao marcar a opção correspondente, você declara:\n\n• Ter lido e compreendido integralmente este termo\n• Concordar com o tratamento dos seus dados pessoais conforme descrito\n• Estar ciente dos seus direitos como titular de dados\n• Compreender que o consentimento pode ser revogado a qualquer momento"
+        }
+      ]
+    },
+    "adminTerms": {
+      "title": "TERMO DE RESPONSABILIDADE DO USUÁRIO ADMINISTRADOR",
+      "lastUpdated": "Última atualização: Janeiro de 2025",
+      "sections": [
+        {
+          "title": "IDENTIFICAÇÃO",
+          "content": "Este termo estabelece as responsabilidades do usuário designado como Administrador do sistema KROA, plataforma de gestão odontológica, no que se refere ao uso adequado do sistema e à proteção de dados pessoais."
+        },
+        {
+          "title": "RESPONSABILIDADES GERAIS",
+          "content": "O Usuário Administrador assume as seguintes responsabilidades:\n\n• Manter suas credenciais de acesso em sigilo absoluto\n• Utilizar o sistema de acordo com os termos de uso\n• Garantir que apenas pessoas autorizadas tenham acesso ao sistema\n• Reportar imediatamente qualquer suspeita de uso indevido\n• Manter atualizadas as informações de configuração\n• Realizar backup regular dos dados importantes\n• Cumprir todas as normas legais aplicáveis ao setor odontológico"
+        },
+        {
+          "title": "RESPONSABILIDADES QUANTO À PROTEÇÃO DE DADOS",
+          "content": "Especificamente em relação à proteção de dados pessoais, o Administrador compromete-se a:\n\n• Implementar medidas técnicas e organizacionais adequadas para proteger dados pessoais\n• Garantir que apenas colaboradores autorizados tenham acesso aos dados de pacientes\n• Treinar a equipe sobre boas práticas de proteção de dados\n• Reportar incidentes de segurança em até 72 horas\n• Manter registros de atividades de tratamento de dados\n• Garantir o cumprimento da LGPD e demais normas aplicáveis"
+        },
+        {
+          "title": "ACEITE E CONCORDÂNCIA",
+          "content": "Ao aceitar este termo, o Usuário Administrador declara:\n\n• Ter lido e compreendido integralmente todas as cláusulas\n• Concordar em cumprir todas as responsabilidades estabelecidas\n• Estar ciente das consequências do descumprimento\n• Comprometer-se a atuar sempre em conformidade com a lei\n• Assumir total responsabilidade pelas ações sob sua gestão\n• Entender a importância da proteção de dados pessoais dos pacientes"
+        }
+      ]
     }
   },
   "EN": {
@@ -180,6 +242,24 @@
       "cardCvv": "CVV",
       "securityNote": "🔒 Your data is secure and encrypted",
       "startTrial": "Start free trial",
+      "termsRequired": "You must accept the terms to continue",
+      "coupon": "Discount coupon (optional)",
+      "couponPlaceholder": "Enter your coupon",
+      "applyCoupon": "Apply",
+      "couponApplied": "Coupon applied successfully!",
+      "couponInvalid": "Invalid or expired coupon",
+      "validCoupons": {
+        "DISCOUNT10": { "discount": 10, "type": "percentage" },
+        "FIRST50": { "discount": 50, "type": "fixed" },
+        "TEST30": { "discount": 30, "type": "percentage" }
+      },
+      "termsSection": "Terms Acceptance",
+      "hipaaConsent": "I accept the HIPAA terms",
+      "hipaaDescription": "I acknowledge and agree to comply with the Health Insurance Portability and Accountability Act (HIPAA) requirements for protecting patient health information.",
+      "viewHipaaDocument": "View full document",
+      "adminResponsibility": "I accept the administrator user responsibilities",
+      "adminResponsibilityDescription": "I assume full responsibility for the configurations and data entered in the system, committing to maintain the security and confidentiality of patient information.",
+      "viewResponsibilityDocument": "View responsibility terms",
       "plans": {
         "basic": {
           "name": "Starter",
@@ -266,6 +346,88 @@
       "success": "Account created successfully!",
       "successMessage": "Your clinic is ready to use. You'll be redirected in a few seconds.",
       "accessNow": "Access now"
+    },
+    "hipaaTerms": {
+      "title": "HIPAA COMPLIANCE AGREEMENT",
+      "lastUpdated": "Last updated: January 2025",
+      "sections": [
+        {
+          "title": "HIPAA OVERVIEW",
+          "content": "The Health Insurance Portability and Accountability Act (HIPAA) establishes national standards for protecting patients' medical records and other personal health information. As a covered entity or business associate using the KROA dental management system, you must comply with HIPAA requirements."
+        },
+        {
+          "title": "PROTECTED HEALTH INFORMATION (PHI)",
+          "content": "PHI includes any individually identifiable health information held or transmitted by a covered entity or its business associates, including:\n\n• Patient demographics and contact information\n• Medical and dental records\n• Treatment plans and clinical notes\n• Billing and insurance information\n• Appointment schedules\n• Digital images and X-rays\n• Any information that could identify a patient"
+        },
+        {
+          "title": "MINIMUM NECESSARY STANDARD",
+          "content": "You must limit access to PHI to the minimum necessary to accomplish the intended purpose. This includes:\n\n• Implementing role-based access controls\n• Limiting user permissions based on job functions\n• Regularly reviewing and updating access permissions\n• Training staff on minimum necessary principles\n• Documenting access controls and procedures"
+        },
+        {
+          "title": "SECURITY REQUIREMENTS",
+          "content": "You must implement administrative, physical, and technical safeguards:\n\n• Administrative: Designate a security officer, conduct risk assessments, train workforce\n• Physical: Control facility access, protect workstations, secure media and equipment\n• Technical: Implement access controls, audit logs, encryption, and secure transmission\n• Regular security updates and patches\n• Incident response procedures"
+        },
+        {
+          "title": "BREACH NOTIFICATION",
+          "content": "In case of a security incident or breach involving PHI, you must:\n\n• Conduct immediate risk assessment\n• Notify affected patients within 60 days\n• Report to HHS within 60 days\n• Notify media if breach affects 500+ individuals\n• Maintain documentation of the breach and response\n• Implement corrective measures to prevent future breaches"
+        },
+        {
+          "title": "PATIENT RIGHTS",
+          "content": "Patients have the right to:\n\n• Access their PHI and request copies\n• Request amendments to their records\n• Request restrictions on use and disclosure\n• Request alternative communication methods\n• File complaints about privacy practices\n• Receive notice of privacy practices"
+        },
+        {
+          "title": "BUSINESS ASSOCIATE AGREEMENT",
+          "content": "KROA serves as a business associate and commits to:\n\n• Use PHI only as permitted by this agreement\n• Implement appropriate safeguards\n• Report security incidents promptly\n• Return or destroy PHI when contract ends\n• Allow covered entity to monitor compliance\n• Ensure subcontractors meet same standards"
+        },
+        {
+          "title": "COMPLIANCE ACKNOWLEDGMENT",
+          "content": "By accepting this agreement, you acknowledge:\n\n• Understanding of HIPAA requirements\n• Commitment to implement required safeguards\n• Responsibility for staff training and compliance\n• Obligation to report security incidents\n• Understanding that violations may result in civil and criminal penalties\n• Agreement to cooperate with compliance audits and investigations"
+        }
+      ]
+    },
+    "lgpdTerms": {
+      "title": "CONSENT TERM FOR PERSONAL DATA PROCESSING - LGPD",
+      "lastUpdated": "Last updated: January 2025",
+      "sections": [
+        {
+          "title": "CONTROLLER IDENTIFICATION",
+          "content": "This document is issued by the KROA platform, a dental management system developed to assist dental clinics and offices in managing patients, appointments, and procedures."
+        },
+        {
+          "title": "PROCESSING PURPOSE",
+          "content": "Personal data collected will be used exclusively for:\n\n• Administrative management of the dental clinic\n• Patient registration and control\n• Appointment and procedure scheduling\n• Management reports generation\n• Patient communication (reminders, confirmations)\n• Medical-dental history\n• Billing and financial control\n• Compliance with legal and regulatory obligations"
+        },
+        {
+          "title": "TYPES OF DATA COLLECTED",
+          "content": "The following personal data may be processed:\n\n• Identification data (name, SSN, ID, date of birth)\n• Contact data (phone, email, address)\n• Health data (dental history, procedures performed)\n• Financial data (payment method, payment history)\n• Images (X-rays, clinical photographs, when applicable)\n• Navigation and system usage data"
+        },
+        {
+          "title": "CONSENT",
+          "content": "By checking the corresponding option, you declare:\n\n• Having read and fully understood this term\n• Agreeing with the processing of your personal data as described\n• Being aware of your rights as a data subject\n• Understanding that consent may be revoked at any time"
+        }
+      ]
+    },
+    "adminTerms": {
+      "title": "ADMINISTRATOR USER RESPONSIBILITY TERMS",
+      "lastUpdated": "Last updated: January 2025",
+      "sections": [
+        {
+          "title": "IDENTIFICATION",
+          "content": "This term establishes the responsibilities of the user designated as Administrator of the KROA system, dental management platform, regarding proper system use and personal data protection."
+        },
+        {
+          "title": "GENERAL RESPONSIBILITIES",
+          "content": "The Administrator User assumes the following responsibilities:\n\n• Keep access credentials in absolute secrecy\n• Use the system according to terms of use\n• Ensure only authorized persons have system access\n• Immediately report any suspected misuse\n• Keep configuration information updated\n• Perform regular backup of important data\n• Comply with all legal standards applicable to dental sector"
+        },
+        {
+          "title": "DATA PROTECTION RESPONSIBILITIES",
+          "content": "Specifically regarding personal data protection, the Administrator commits to:\n\n• Implement adequate technical and organizational measures to protect personal data\n• Ensure only authorized staff have access to patient data\n• Train team on data protection best practices\n• Report security incidents within 72 hours\n• Maintain records of data processing activities\n• Ensure HIPAA/LGPD compliance and other applicable regulations"
+        },
+        {
+          "title": "ACCEPTANCE AND AGREEMENT",
+          "content": "By accepting this term, the Administrator User declares:\n\n• Having read and fully understood all clauses\n• Agreeing to comply with all established responsibilities\n• Being aware of consequences of non-compliance\n• Committing to always act in accordance with the law\n• Assuming full responsibility for actions under their management\n• Understanding the importance of protecting patients' personal data"
+        }
+      ]
     }
   },
   "ES": {
@@ -314,7 +476,25 @@
       "cardExpiry": "Vencimiento",
       "cardCvv": "CVV",
       "securityNote": "🔒 Sus datos están seguros y encriptados",
-      "startTrial": "Iniciar prueba gratuita"
+      "startTrial": "Iniciar prueba gratuita",
+      "termsRequired": "Debe aceptar los términos para continuar",
+      "coupon": "Cupón de descuento (opcional)",
+      "couponPlaceholder": "Ingrese su cupón",
+      "applyCoupon": "Aplicar",
+      "couponApplied": "¡Cupón aplicado con éxito!",
+      "couponInvalid": "Cupón inválido o expirado",
+      "validCoupons": {
+        "DESCUENTO10": { "discount": 10, "type": "percentage" },
+        "PRIMERO50": { "discount": 50, "type": "fixed" },
+        "PRUEBA30": { "discount": 30, "type": "percentage" }
+      },
+      "termsSection": "Aceptación de Términos",
+      "lgpdConsent": "Acepto los términos de LGPD",
+      "lgpdDescription": "Declaro estar consciente y de acuerdo con los términos de la Ley General de Protección de Datos (LGPD) y autorizo el tratamiento de datos personales según se describe en la política de privacidad.",
+      "viewLgpdDocument": "Ver documento completo",
+      "adminResponsibility": "Acepto las responsabilidades de usuario administrador",
+      "adminResponsibilityDescription": "Asumo total responsabilidad por las configuraciones y datos ingresados en el sistema, comprometiéndome a mantener la seguridad y confidencialidad de la información de los pacientes.",
+      "viewResponsibilityDocument": "Ver términos de responsabilidad"
     },
     "step3": {
       "title": "Configuraciones avanzadas",
@@ -366,6 +546,42 @@
       "success": "¡Cuenta creada con éxito!",
       "successMessage": "Su clínica está lista para usar. Será redirigido en unos segundos.",
       "accessNow": "Acceder ahora"
+    },
+    "lgpdTerms": {
+      "title": "TÉRMINO DE CONSENTIMIENTO PARA TRATAMIENTO DE DATOS PERSONALES - LGPD",
+      "lastUpdated": "Última actualización: Enero de 2025",
+      "sections": [
+        {
+          "title": "IDENTIFICACIÓN DEL CONTROLADOR",
+          "content": "Este documento es emitido por la plataforma KROA, sistema de gestión odontológica, desarrollado para auxiliar clínicas y consultorios odontológicos en la gestión de pacientes, citas y procedimientos."
+        },
+        {
+          "title": "FINALIDAD DEL TRATAMIENTO",
+          "content": "Los datos personales recolectados serán utilizados exclusivamente para:\n\n• Gestión administrativa de la clínica odontológica\n• Registro y control de pacientes\n• Programación de citas y procedimientos\n• Generación de reportes gerenciales\n• Comunicación con pacientes (recordatorios, confirmaciones)\n• Historial médico-odontológico\n• Facturación y control financiero\n• Cumplimiento de obligaciones legales y regulatorias"
+        },
+        {
+          "title": "CONSENTIMIENTO",
+          "content": "Al marcar la opción correspondiente, usted declara:\n\n• Haber leído y comprendido íntegralmente este término\n• Estar de acuerdo con el tratamiento de sus datos personales según se describe\n• Estar consciente de sus derechos como titular de datos\n• Entender que el consentimiento puede ser revocado en cualquier momento"
+        }
+      ]
+    },
+    "adminTerms": {
+      "title": "TÉRMINO DE RESPONSABILIDAD DEL USUARIO ADMINISTRADOR",
+      "lastUpdated": "Última actualización: Enero de 2025",
+      "sections": [
+        {
+          "title": "IDENTIFICACIÓN",
+          "content": "Este término establece las responsabilidades del usuario designado como Administrador del sistema KROA, plataforma de gestión odontológica, en lo que se refiere al uso adecuado del sistema y a la protección de datos personales."
+        },
+        {
+          "title": "RESPONSABILIDADES GENERALES",
+          "content": "El Usuario Administrador asume las siguientes responsabilidades:\n\n• Mantener sus credenciales de acceso en secreto absoluto\n• Utilizar el sistema de acuerdo con los términos de uso\n• Garantizar que solo personas autorizadas tengan acceso al sistema\n• Reportar inmediatamente cualquier sospecha de uso indebido\n• Mantener actualizadas las informaciones de configuración\n• Realizar respaldo regular de los datos importantes\n• Cumplir todas las normas legales aplicables al sector odontológico"
+        },
+        {
+          "title": "ACEPTACIÓN Y CONCORDANCIA",
+          "content": "Al aceptar este término, el Usuario Administrador declara:\n\n• Haber leído y comprendido íntegramente todas las cláusulas\n• Estar de acuerdo en cumplir todas las responsabilidades establecidas\n• Estar consciente de las consecuencias del incumplimiento\n• Comprometerse a actuar siempre en conformidad con la ley\n• Asumir total responsabilidad por las acciones bajo su gestión\n• Entender la importancia de la protección de datos personales de los pacientes"
+        }
+      ]
     }
   }
 }

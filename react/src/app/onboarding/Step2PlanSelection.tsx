@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
+import { Modal } from '../../components/ui/Modal';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useRegion } from '../../contexts/RegionContext';
 import translations from './translation.json';
@@ -10,7 +11,9 @@ interface Step2Props {
     selectedPlan: string;
     couponCode?: string;
     termsAccepted: boolean;
-    lgpdAccepted: boolean;
+    lgpdAccepted?: boolean;
+    hipaaAccepted?: boolean;
+    adminAccepted: boolean;
   }) => void;
   onBack: () => void;
 }
@@ -22,10 +25,15 @@ export function Step2PlanSelection({ onNext, onBack }: Step2Props) {
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setCouponError] = useState('');
   const [couponSuccess, setCouponSuccess] = useState('');
-  const [termsAccepted, setTermsAccepted] = useState(false);
   const [lgpdAccepted, setLgpdAccepted] = useState(false);
+  const [hipaaAccepted, setHipaaAccepted] = useState(false);
+  const [adminAccepted, setAdminAccepted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [documentModal, setDocumentModal] = useState<{
+    isOpen: boolean;
+    type: 'lgpd' | 'hipaa' | 'admin' | null;
+  }>({ isOpen: false, type: null });
 
   const plans = currentRegion === 'BR' ? {
     basic: {
@@ -100,29 +108,42 @@ export function Step2PlanSelection({ onNext, onBack }: Step2Props) {
     setCouponError('');
     setCouponSuccess('');
 
-    const validCoupons = ['KROA10', 'DESCONTO15', 'PROMOCAO20'];
+    // Get valid coupons from translations
+    const validCoupons = t?.step2?.validCoupons || {
+      'DESCONTO10': { discount: 10, type: 'percentage' },
+      'PRIMEIRA50': { discount: 50, type: 'fixed' },
+      'TESTE30': { discount: 30, type: 'percentage' }
+    };
 
     if (!couponCode.trim()) {
-      setCouponError('Digite um código de cupom');
+      setCouponError(t?.step2?.couponInvalid || 'Digite um código de cupom');
       return;
     }
 
-    if (validCoupons.includes(couponCode.toUpperCase())) {
-      setCouponSuccess('Cupom aplicado com sucesso! 15% de desconto');
+    const coupon = validCoupons[couponCode.toUpperCase()];
+    if (coupon) {
+      const discountText = coupon.type === 'percentage'
+        ? `${coupon.discount}% de desconto`
+        : `R$ ${coupon.discount} de desconto`;
+      setCouponSuccess(t?.step2?.couponApplied?.replace('!', `! ${discountText}`) || `Cupom aplicado com sucesso! ${discountText}`);
     } else {
-      setCouponError('Cupom inválido ou expirado');
+      setCouponError(t?.step2?.couponInvalid || 'Cupom inválido ou expirado');
     }
   };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!termsAccepted) {
-      newErrors.terms = 'Você deve aceitar os termos de responsabilidade';
+    if (!adminAccepted) {
+      newErrors.admin = t?.step2?.termsRequired || 'Você deve aceitar os termos de responsabilidade';
     }
 
-    if (!lgpdAccepted) {
-      newErrors.lgpd = 'Você deve aceitar os termos da LGPD';
+    if (currentRegion === 'BR' && !lgpdAccepted) {
+      newErrors.lgpd = t?.step2?.termsRequired || 'Você deve aceitar os termos da LGPD';
+    }
+
+    if (currentRegion === 'US' && !hipaaAccepted) {
+      newErrors.hipaa = t?.step2?.termsRequired || 'You must accept the HIPAA terms';
     }
 
     setErrors(newErrors);
@@ -137,8 +158,10 @@ export function Step2PlanSelection({ onNext, onBack }: Step2Props) {
         onNext({
           selectedPlan,
           couponCode: couponSuccess ? couponCode : undefined,
-          termsAccepted,
-          lgpdAccepted
+          termsAccepted: true,
+          lgpdAccepted: currentRegion === 'BR' ? lgpdAccepted : undefined,
+          hipaaAccepted: currentRegion === 'US' ? hipaaAccepted : undefined,
+          adminAccepted
         });
         setIsLoading(false);
       }, 1000);
@@ -203,13 +226,13 @@ export function Step2PlanSelection({ onNext, onBack }: Step2Props) {
 
           {/* Coupon Section */}
           <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-semibold text-gray-900 mb-3">Tem um cupom de desconto?</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">{t?.step2?.coupon || 'Tem um cupom de desconto?'}</h3>
             <div className="flex gap-3">
               <div className="flex-1">
                 <Input
                   value={couponCode}
                   onChange={(value) => setCouponCode(value.toUpperCase())}
-                  placeholder="Digite seu código"
+                  placeholder={t?.step2?.couponPlaceholder || 'Digite seu código'}
                   error={couponError}
                 />
                 {couponSuccess && (
@@ -227,72 +250,107 @@ export function Step2PlanSelection({ onNext, onBack }: Step2Props) {
                 onClick={applyCoupon}
                 disabled={!couponCode.trim()}
               >
-                Aplicar
+                {t?.step2?.applyCoupon || 'Aplicar'}
               </Button>
             </div>
           </div>
 
           {/* Terms and Conditions */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-gray-900">Termos e Condições</h3>
+            <h3 className="font-semibold text-gray-900">{t?.step2?.termsSection || 'Termos e Condições'}</h3>
 
-            {/* LGPD Terms */}
-            <div className="border rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="lgpd-terms"
-                  checked={lgpdAccepted}
-                  onChange={(e) => setLgpdAccepted(e.target.checked)}
-                  className="mt-1 w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
-                />
-                <div className="flex-1">
-                  <label htmlFor="lgpd-terms" className="text-sm text-gray-700 cursor-pointer">
-                    Li e aceito os{' '}
+            {/* Data Protection Terms - LGPD (BR) or HIPAA (US) */}
+            {currentRegion === 'BR' && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="lgpd-terms"
+                    checked={lgpdAccepted}
+                    onChange={(e) => setLgpdAccepted(e.target.checked)}
+                    className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
+                  />
+                  <div className="flex-1">
+                    <label htmlFor="lgpd-terms" className="text-sm font-medium text-blue-900 cursor-pointer block">
+                      {t?.step2?.lgpdConsent || 'Aceito os termos da LGPD'}
+                    </label>
+                    <p className="text-xs text-blue-700 mt-1 leading-relaxed">
+                      {t?.step2?.lgpdDescription || 'Declaro estar ciente e concordo com os termos da Lei Geral de Proteção de Dados (LGPD) e autorizo o tratamento dos dados pessoais conforme descrito na política de privacidade.'}
+                    </p>
                     <button
                       type="button"
-                      className="text-krooa-green hover:underline font-medium"
-                      onClick={() => {
-                        // Abrir modal ou nova página com termos LGPD
-                        window.open('/termos-lgpd', '_blank');
-                      }}
+                      className="text-xs text-blue-600 underline mt-2 hover:text-blue-800 transition-colors"
+                      onClick={() => setDocumentModal({ isOpen: true, type: 'lgpd' })}
                     >
-                      Termos de Tratamento de Dados Pessoais (LGPD)
+                      {t?.step2?.viewLgpdDocument || 'Ver documento completo'} →
                     </button>
-                  </label>
-                  {errors.lgpd && (
-                    <p className="text-sm text-red-600 mt-1">{errors.lgpd}</p>
-                  )}
+                    {errors.lgpd && (
+                      <p className="text-sm text-red-600 mt-1">{errors.lgpd}</p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* HIPAA Terms for US */}
+            {currentRegion === 'US' && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="hipaa-terms"
+                    checked={hipaaAccepted}
+                    onChange={(e) => setHipaaAccepted(e.target.checked)}
+                    className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
+                  />
+                  <div className="flex-1">
+                    <label htmlFor="hipaa-terms" className="text-sm font-medium text-blue-900 cursor-pointer block">
+                      {t?.step2?.hipaaConsent || 'I accept the HIPAA terms'}
+                    </label>
+                    <p className="text-xs text-blue-700 mt-1 leading-relaxed">
+                      {t?.step2?.hipaaDescription || 'I acknowledge and agree to comply with the Health Insurance Portability and Accountability Act (HIPAA) requirements for protecting patient health information.'}
+                    </p>
+                    <button
+                      type="button"
+                      className="text-xs text-blue-600 underline mt-2 hover:text-blue-800 transition-colors"
+                      onClick={() => setDocumentModal({ isOpen: true, type: 'hipaa' })}
+                    >
+                      {t?.step2?.viewHipaaDocument || 'View full document'} →
+                    </button>
+                    {errors.hipaa && (
+                      <p className="text-sm text-red-600 mt-1">{errors.hipaa}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Admin Responsibility Terms */}
-            <div className="border rounded-lg p-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="admin-terms"
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                  className="mt-1 w-4 h-4 text-krooa-green rounded focus:ring-krooa-green"
+                  checked={adminAccepted}
+                  onChange={(e) => setAdminAccepted(e.target.checked)}
+                  className="mt-1 w-4 h-4 text-amber-600 bg-gray-100 border-gray-300 rounded focus:ring-amber-500 flex-shrink-0"
                 />
                 <div className="flex-1">
-                  <label htmlFor="admin-terms" className="text-sm text-gray-700 cursor-pointer">
-                    Li e aceito os{' '}
-                    <button
-                      type="button"
-                      className="text-krooa-green hover:underline font-medium"
-                      onClick={() => {
-                        // Abrir modal ou nova página com termos de responsabilidade
-                        window.open('/termos-responsabilidade', '_blank');
-                      }}
-                    >
-                      Termos de Responsabilidade do Usuário Administrador
-                    </button>
+                  <label htmlFor="admin-terms" className="text-sm font-medium text-amber-900 cursor-pointer block">
+                    {t?.step2?.adminResponsibility || 'Aceito as responsabilidades de usuário administrador'}
                   </label>
-                  {errors.terms && (
-                    <p className="text-sm text-red-600 mt-1">{errors.terms}</p>
+                  <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+                    {t?.step2?.adminResponsibilityDescription || 'Assumo total responsabilidade pelas configurações e dados inseridos no sistema, comprometendo-me a manter a segurança e confidencialidade das informações dos pacientes.'}
+                  </p>
+                  <button
+                    type="button"
+                    className="text-xs text-amber-600 underline mt-2 hover:text-amber-800 transition-colors"
+                    onClick={() => setDocumentModal({ isOpen: true, type: 'admin' })}
+                  >
+                    {t?.step2?.viewResponsibilityDocument || 'Ver termo de responsabilidade'} →
+                  </button>
+                  {errors.admin && (
+                    <p className="text-sm text-red-600 mt-1">{errors.admin}</p>
                   )}
                 </div>
               </div>
@@ -326,7 +384,7 @@ export function Step2PlanSelection({ onNext, onBack }: Step2Props) {
               onClick={onBack}
               className="flex-1"
             >
-              Voltar
+              {t?.common?.back || 'Voltar'}
             </Button>
             <Button
               type="submit"
@@ -337,15 +395,92 @@ export function Step2PlanSelection({ onNext, onBack }: Step2Props) {
               {isLoading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Carregando...
+                  {t?.common?.loading || 'Carregando...'}
                 </div>
               ) : (
-                'Continuar para pagamento'
+                t?.common?.next || 'Continuar'
               )}
             </Button>
           </div>
         </form>
       </div>
+
+      {/* Document Modal */}
+      <Modal
+        isOpen={documentModal.isOpen}
+        onClose={() => setDocumentModal({ isOpen: false, type: null })}
+        size="lg"
+      >
+        <div className="max-h-[80vh] overflow-y-auto">
+          {documentModal.type === 'lgpd' && t?.lgpdTerms && (
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">{t.lgpdTerms.title}</h2>
+              <p className="text-sm text-gray-500 mb-6">{t.lgpdTerms.lastUpdated}</p>
+              <div className="space-y-6">
+                {t.lgpdTerms.sections?.map((section: any, index: number) => (
+                  <div key={index}>
+                    <h3 className="font-semibold text-gray-900 mb-2">{section.title}</h3>
+                    <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{section.content}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {documentModal.type === 'hipaa' && t?.hipaaTerms && (
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">{t.hipaaTerms.title}</h2>
+              <p className="text-sm text-gray-500 mb-6">{t.hipaaTerms.lastUpdated}</p>
+              <div className="space-y-6">
+                {t.hipaaTerms.sections?.map((section: any, index: number) => (
+                  <div key={index}>
+                    <h3 className="font-semibold text-gray-900 mb-2">{section.title}</h3>
+                    <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{section.content}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {documentModal.type === 'admin' && t?.adminTerms && (
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">{t.adminTerms.title}</h2>
+              <p className="text-sm text-gray-500 mb-6">{t.adminTerms.lastUpdated}</p>
+              <div className="space-y-6">
+                {t.adminTerms.sections?.map((section: any, index: number) => (
+                  <div key={index}>
+                    <h3 className="font-semibold text-gray-900 mb-2">{section.title}</h3>
+                    <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{section.content}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="mt-6 flex gap-3">
+          <Button
+            variant="outline"
+            onClick={() => setDocumentModal({ isOpen: false, type: null })}
+            className="flex-1"
+          >
+            {t?.common?.cancel || 'Fechar'}
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              if (documentModal.type === 'lgpd') {
+                setLgpdAccepted(true);
+              } else if (documentModal.type === 'hipaa') {
+                setHipaaAccepted(true);
+              } else if (documentModal.type === 'admin') {
+                setAdminAccepted(true);
+              }
+              setDocumentModal({ isOpen: false, type: null });
+            }}
+            className="flex-1"
+          >
+            Aceitar Termos
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }
