@@ -64,8 +64,8 @@ export function OnboardingLayout({
       {/* Main Content */}
       <main className="flex-1 flex">
         {/* Sidebar motivacional - apenas desktop */}
-        <div className="hidden xl:flex xl:w-1/2 bg-gradient-to-br from-krooa-green to-krooa-blue p-12 items-center justify-center">
-          <div className="max-w-lg text-white">
+        <div className="hidden xl:flex xl:w-1/2 bg-gradient-to-br from-krooa-green to-krooa-blue p-12 justify-center">
+          <div className="max-w-lg text-white sticky top-[10%] h-fit">
             <div className="mb-8">
               <h2 className="text-3xl font-bold mb-4">
                 {t?.layout?.sidebarTitle || 'Você está a alguns passos de transformar sua clínica'}

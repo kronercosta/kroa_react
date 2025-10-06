@@ -123,17 +123,30 @@ const regionConfigs: Record<RegionType, RegionConfig> = {
 export function RegionProvider({ children }: { children: React.ReactNode }) {
   // Busca região da variável de ambiente ou localStorage
   const envRegion = (import.meta.env.VITE_CLINIC_REGION || 'BR') as RegionType;
-  const storedRegion = localStorage.getItem('clinic_region') as RegionType;
-  const initialRegion = storedRegion || (regionConfigs[envRegion] ? envRegion : 'BR');
+  const storedRegion = localStorage.getItem('krooa_region') as RegionType;
+
+  // Se há variável de ambiente definida, dar prioridade sobre localStorage
+  const initialRegion = envRegion && regionConfigs[envRegion] ? envRegion : (storedRegion || 'BR');
+
+  // Limpar chave antiga e forçar uso da variável de ambiente se definida
+  localStorage.removeItem('clinic_region'); // Remover chave antiga
+  if (envRegion && envRegion !== storedRegion) {
+    localStorage.setItem('krooa_region', envRegion);
+  }
 
   const [currentRegion, setCurrentRegion] = useState<RegionType>(initialRegion);
   const [config, setConfig] = useState<RegionConfig>(regionConfigs[initialRegion]);
+
+  // Garantir que config está sincronizado com currentRegion
+  if (config.region !== currentRegion) {
+    setConfig(regionConfigs[currentRegion]);
+  }
 
   const setRegion = (region: RegionType) => {
     if (regionConfigs[region]) {
       setCurrentRegion(region);
       setConfig(regionConfigs[region]);
-      localStorage.setItem('clinic_region', region);
+      localStorage.setItem('krooa_region', region);
 
       // Force page refresh to ensure all components update with new region
       setTimeout(() => {

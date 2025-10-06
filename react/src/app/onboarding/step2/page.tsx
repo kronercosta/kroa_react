@@ -11,7 +11,7 @@ import translations from '../translation.json';
 export default function Step2Page() {
   const navigate = useNavigate();
   const { t } = useTranslation(translations);
-  const { currentRegion } = useRegion();
+  const { currentRegion, formatCurrency } = useRegion();
   const [selectedPlan, setSelectedPlan] = useState('professional');
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setCouponError] = useState('');
@@ -26,10 +26,25 @@ export default function Step2Page() {
     type: 'lgpd' | 'hipaa' | 'admin' | null;
   }>({ isOpen: false, type: null });
 
-  const plans = currentRegion === 'BR' ? {
+  // Aguardar carregamento das traduções
+  if (!t || !t.step2) {
+    return (
+      <OnboardingLayout currentStep={2} totalSteps={5} showProgress={true}>
+        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+          <div className="w-6 h-6 border-2 border-krooa-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p>Carregando...</p>
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Usar valores baseados na região
+  const regionPricing = currentRegion === 'BR' ? [149.90, 299.90, 599.90] : [49.00, 99.00, 199.00];
+
+  const plans = {
     basic: {
       name: t?.step2?.plans?.basic?.name || 'Básico',
-      price: t?.step2?.plans?.basic?.price || 'R$ 149,90',
+      price: formatCurrency(regionPricing[0]),
       period: t?.step2?.plans?.basic?.period || '/mês',
       features: t?.step2?.plans?.basic?.features || [
         'Até 2 profissionais',
@@ -39,7 +54,7 @@ export default function Step2Page() {
     },
     professional: {
       name: t?.step2?.plans?.professional?.name || 'Profissional',
-      price: t?.step2?.plans?.professional?.price || 'R$ 299,90',
+      price: formatCurrency(regionPricing[1]),
       period: t?.step2?.plans?.professional?.period || '/mês',
       features: t?.step2?.plans?.professional?.features || [
         'Até 5 profissionais',
@@ -50,7 +65,7 @@ export default function Step2Page() {
     },
     enterprise: {
       name: t?.step2?.plans?.enterprise?.name || 'Empresarial',
-      price: t?.step2?.plans?.enterprise?.price || 'R$ 599,90',
+      price: formatCurrency(regionPricing[2]),
       period: t?.step2?.plans?.enterprise?.period || '/mês',
       features: t?.step2?.plans?.enterprise?.features || [
         'Profissionais ilimitados',
@@ -59,50 +74,28 @@ export default function Step2Page() {
         'API completa'
       ]
     }
-  } : {
-    basic: {
-      name: 'Starter',
-      price: '$49.00',
-      period: '/month',
-      features: [
-        'Up to 2 providers',
-        'Basic scheduling',
-        'Simple reports'
-      ]
-    },
-    professional: {
-      name: 'Professional',
-      price: '$99.00',
-      period: '/month',
-      features: [
-        'Up to 5 providers',
-        'Advanced scheduling',
-        'Detailed reports',
-        'Cost centers',
-        'Insurance billing'
-      ]
-    },
-    enterprise: {
-      name: 'Enterprise',
-      price: '$199.00',
-      period: '/month',
-      features: [
-        'Unlimited providers',
-        'Multiple locations',
-        'HIPAA compliant',
-        'Full API access'
-      ]
-    }
   };
 
   const applyCoupon = () => {
     setCouponError('');
     setCouponSuccess('');
 
-    // Get valid coupons from translations
-    const validCoupons = t?.step2?.validCoupons || {
+    // Get valid coupons based on region - valores ajustados por região
+    const validCoupons = currentRegion === 'BR' ? {
       'DESCONTO10': { discount: 10, type: 'percentage' },
       'PRIMEIRA50': { discount: 50, type: 'fixed' },
+      'TESTE30': { discount: 30, type: 'percentage' },
+      // Aceitar cupons em inglês para região BR
+      'DISCOUNT10': { discount: 10, type: 'percentage' },
+      'FIRST50': { discount: 50, type: 'fixed' },
+      'TEST30': { discount: 30, type: 'percentage' }
+    } : {
+      'DISCOUNT10': { discount: 10, type: 'percentage' },
+      'FIRST50': { discount: 15, type: 'fixed' },
+      'TEST30': { discount: 30, type: 'percentage' },
+      // Aceitar cupons em português para região US
+      'DESCONTO10': { discount: 10, type: 'percentage' },
+      'PRIMEIRA50': { discount: 15, type: 'fixed' },
       'TESTE30': { discount: 30, type: 'percentage' }
     };
 
@@ -111,12 +104,12 @@ export default function Step2Page() {
       return;
     }
 
-    const coupon = validCoupons[couponCode.toUpperCase()];
+    const coupon = validCoupons[couponCode.toUpperCase() as keyof typeof validCoupons];
     if (coupon) {
       const discountText = coupon.type === 'percentage'
-        ? `${coupon.discount}% de desconto`
-        : `R$ ${coupon.discount} de desconto`;
-      setCouponSuccess(t?.step2?.couponApplied?.replace('!', `! ${discountText}`) || `Cupom aplicado com sucesso! ${discountText}`);
+        ? `${coupon.discount}% ${t?.step2?.discountText || 'discount'}`
+        : `${formatCurrency(coupon.discount)}`;
+      setCouponSuccess(t?.step2?.couponApplied?.replace('!', `! ${discountText}`) || `${t?.step2?.couponAppliedSuccess || 'Coupon applied successfully!'} ${discountText}`);
     } else {
       setCouponError(t?.step2?.couponInvalid || 'Cupom inválido ou expirado');
     }
@@ -475,7 +468,7 @@ export default function Step2Page() {
               }}
               className="flex-1"
             >
-              Aceitar Termos
+              {t?.step2?.acceptTerms || 'Aceitar Termos'}
             </Button>
           </div>
         </Modal>

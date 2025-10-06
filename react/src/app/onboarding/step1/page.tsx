@@ -26,6 +26,18 @@ export default function Step1Page() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
 
+  // Aguardar carregamento das traduções
+  if (!t || !t.step1) {
+    return (
+      <OnboardingLayout currentStep={1} totalSteps={5} showProgress={true}>
+        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+          <div className="w-6 h-6 border-2 border-krooa-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p>Loading...</p>
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
   const handleNext = (data: {
     name: string;
     email: string;
@@ -168,7 +180,6 @@ export default function Step1Page() {
             label={t?.step1?.name || 'Nome completo'}
             value={formData.name}
             onChange={(value) => setFormData(prev => ({ ...prev, name: value }))}
-            placeholder={t?.step1?.namePlaceholder || 'Digite seu nome completo'}
             error={errors.name}
             required
             fullWidth
@@ -179,7 +190,6 @@ export default function Step1Page() {
             type="email"
             value={formData.email}
             onChange={(value) => setFormData(prev => ({ ...prev, email: value }))}
-            placeholder={currentRegion === 'BR' ? (t?.step1?.emailPlaceholder || 'Digite seu melhor e-mail') : (t?.step1?.emailPlaceholderUS || 'Enter your best email')}
             error={errors.email}
             required
             fullWidth
@@ -193,7 +203,6 @@ export default function Step1Page() {
             onChange={(value) => {
               setFormData(prev => ({ ...prev, phone: value }));
             }}
-            placeholder={currentRegion === 'BR' ? (t?.step1?.phonePlaceholder || '') : (t?.step1?.phonePlaceholderUS || 'Enter your best phone number')}
             error={errors.phone}
             required
             fullWidth
@@ -233,21 +242,17 @@ export default function Step1Page() {
               </svg>
               <span>{t?.step1?.security?.dataProtected || 'Dados Protegidos'}</span>
             </div>
-            {currentRegion === 'BR' ? (
-              <div className="flex items-center gap-1">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>{t?.step1?.security?.lgpdCompliant || 'LGPD Conformidade'}</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>{t?.step1?.security?.hipaaCompliant || 'HIPAA Compliant'}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-1">
+              <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span>
+                {currentRegion === 'BR'
+                  ? (t?.step1?.security?.lgpdCompliant || 'LGPD Compliant')
+                  : (t?.step1?.security?.hipaaCompliant || 'HIPAA Compliant')
+                }
+              </span>
+            </div>
           </div>
         </div>
       </div>
