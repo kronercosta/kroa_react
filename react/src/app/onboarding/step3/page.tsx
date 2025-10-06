@@ -12,7 +12,7 @@ export default function Step3Page() {
       expiry: string;
       cvv: string;
     };
-    paymentMethod: 'card' | 'google_pay' | 'stripe_link';
+    paymentMethod: 'card' | 'google_pay' | 'stripe_link' | 'boleto';
   }) => {
     // Armazenar dados no sessionStorage
     const onboardingData = JSON.parse(sessionStorage.getItem('onboardingData') || '{}');

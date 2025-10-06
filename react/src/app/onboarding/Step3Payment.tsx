@@ -3,6 +3,7 @@ import { Input } from '../../components/ui/Input';
 import { EnhancedInput } from '../../components/ui/EnhancedInput';
 import { Button } from '../../components/ui/Button';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useRegion } from '../../contexts/RegionContext';
 import translations from './translation.json';
 
 interface Step3Props {
@@ -13,7 +14,7 @@ interface Step3Props {
       expiry: string;
       cvv: string;
     };
-    paymentMethod: 'card' | 'google_pay' | 'stripe_link';
+    paymentMethod: 'card' | 'google_pay' | 'stripe_link' | 'boleto';
   }) => void;
   onBack: () => void;
   planData?: {
@@ -24,6 +25,7 @@ interface Step3Props {
 
 export function Step3Payment({ onNext, onBack, planData }: Step3Props) {
   const { t } = useTranslation(translations);
+  const { currentRegion } = useRegion();
   const [cardData, setCardData] = useState({
     number: '',
     name: '',
@@ -32,6 +34,7 @@ export function Step3Payment({ onNext, onBack, planData }: Step3Props) {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'card' | 'boleto'>('card');
 
   const validateCard = () => {
     const newErrors: Record<string, string> = {};
@@ -84,7 +87,7 @@ export function Step3Payment({ onNext, onBack, planData }: Step3Props) {
     return numbers;
   };
 
-  const handleAlternativePayment = (method: 'google_pay' | 'stripe_link') => {
+  const handleAlternativePayment = (method: 'google_pay' | 'stripe_link' | 'boleto') => {
     setIsLoading(true);
 
     if (method === 'google_pay') {
@@ -114,6 +117,21 @@ export function Step3Payment({ onNext, onBack, planData }: Step3Props) {
             cvv: '***'
           },
           paymentMethod: 'stripe_link'
+        });
+        setIsLoading(false);
+      }, 1500);
+    } else if (method === 'boleto') {
+      // Gerar boleto bancário
+      setTimeout(() => {
+        alert('Boleto gerado! Você receberá o boleto por e-mail e poderá visualizar/imprimir na próxima tela.');
+        onNext({
+          cardData: {
+            number: '**** **** **** BOLETO',
+            name: 'Boleto Bancário',
+            expiry: '**/**',
+            cvv: '***'
+          },
+          paymentMethod: 'boleto'
         });
         setIsLoading(false);
       }, 1500);
@@ -172,6 +190,70 @@ export function Step3Payment({ onNext, onBack, planData }: Step3Props) {
           </div>
         </div>
 
+        {/* Payment Method Selection - Only for BR */}
+        {currentRegion === 'BR' && (
+          <div className="mb-6">
+            <h3 className="font-semibold text-gray-900 mb-4">{t?.step2?.paymentMethod || 'Forma de pagamento'}</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                className={`p-4 border-2 rounded-lg text-left transition-all ${
+                  selectedPaymentMethod === 'card'
+                    ? 'border-krooa-green bg-krooa-green/5'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => setSelectedPaymentMethod('card')}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className={`w-4 h-4 rounded-full border-2 ${
+                    selectedPaymentMethod === 'card'
+                      ? 'border-krooa-green bg-krooa-green'
+                      : 'border-gray-300'
+                  }`}>
+                    {selectedPaymentMethod === 'card' && (
+                      <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                    )}
+                  </div>
+                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M2 4h20c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H2c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v2h20V6H2zm0 10h20v-6H2v6z"/>
+                  </svg>
+                  <span className="font-medium text-gray-900">{t?.step2?.creditCard || 'Cartão de Crédito'}</span>
+                </div>
+                <p className="text-sm text-gray-600 ml-7">{t?.step2?.creditCardDescription || 'Débito imediato • Aprovação instantânea'}</p>
+              </button>
+
+              <button
+                type="button"
+                className={`p-4 border-2 rounded-lg text-left transition-all ${
+                  selectedPaymentMethod === 'boleto'
+                    ? 'border-krooa-green bg-krooa-green/5'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => setSelectedPaymentMethod('boleto')}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className={`w-4 h-4 rounded-full border-2 ${
+                    selectedPaymentMethod === 'boleto'
+                      ? 'border-krooa-green bg-krooa-green'
+                      : 'border-gray-300'
+                  }`}>
+                    {selectedPaymentMethod === 'boleto' && (
+                      <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                    )}
+                  </div>
+                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                  </svg>
+                  <span className="font-medium text-gray-900">{t?.step2?.boleto || 'Boleto Bancário'}</span>
+                </div>
+                <p className="text-sm text-gray-600 ml-7">{t?.step2?.boletoDescription || 'Vencimento 3 dias • Aprovação em 1-2 dias úteis'}</p>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Card Payment Form */}
+        {(currentRegion !== 'BR' || selectedPaymentMethod === 'card') && (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="mb-6">
             <h3 className="font-semibold text-gray-900 mb-2">
@@ -245,6 +327,8 @@ export function Step3Payment({ onNext, onBack, planData }: Step3Props) {
               <span className="text-sm text-gray-500 bg-white px-3">ou escolha outra forma de pagamento</span>
             </div>
 
+            {/* Show Google Pay and Stripe Link only for card payments */}
+            {(currentRegion !== 'BR' || selectedPaymentMethod === 'card') && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
               <button
                 type="button"
@@ -280,38 +364,69 @@ export function Step3Payment({ onNext, onBack, planData }: Step3Props) {
               </p>
             </div>
           </div>
-
-          <div className="flex gap-3 mt-8">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onBack}
-              className="flex-1"
-            >
-              Voltar
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={isLoading}
-              className="flex-1"
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Carregando...
-                </div>
-              ) : (
-                <>
-                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clipRule="evenodd" />
-                  </svg>
-                  Finalizar
-                </>
-              )}
-            </Button>
-          </div>
+          )}
         </form>
+        )}
+
+        {/* Boleto Payment Option */}
+        {currentRegion === 'BR' && selectedPaymentMethod === 'boleto' && (
+          <div className="space-y-6">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-medium text-amber-900 mb-1">{t?.step2?.boleto || 'Boleto Bancário'}</h4>
+                  <div className="text-sm text-amber-700 space-y-2">
+                    {(t?.step2?.boletoDetails || [
+                      'O boleto será gerado após a confirmação',
+                      'Vencimento em 3 dias corridos',
+                      'Acesso liberado em 1-2 dias úteis após o pagamento',
+                      'Você receberá o boleto por e-mail e poderá imprimir'
+                    ]).map((detail: string, index: number) => (
+                      <p key={index}>• {detail}</p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onBack}
+                className="flex-1"
+              >
+                Voltar
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => handleAlternativePayment('boleto')}
+                disabled={isLoading}
+                className="flex-1"
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    {t?.step2?.generatingBoleto || 'Gerando boleto...'}
+                  </div>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                    </svg>
+                    {t?.step2?.generateBoleto || 'Gerar Boleto'}
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
