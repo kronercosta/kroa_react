@@ -16,7 +16,12 @@ export function OnboardingLayout({
   totalSteps,
   showProgress = true
 }: OnboardingLayoutProps) {
-  const { t } = useTranslation(translations);
+  const { t, currentLanguage } = useTranslation(translations);
+
+  // Debug temporário
+  console.log('OnboardingLayout - Idioma atual:', currentLanguage);
+  console.log('OnboardingLayout - Traduções disponíveis:', Object.keys(translations));
+  console.log('OnboardingLayout - Tradução carregada:', t?.layout?.sidebarTitle);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-krooa-green/5 to-blue-50 flex flex-col">

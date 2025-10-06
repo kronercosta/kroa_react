@@ -76,10 +76,14 @@ const regionConfigs: Record<RegionCode, RegionConfig> = {
 export function useTranslation(translationsObject?: Record<LanguageCode, Translations>) {
   const { currentRegion } = useRegion();
 
-  // Idioma independente da região - carregado do localStorage
+  // Idioma baseado na região por padrão, mas pode ser alterado independentemente
   const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>(() => {
     const savedLanguage = localStorage.getItem('krooa_language') as LanguageCode;
-    return savedLanguage && ['PT', 'EN', 'ES'].includes(savedLanguage) ? savedLanguage : 'PT';
+    if (savedLanguage && ['PT', 'EN', 'ES'].includes(savedLanguage)) {
+      return savedLanguage;
+    }
+    // Se não há idioma salvo, usar baseado na região
+    return currentRegion === 'US' ? 'EN' : 'PT';
   });
 
   const [translations, setTranslations] = useState<Translations>({});
@@ -90,6 +94,17 @@ export function useTranslation(translationsObject?: Record<LanguageCode, Transla
       setTranslations(translationsObject[currentLanguage]);
     }
   }, [translationsObject, currentLanguage]);
+
+  // Atualizar idioma automaticamente quando a região mudar (apenas se não há preferência salva)
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('krooa_language');
+    if (!savedLanguage) {
+      const newLanguage = currentRegion === 'US' ? 'EN' : 'PT';
+      if (newLanguage !== currentLanguage) {
+        setCurrentLanguage(newLanguage);
+      }
+    }
+  }, [currentRegion, currentLanguage]);
 
   // Função para mudar idioma e salvar no localStorage
   const changeLanguage = (language: LanguageCode) => {
