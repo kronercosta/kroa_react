@@ -360,10 +360,10 @@ export function Step2Subscription({ onNext, onBack }: Step2Props) {
             <span>{t?.step2?.securityNote || '🔒 Seus dados estão seguros e criptografados'}</span>
           </div>
 
-          {/* Payment Methods */}
+          {/* Alternative Payment Methods */}
           <div className="mt-6 pt-6 border-t border-gray-200">
             <div className="text-center mb-4">
-              <span className="text-sm text-gray-500 bg-white px-3">ou pague com</span>
+              <span className="text-sm text-gray-500 bg-white px-3">ou escolha outra forma de pagamento</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
@@ -371,20 +371,15 @@ export function Step2Subscription({ onNext, onBack }: Step2Props) {
                 type="button"
                 className="flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 onClick={() => {
-                  // Simular checkout com Google Pay
+                  // Redirecionar para Stripe Checkout com Google Pay habilitado
                   setIsLoading(true);
+                  // Simular redirecionamento para Stripe Checkout
                   setTimeout(() => {
-                    onNext({
-                      selectedPlan,
-                      cardData: {
-                        number: '**** **** **** 1234',
-                        name: 'Google Pay',
-                        expiry: '**/**',
-                        cvv: '***'
-                      }
-                    });
+                    // URL seria algo como: https://checkout.stripe.com/c/pay/cs_test_...
+                    // com payment_method_types: ['card', 'google_pay']
+                    window.open('https://checkout.stripe.com/demo', '_blank');
                     setIsLoading(false);
-                  }, 2000);
+                  }, 1000);
                 }}
               >
                 <svg className="w-6 h-6" viewBox="0 0 24 24">
@@ -400,15 +395,26 @@ export function Step2Subscription({ onNext, onBack }: Step2Props) {
                 type="button"
                 className="flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 onClick={() => {
-                  // Simular integração com Stripe
-                  window.open('https://checkout.stripe.com/demo', '_blank');
+                  // Redirecionar para Stripe Link (pagamento por SMS/email)
+                  setIsLoading(true);
+                  setTimeout(() => {
+                    // Simular envio de link de pagamento
+                    alert('Link de pagamento enviado! Verifique seu email ou SMS para completar o pagamento.');
+                    setIsLoading(false);
+                  }, 1500);
                 }}
               >
-                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#635BFF">
-                  <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/>
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#00D924">
+                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.568 8.16l-6.222 6.222a.749.749 0 01-1.06 0L7.432 11.53a.75.75 0 111.061-1.061l2.323 2.323L16.507 7.1a.75.75 0 111.061 1.06z"/>
                 </svg>
-                <span className="font-medium text-gray-700">Stripe</span>
+                <span className="font-medium text-gray-700">Stripe Link</span>
               </button>
+            </div>
+
+            <div className="text-center">
+              <p className="text-xs text-gray-500">
+                Processado com segurança pela Stripe • Todos os métodos são criptografados
+              </p>
             </div>
           </div>
 
@@ -433,7 +439,12 @@ export function Step2Subscription({ onNext, onBack }: Step2Props) {
                   {t?.common?.loading || 'Carregando...'}
                 </div>
               ) : (
-                t?.step2?.startTrial || 'Iniciar teste grátis'
+                <>
+                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clipRule="evenodd" />
+                  </svg>
+                  {t?.step2?.startTrial || 'Pagar com Stripe'}
+                </>
               )}
             </Button>
           </div>
