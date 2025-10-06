@@ -110,19 +110,19 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
           <button
             className={`p-6 border-2 rounded-xl text-left transition-all ${
               wantsGuidedTour
-                ? 'border-krooa-green bg-krooa-green/5'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-krooa-green bg-krooa-green/10 shadow-md'
+                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
             }`}
             onClick={() => setWantsGuidedTour(true)}
           >
             <div className="flex items-start gap-4">
-              <div className={`w-6 h-6 rounded-full border-2 mt-1 ${
+              <div className={`w-6 h-6 rounded-full border-2 mt-1 transition-all ${
                 wantsGuidedTour
-                  ? 'border-krooa-green bg-krooa-green'
+                  ? 'border-krooa-green bg-krooa-green shadow-sm'
                   : 'border-gray-300'
               }`}>
                 {wantsGuidedTour && (
-                  <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                  <div className="w-3 h-3 rounded-full bg-white m-0.5"></div>
                 )}
               </div>
               <div>
@@ -140,19 +140,19 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
           <button
             className={`p-6 border-2 rounded-xl text-left transition-all ${
               !wantsGuidedTour
-                ? 'border-krooa-green bg-krooa-green/5'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-krooa-green bg-krooa-green/10 shadow-md'
+                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
             }`}
             onClick={() => setWantsGuidedTour(false)}
           >
             <div className="flex items-start gap-4">
-              <div className={`w-6 h-6 rounded-full border-2 mt-1 ${
+              <div className={`w-6 h-6 rounded-full border-2 mt-1 transition-all ${
                 !wantsGuidedTour
-                  ? 'border-krooa-green bg-krooa-green'
+                  ? 'border-krooa-green bg-krooa-green shadow-sm'
                   : 'border-gray-300'
               }`}>
                 {!wantsGuidedTour && (
-                  <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                  <div className="w-3 h-3 rounded-full bg-white m-0.5"></div>
                 )}
               </div>
               <div>
@@ -175,12 +175,11 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
     <div className="space-y-8">
       <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          🎯 Sistema de Estágios Evolutivos
+          🎮 Sistema de Níveis Progressivos
         </h1>
         <p className="text-gray-600 max-w-3xl mx-auto">
-          Nossa implementação segue um cronograma específico. Cada estágio libera recursos
-          avançados baseado no seu progresso. Isso garante que a inteligência do sistema
-          funcione corretamente.
+          Como em um jogo, você evolui conforme domina cada funcionalidade. Cada nível desbloqueia
+          novos recursos e poderes especiais para sua clínica.
         </p>
       </div>
 
@@ -192,12 +191,11 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
             </svg>
           </div>
           <div>
-            <h3 className="font-semibold text-blue-900 mb-2">Por que funciona assim?</h3>
+            <h3 className="font-semibold text-blue-900 mb-2">Por que funciona como um jogo?</h3>
             <p className="text-sm text-blue-800 leading-relaxed">
-              Quando a agenda é usada de forma consistente, os alertas funcionam.
-              Quando os alertas funcionam, as evoluções fazem sentido. Uma coisa está
-              conectada à outra. <strong>Em apenas 7 dias</strong> você consegue atingir
-              os requisitos para subir de nível.
+              Você ganha XP usando o sistema consistentemente. Quanto mais você pratica,
+              mais rápido evolui. <strong>Em apenas 7 dias</strong> de uso ativo você pode
+              fazer seu primeiro Level Up!
             </p>
           </div>
         </div>
@@ -205,17 +203,18 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
 
       <div className="grid gap-4 max-w-6xl mx-auto">
         {stages.map((stage, index) => (
-          <div key={stage.id} className={`border-2 rounded-xl p-6 transition-all ${stage.lightColor}`}>
+          <div key={stage.id} className={`border-2 rounded-xl p-6 transition-all hover:shadow-md ${stage.lightColor} border-gray-200`}>
             <div className="flex items-start gap-4">
-              <div className={`w-12 h-12 ${stage.color} rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0`}>
-                E{stage.id}
+              <div className={`w-14 h-14 ${stage.color} rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0 shadow-sm`}>
+                <span className="text-lg">{stage.icon}</span>
+                <span className="text-sm ml-1">{stage.shortName}</span>
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h3 className="text-xl font-bold text-gray-900">{stage.name}</h3>
                   <div className="flex gap-1">
                     {[1, 2, 3].map((star) => (
-                      <svg key={star} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                      <svg key={star} className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                       </svg>
                     ))}
@@ -224,16 +223,16 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
                 <p className="text-gray-600 mb-3">{stage.description}</p>
                 <div className="flex flex-wrap gap-2">
                   {stage.goals.map((goal, goalIndex) => (
-                    <span key={goalIndex} className={`px-3 py-1 ${stage.textColor} ${stage.lightColor} border border-current rounded-full text-xs font-medium`}>
+                    <span key={goalIndex} className={`px-3 py-1 ${stage.textColor} bg-white/80 border border-current rounded-full text-xs font-medium shadow-sm`}>
                       {goal}
                     </span>
                   ))}
                 </div>
                 <div className="mt-3 flex items-center gap-2 text-sm text-gray-500">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
-                  {stage.blocks} blocos de treinamento • Avaliação automática toda segunda-feira
+                  {stage.blocks} missões de treinamento • Level Up automático toda segunda-feira
                 </div>
               </div>
             </div>
@@ -249,11 +248,10 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
             </svg>
           </div>
           <div>
-            <h3 className="font-semibold text-amber-900 mb-2">⚡ Progressão Rápida</h3>
+            <h3 className="font-semibold text-amber-900 mb-2">⚡ Level Up Rápido</h3>
             <p className="text-sm text-amber-800">
-              O processo é rápido! Em apenas 7 dias você já consegue atingir os requisitos
-              para subir de nível. Cada estágio é avaliado automaticamente toda segunda-feira
-              baseado no seu uso dos últimos 7 dias.
+              É possível evoluir rapidamente! Use o sistema por 7 dias consecutivos e você já pode
+              fazer seu primeiro Level Up. Sua evolução é calculada automaticamente toda segunda-feira.
             </p>
           </div>
         </div>
@@ -276,19 +274,19 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
         <button
           className={`p-6 border-2 rounded-xl text-left transition-all ${
             dataMigration === 'yes'
-              ? 'border-green-500 bg-green-50'
-              : 'border-gray-200 hover:border-gray-300'
+              ? 'border-emerald-500 bg-emerald-50 shadow-md'
+              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
           }`}
           onClick={() => setDataMigration('yes')}
         >
           <div className="flex items-start gap-4">
-            <div className={`w-6 h-6 rounded-full border-2 mt-1 ${
+            <div className={`w-6 h-6 rounded-full border-2 mt-1 transition-all ${
               dataMigration === 'yes'
-                ? 'border-green-500 bg-green-500'
+                ? 'border-emerald-500 bg-emerald-500 shadow-sm'
                 : 'border-gray-300'
             }`}>
               {dataMigration === 'yes' && (
-                <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                <div className="w-3 h-3 rounded-full bg-white m-0.5"></div>
               )}
             </div>
             <div>
@@ -306,19 +304,19 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
         <button
           className={`p-6 border-2 rounded-xl text-left transition-all ${
             dataMigration === 'no'
-              ? 'border-blue-500 bg-blue-50'
-              : 'border-gray-200 hover:border-gray-300'
+              ? 'border-blue-500 bg-blue-50 shadow-md'
+              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
           }`}
           onClick={() => setDataMigration('no')}
         >
           <div className="flex items-start gap-4">
-            <div className={`w-6 h-6 rounded-full border-2 mt-1 ${
+            <div className={`w-6 h-6 rounded-full border-2 mt-1 transition-all ${
               dataMigration === 'no'
-                ? 'border-blue-500 bg-blue-500'
+                ? 'border-blue-500 bg-blue-500 shadow-sm'
                 : 'border-gray-300'
             }`}>
               {dataMigration === 'no' && (
-                <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                <div className="w-3 h-3 rounded-full bg-white m-0.5"></div>
               )}
             </div>
             <div>
@@ -336,19 +334,19 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
         <button
           className={`p-6 border-2 rounded-xl text-left transition-all ${
             dataMigration === 'later'
-              ? 'border-amber-500 bg-amber-50'
-              : 'border-gray-200 hover:border-gray-300'
+              ? 'border-amber-500 bg-amber-50 shadow-md'
+              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
           }`}
           onClick={() => setDataMigration('later')}
         >
           <div className="flex items-start gap-4">
-            <div className={`w-6 h-6 rounded-full border-2 mt-1 ${
+            <div className={`w-6 h-6 rounded-full border-2 mt-1 transition-all ${
               dataMigration === 'later'
-                ? 'border-amber-500 bg-amber-500'
+                ? 'border-amber-500 bg-amber-500 shadow-sm'
                 : 'border-gray-300'
             }`}>
               {dataMigration === 'later' && (
-                <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                <div className="w-3 h-3 rounded-full bg-white m-0.5"></div>
               )}
             </div>
             <div>
@@ -365,16 +363,16 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
       </div>
 
       {dataMigration === 'yes' && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-6 max-w-2xl mx-auto">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6 max-w-2xl mx-auto">
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+            <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
             </div>
             <div>
-              <h3 className="font-semibold text-green-900 mb-2">Ótima escolha!</h3>
-              <p className="text-sm text-green-800">
+              <h3 className="font-semibold text-emerald-900 mb-2">Ótima escolha!</h3>
+              <p className="text-sm text-emerald-800">
                 Nossa equipe entrará em contato nas próximas 24h para agendar a migração.
                 Enquanto isso, você pode começar a configurar sua conta.
               </p>
