@@ -8,7 +8,6 @@ interface WelcomeFirstExperienceProps {
   onNext: (data: {
     wantsGuidedTour: boolean;
     dataMigration: 'yes' | 'no' | 'later';
-    currentStage: number;
   }) => void;
   onSkip: () => void;
 }
@@ -16,42 +15,50 @@ interface WelcomeFirstExperienceProps {
 const stages = [
   {
     id: 1,
-    name: 'Desorganizado',
-    description: 'Configuração básica do sistema',
+    name: 'Iniciante',
+    shortName: 'LV1',
+    description: 'Primeiros passos no sistema',
     color: 'bg-red-500',
     lightColor: 'bg-red-50',
     textColor: 'text-red-600',
-    goals: ['60% evolução de status', '85% evolução de procedimentos', '95% alertas de continuidade'],
+    icon: '🥉',
+    goals: ['Cadastrar pacientes', 'Agendar consultas', 'Usar agenda básica'],
     blocks: 4
   },
   {
     id: 2,
-    name: 'Básico',
-    description: 'Integração entre processos',
+    name: 'Explorando',
+    shortName: 'LV2',
+    description: 'Dominando o básico',
     color: 'bg-orange-500',
     lightColor: 'bg-orange-50',
     textColor: 'text-orange-600',
-    goals: ['5% outras evoluções', '40% com orçamento', '5% CRM agendamentos'],
+    icon: '🥈',
+    goals: ['Procedimentos avançados', 'Orçamentos digitais', 'Alertas automáticos'],
     blocks: 4
   },
   {
     id: 3,
-    name: 'Consistente',
-    description: 'Controle financeiro integrado',
+    name: 'Profissional',
+    shortName: 'LV3',
+    description: 'Sistema otimizado',
     color: 'bg-blue-500',
     lightColor: 'bg-blue-50',
     textColor: 'text-blue-600',
-    goals: ['50% orçamentos vinculados', '50% transações com nota', 'Integração completa'],
+    icon: '🥇',
+    goals: ['Controle financeiro', 'Relatórios detalhados', 'Integração completa'],
     blocks: 4
   },
   {
     id: 4,
-    name: 'Alta Performance',
-    description: 'Motor de crescimento escalável',
-    color: 'bg-green-500',
-    lightColor: 'bg-green-50',
-    textColor: 'text-green-600',
-    goals: ['Metas financeiras', 'DRE em tempo real', 'Marketing integrado'],
+    name: 'Mestre',
+    shortName: 'LV4',
+    description: 'Clínica de elite',
+    color: 'bg-purple-500',
+    lightColor: 'bg-purple-50',
+    textColor: 'text-purple-600',
+    icon: '💎',
+    goals: ['IA avançada', 'Marketing automático', 'Crescimento escalável'],
     blocks: 4
   }
 ];
@@ -62,20 +69,17 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
   const [currentStep, setCurrentStep] = useState(1);
   const [wantsGuidedTour, setWantsGuidedTour] = useState(true);
   const [dataMigration, setDataMigration] = useState<'yes' | 'no' | 'later'>('no');
-  const [selectedStage, setSelectedStage] = useState(1);
 
   const handleNext = () => {
     if (currentStep === 1) {
       setCurrentStep(2);
     } else if (currentStep === 2) {
       setCurrentStep(3);
-    } else if (currentStep === 3) {
-      setCurrentStep(4);
     } else {
+      // Step 3 é o último - vai direto para o onboarding
       onNext({
         wantsGuidedTour,
-        dataMigration,
-        currentStage: selectedStage
+        dataMigration
       });
     }
   };
@@ -381,79 +385,6 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
     </div>
   );
 
-  const renderStageSelection = () => (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          🎯 Qual estágio melhor descreve sua clínica hoje?
-        </h1>
-        <p className="text-gray-600 max-w-3xl mx-auto">
-          Isso nos ajuda a personalizar sua experiência e focar no que mais importa para você.
-          Não se preocupe, isso muda automaticamente baseado no seu progresso.
-        </p>
-      </div>
-
-      <div className="grid gap-4 max-w-4xl mx-auto">
-        {stages.map((stage) => (
-          <button
-            key={stage.id}
-            className={`p-6 border-2 rounded-xl text-left transition-all ${
-              selectedStage === stage.id
-                ? `border-krooa-green bg-krooa-green/5`
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => setSelectedStage(stage.id)}
-          >
-            <div className="flex items-start gap-4">
-              <div className={`w-6 h-6 rounded-full border-2 mt-1 ${
-                selectedStage === stage.id
-                  ? 'border-krooa-green bg-krooa-green'
-                  : 'border-gray-300'
-              }`}>
-                {selectedStage === stage.id && (
-                  <div className="w-full h-full rounded-full bg-white scale-50"></div>
-                )}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className={`w-8 h-8 ${stage.color} rounded-lg flex items-center justify-center text-white font-bold text-sm`}>
-                    E{stage.id}
-                  </div>
-                  <h3 className="font-semibold text-gray-900">{stage.name}</h3>
-                </div>
-                <p className="text-sm text-gray-600 mb-3">{stage.description}</p>
-                <div className="flex flex-wrap gap-2">
-                  {stage.goals.slice(0, 2).map((goal, goalIndex) => (
-                    <span key={goalIndex} className={`px-2 py-1 ${stage.textColor} ${stage.lightColor} border border-current rounded text-xs`}>
-                      {goal}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-4xl mx-auto">
-        <div className="flex items-start gap-3">
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-            <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <div>
-            <h3 className="font-semibold text-blue-900 mb-2">Lembre-se</h3>
-            <p className="text-sm text-blue-800">
-              Seu estágio é reavaliado automaticamente toda segunda-feira baseado no uso
-              dos últimos 7 dias. Você pode evoluir rapidamente ou até retroceder se não
-              usar o sistema de forma consistente.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
@@ -461,7 +392,7 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
         {/* Progress indicator */}
         <div className="mb-8">
           <div className="flex justify-center items-center gap-2">
-            {[1, 2, 3, 4].map((step) => (
+            {[1, 2, 3].map((step) => (
               <div key={step} className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
                   step <= currentStep
@@ -470,7 +401,7 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
                 }`}>
                   {step}
                 </div>
-                {step < 4 && (
+                {step < 3 && (
                   <div className={`w-12 h-1 mx-2 ${
                     step < currentStep ? 'bg-krooa-green' : 'bg-gray-200'
                   }`} />
@@ -479,7 +410,7 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
             ))}
           </div>
           <div className="text-center mt-2 text-sm text-gray-500">
-            Passo {currentStep} de 4
+            Passo {currentStep} de 3
           </div>
         </div>
 
@@ -488,7 +419,6 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
           {currentStep === 1 && renderWelcomeStep()}
           {currentStep === 2 && renderStagesExplanation()}
           {currentStep === 3 && renderDataMigration()}
-          {currentStep === 4 && renderStageSelection()}
         </div>
 
         {/* Navigation */}
@@ -510,7 +440,7 @@ export function WelcomeFirstExperience({ onNext, onSkip }: WelcomeFirstExperienc
             variant="primary"
             onClick={handleNext}
           >
-            {currentStep === 4 ? 'Começar configuração' : 'Continuar'}
+            {currentStep === 3 ? 'Começar configuração' : 'Continuar'}
           </Button>
         </div>
       </div>

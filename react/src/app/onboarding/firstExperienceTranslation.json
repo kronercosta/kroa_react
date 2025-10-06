@@ -10,14 +10,14 @@
       "skipToSetupDescription": "Pular a explicação e ir direto para criar minha conta. Posso ver o tour depois nas configurações."
     },
     "stages": {
-      "title": "🎯 Sistema de Estágios Evolutivos",
-      "subtitle": "Nossa implementação segue um cronograma específico. Cada estágio libera recursos avançados baseado no seu progresso. Isso garante que a inteligência do sistema funcione corretamente.",
-      "whyWorks": "Por que funciona assim?",
-      "explanation": "Quando a agenda é usada de forma consistente, os alertas funcionam. Quando os alertas funcionam, as evoluções fazem sentido. Uma coisa está conectada à outra. Em apenas 7 dias você consegue atingir os requisitos para subir de nível.",
-      "fastProgression": "⚡ Progressão Rápida",
-      "progressionInfo": "O processo é rápido! Em apenas 7 dias você já consegue atingir os requisitos para subir de nível. Cada estágio é avaliado automaticamente toda segunda-feira baseado no seu uso dos últimos 7 dias.",
-      "trainingBlocks": "blocos de treinamento",
-      "automaticEvaluation": "Avaliação automática toda segunda-feira"
+      "title": "🎮 Sistema de Níveis Progressivos",
+      "subtitle": "Como em um jogo, você evolui conforme domina cada funcionalidade. Cada nível desbloqueia novos recursos e poderes especiais para sua clínica.",
+      "whyWorks": "Por que funciona como um jogo?",
+      "explanation": "Você ganha XP usando o sistema consistentemente. Quanto mais você pratica, mais rápido evolui. Em apenas 7 dias de uso ativo você pode subir de nível!",
+      "fastProgression": "⚡ Level Up Rápido",
+      "progressionInfo": "É possível evoluir rapidamente! Use o sistema por 7 dias consecutivos e você já pode fazer seu primeiro Level Up. Sua evolução é calculada automaticamente toda segunda-feira.",
+      "trainingBlocks": "missões de treinamento",
+      "automaticEvaluation": "Level Up automático toda segunda-feira"
     },
     "dataMigration": {
       "title": "📋 Migração de Dados",
@@ -38,25 +38,29 @@
       "reminder": "Seu estágio é reavaliado automaticamente toda segunda-feira baseado no uso dos últimos 7 dias. Você pode evoluir rapidamente ou até retroceder se não usar o sistema de forma consistente."
     },
     "stageDetails": {
-      "E1": {
-        "name": "Desorganizado",
-        "description": "Configuração básica do sistema",
-        "goals": ["60% evolução de status", "85% evolução de procedimentos", "95% alertas de continuidade"]
+      "LV1": {
+        "name": "Iniciante",
+        "description": "Primeiros passos no sistema",
+        "icon": "🥉",
+        "goals": ["Cadastrar pacientes", "Agendar consultas", "Usar agenda básica"]
       },
-      "E2": {
-        "name": "Básico",
-        "description": "Integração entre processos",
-        "goals": ["5% outras evoluções", "40% com orçamento", "5% CRM agendamentos"]
+      "LV2": {
+        "name": "Explorando",
+        "description": "Dominando o básico",
+        "icon": "🥈",
+        "goals": ["Procedimentos avançados", "Orçamentos digitais", "Alertas automáticos"]
       },
-      "E3": {
-        "name": "Consistente",
-        "description": "Controle financeiro integrado",
-        "goals": ["50% orçamentos vinculados", "50% transações com nota", "Integração completa"]
+      "LV3": {
+        "name": "Profissional",
+        "description": "Sistema otimizado",
+        "icon": "🥇",
+        "goals": ["Controle financeiro", "Relatórios detalhados", "Integração completa"]
       },
-      "E4": {
-        "name": "Alta Performance",
-        "description": "Motor de crescimento escalável",
-        "goals": ["Metas financeiras", "DRE em tempo real", "Marketing integrado"]
+      "LV4": {
+        "name": "Mestre",
+        "description": "Clínica de elite",
+        "icon": "💎",
+        "goals": ["IA avançada", "Marketing automático", "Crescimento escalável"]
       }
     },
     "navigation": {

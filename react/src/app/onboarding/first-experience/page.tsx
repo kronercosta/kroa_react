@@ -7,11 +7,11 @@ export default function FirstExperiencePage() {
   const handleNext = (data: {
     wantsGuidedTour: boolean;
     dataMigration: 'yes' | 'no' | 'later';
-    currentStage: number;
   }) => {
     // Armazenar dados da primeira experiência no sessionStorage
     const firstExperienceData = {
       ...data,
+      currentStage: 1, // Sempre começa no LV1
       completedFirstExperience: true,
       timestamp: new Date().toISOString()
     };
@@ -32,7 +32,7 @@ export default function FirstExperiencePage() {
     const skipData = {
       wantsGuidedTour: false,
       dataMigration: 'later' as const,
-      currentStage: 1,
+      currentStage: 1, // Sempre começa no LV1
       completedFirstExperience: false,
       skipped: true,
       timestamp: new Date().toISOString()

@@ -7,39 +7,43 @@ interface StageIndicatorProps {
 const stages = [
   {
     id: 1,
-    name: 'Desorganizado',
-    shortName: 'E1',
+    name: 'Iniciante',
+    shortName: 'LV1',
     color: 'bg-red-500',
     lightColor: 'bg-red-50',
     textColor: 'text-red-600',
-    description: 'Configuração básica'
+    description: 'Primeiros passos',
+    icon: '🥉'
   },
   {
     id: 2,
-    name: 'Básico',
-    shortName: 'E2',
+    name: 'Explorando',
+    shortName: 'LV2',
     color: 'bg-orange-500',
     lightColor: 'bg-orange-50',
     textColor: 'text-orange-600',
-    description: 'Integração entre processos'
+    description: 'Dominando o básico',
+    icon: '🥈'
   },
   {
     id: 3,
-    name: 'Consistente',
-    shortName: 'E3',
+    name: 'Profissional',
+    shortName: 'LV3',
     color: 'bg-blue-500',
     lightColor: 'bg-blue-50',
     textColor: 'text-blue-600',
-    description: 'Controle financeiro'
+    description: 'Sistema otimizado',
+    icon: '🥇'
   },
   {
     id: 4,
-    name: 'Alta Performance',
-    shortName: 'E4',
-    color: 'bg-green-500',
-    lightColor: 'bg-green-50',
-    textColor: 'text-green-600',
-    description: 'Motor de crescimento'
+    name: 'Mestre',
+    shortName: 'LV4',
+    color: 'bg-purple-500',
+    lightColor: 'bg-purple-50',
+    textColor: 'text-purple-600',
+    description: 'Clínica de elite',
+    icon: '💎'
   }
 ];
 
@@ -72,7 +76,8 @@ export function StageIndicator({ className = '' }: StageIndicatorProps) {
         onMouseLeave={() => setShowTooltip(false)}
       >
         {/* Badge do estágio */}
-        <div className={`${stage.color} text-white px-2 py-1 rounded-lg text-sm font-bold flex items-center gap-1`}>
+        <div className={`${stage.color} text-white px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-2`}>
+          <span className="text-base">{stage.icon}</span>
           <span>{stage.shortName}</span>
           {/* Estrelas */}
           <div className="flex">
@@ -104,8 +109,9 @@ export function StageIndicator({ className = '' }: StageIndicatorProps) {
       {showTooltip && (
         <div className="absolute top-full left-0 mt-2 p-4 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-64">
           <div className="flex items-center gap-2 mb-2">
-            <div className={`${stage.color} text-white px-2 py-1 rounded text-sm font-bold`}>
-              {stage.shortName}
+            <div className={`${stage.color} text-white px-2 py-1 rounded text-sm font-bold flex items-center gap-1`}>
+              <span>{stage.icon}</span>
+              <span>{stage.shortName}</span>
             </div>
             <span className="font-semibold text-gray-900">{stage.name}</span>
           </div>

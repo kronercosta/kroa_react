@@ -4,6 +4,7 @@ import { Icon } from '@iconify/react';
 import { Logo } from '../components/Logo';
 import { Navigation } from '../components/layout/Sidebar';
 import { Select } from '../components/ui/Select';
+import { StageIndicator } from '../components/ui/StageIndicator';
 import { useClinic } from '../contexts/ClinicContext';
 import { useTranslation } from '../hooks/useTranslation';
 import layoutTranslations from '../components/layout-translation.json';
@@ -307,6 +308,9 @@ export function MainLayout({ children }: LayoutProps) {
                 alt="Krooa"
                 className="hidden sm:block h-14 object-contain"
               />
+
+              {/* Stage Indicator */}
+              <StageIndicator className="ml-3 sm:ml-6" />
             </div>
 
             {/* Ações do header - Lado direito */}
