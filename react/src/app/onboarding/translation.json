@@ -29,7 +29,8 @@
       "security": {
         "sslSecure": "SSL Seguro",
         "dataProtected": "Dados Protegidos",
-        "lgpdCompliant": "LGPD Conformidade"
+        "lgpdCompliant": "LGPD Conformidade",
+        "hipaaCompliant": "HIPAA Conformidade"
       }
     },
     "step2": {
@@ -263,7 +264,8 @@
       "security": {
         "sslSecure": "SSL Secure",
         "dataProtected": "Data Protected",
-        "lgpdCompliant": "GDPR Compliant"
+        "lgpdCompliant": "GDPR Compliant",
+        "hipaaCompliant": "HIPAA Compliant"
       }
     },
     "step2": {
