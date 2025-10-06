@@ -12,7 +12,7 @@ interface Step4Props {
   };
 }
 
-export function Step4AccountCreation({ onComplete, accountData }: Step4Props) {
+export function Step5AccountCreation({ onComplete, accountData }: Step4Props) {
   const { t } = useTranslation(translations);
   const [currentStep, setCurrentStep] = useState(0);
   const [isComplete, setIsComplete] = useState(false);

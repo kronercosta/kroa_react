@@ -19,7 +19,7 @@ interface Step3Props {
   };
 }
 
-export function Step3AdvancedSettings({ onNext, onBack, userData }: Step3Props) {
+export function Step4AdvancedSettings({ onNext, onBack, userData }: Step3Props) {
   const { t } = useTranslation(translations);
   const { currentRegion } = useRegion();
   const [formData, setFormData] = useState({

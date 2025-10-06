@@ -1,25 +1,22 @@
 import { useNavigate } from 'react-router-dom';
 import { OnboardingLayout } from '../OnboardingLayout';
-import { Step2Subscription } from '../Step2Subscription';
+import { Step2PlanSelection } from '../Step2PlanSelection';
 
 export default function Step2Page() {
   const navigate = useNavigate();
 
   const handleNext = (data: {
     selectedPlan: string;
-    cardData: {
-      number: string;
-      name: string;
-      expiry: string;
-      cvv: string;
-    };
+    couponCode?: string;
+    termsAccepted: boolean;
+    lgpdAccepted: boolean;
   }) => {
     // Armazenar dados no sessionStorage
     const onboardingData = JSON.parse(sessionStorage.getItem('onboardingData') || '{}');
     const updatedData = { ...onboardingData, ...data };
     sessionStorage.setItem('onboardingData', JSON.stringify(updatedData));
 
-    // Navegar para próxima etapa
+    // Navegar para próxima etapa (pagamento)
     navigate('/onboarding/step3');
   };
 
@@ -30,10 +27,10 @@ export default function Step2Page() {
   return (
     <OnboardingLayout
       currentStep={2}
-      totalSteps={4}
+      totalSteps={5}
       showProgress={true}
     >
-      <Step2Subscription
+      <Step2PlanSelection
         onNext={handleNext}
         onBack={handleBack}
       />

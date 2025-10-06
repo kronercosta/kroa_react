@@ -32,7 +32,7 @@ export default function Step1Page() {
   return (
     <OnboardingLayout
       currentStep={1}
-      totalSteps={4}
+      totalSteps={5}
       showProgress={true}
     >
       <Step1BasicInfo
