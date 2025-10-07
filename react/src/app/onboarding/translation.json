@@ -20,13 +20,17 @@
       "phonePlaceholder": "Digite seu telefone",
       "phonePlaceholderUS": "Digite seu melhor telefone",
       "signInWithGoogle": "Entrar com Google",
+      "signInWithApple": "Entrar com Apple",
       "or": "ou",
       "validation": {
         "nameRequired": "Nome é obrigatório",
         "emailRequired": "E-mail é obrigatório",
         "emailInvalid": "E-mail inválido",
         "phoneRequired": "Telefone é obrigatório",
-        "phoneInvalid": "Telefone inválido"
+        "phoneInvalid": "Telefone inválido",
+        "phoneIncomplete": "Telefone incompleto",
+        "phoneCellInvalid": "Para celular, digite 9 após o DDD",
+        "phoneTooLong": "Telefone com muitos dígitos"
       },
       "security": {
         "sslSecure": "SSL Seguro",
@@ -36,8 +40,8 @@
       }
     },
     "step2": {
-      "title": "Teste grátis por 7 dias",
-      "subtitle": "Experimente todas as funcionalidades sem compromisso",
+      "title": "Escolha seu plano",
+      "subtitle": "Teste grátis por 7 dias, sem compromisso",
       "benefits": [
         "✓ Acesso completo a todas as funcionalidades",
         "✓ Suporte técnico incluído",
@@ -97,39 +101,50 @@
       "adminResponsibilityDescription": "Assumo total responsabilidade pelas configurações e dados inseridos no sistema, comprometendo-me a manter a segurança e confidencialidade das informações dos pacientes.",
       "viewResponsibilityDocument": "Ver termo de responsabilidade",
       "acceptTerms": "Aceitar Termos",
+      "planDescription": "Tudo que você precisa para gerenciar sua clínica",
+      "choosePeriod": "Escolha o período de cobrança:",
+      "addOns": "Recursos adicionais (opcionais):",
+      "whatsappAddon": "Canal de comunicação WhatsApp adicional",
+      "whatsappDescription": "Conecte mais números do WhatsApp para atendimento",
+      "aiAddon": "Assistente de IA adicional",
+      "aiDescription": "Mais recursos de inteligência artificial para otimização",
+      "removeCoupon": "Remover",
+      "yearlyDiscount": "Economize 2 meses",
+      "selectedPeriod": "Período selecionado:",
+      "quarterlyBenefit": "Pagamento a cada 3 meses",
+      "monthlyBenefit": "Flexibilidade mensal",
+      "economicalBadge": "+ Econômico",
+      "additionalResources": "Recursos adicionais disponíveis",
+      "additionalResourcesDescription": "Após contratar o plano, você poderá adicionar recursos extras conforme sua necessidade:",
+      "storageAddon": "Storage adicional",
+      "storageDescription": "Mais espaço para documentos e imagens (além dos 15GB inclusos)",
+      "additionalNote": "Você pode contratar esses recursos a qualquer momento após iniciar seu plano.",
+      "learnMoreAddons": "Saiba mais sobre recursos adicionais",
+      "planFeaturesTitle": "Recursos incluídos no plano",
+      "includedFeatures": "Incluído no seu plano:",
       "plans": {
-        "basic": {
-          "name": "Básico",
-          "price": "R$ 149,90",
-          "period": "/mês",
+        "complete": {
+          "name": "Plano Completo",
           "features": [
-            "Até 2 profissionais",
-            "Agenda básica",
-            "Relatórios simples"
-          ]
-        },
-        "professional": {
-          "name": "Profissional",
-          "price": "R$ 299,90",
-          "period": "/mês",
-          "features": [
-            "Até 5 profissionais",
-            "Agenda completa",
-            "Relatórios avançados",
-            "Centro de custo"
-          ]
-        },
-        "enterprise": {
-          "name": "Empresarial",
-          "price": "R$ 599,90",
-          "period": "/mês",
-          "features": [
-            "Profissionais ilimitados",
-            "Múltiplas unidades",
-            "NFSe integrado",
-            "API completa"
+            "Usuários ilimitados",
+            "Cadeiras ilimitadas",
+            "Centro de custo",
+            "Unidades ilimitadas",
+            "Módulos de agenda",
+            "Módulo financeiro",
+            "15GB de storage",
+            "Assinatura digital (adicional)"
           ]
         }
+      },
+      "periods": {
+        "monthly": "Mensal",
+        "monthlySuffix": "/mês",
+        "quarterly": "Trimestral",
+        "quarterlySuffix": "/trimestre",
+        "yearly": "Anual",
+        "yearlySuffix": "/ano",
+        "yearlyDiscount": "+ Econômico"
       }
     },
     "step3": {
@@ -243,18 +258,100 @@
       ]
     },
     "layout": {
-      "sidebarTitle": "Você está a alguns passos de transformar sua clínica",
-      "sidebarSubtitle": "Junte-se a mais de 1.000 profissionais que já revolucionaram sua gestão odontológica.",
-      "feature1Title": "Configuração em 5 minutos",
-      "feature1Description": "Configure sua clínica rapidamente com nosso processo guiado",
-      "feature2Title": "Resultados imediatos",
-      "feature2Description": "Comece a usar no mesmo dia com todas as funcionalidades",
-      "feature3Title": "Suporte especializado",
-      "feature3Description": "Equipe de especialistas em gestão odontológica à sua disposição",
+      "sidebarTitle": "Transforme a rotina da sua clínica em minutos",
+      "sidebarSubtitle": "A Krooa nasceu dentro das clínicas reais e entende o que custa caro: resposta demorada, retrabalho e uma agenda que parece cheia, mas não fatura.",
+      "feature1Title": "Acesso rápido",
+      "feature1Description": "Entre no sistema em 5 minutos e veja como tudo se conecta sem precisar de treinamento",
+      "feature2Title": "Resultados nas primeiras semanas",
+      "feature2Description": "Reduza tarefas manuais, evite falhas humanas e veja seus pacientes voltando com consistência",
+      "feature3Title": "IA que trabalha por você",
+      "feature3Description": "Responde no WhatsApp, confirma, remarca e resolve 24h por dia, mantendo o relacionamento ativo mesmo com a clínica fechada",
       "testimonialAuthor": "Dr. Carlos Mendes",
       "testimonialClinic": "Clínica OdontoCare",
-      "testimonialText": "\"Em 3 meses com a KROA, nossa produtividade aumentou 40% e reduzimos os custos administrativos pela metade.\"",
+      "testimonialText": "\"Em 3 meses com a Krooa, nossa produtividade cresceu 40% e os custos administrativos caíram pela metade.\"",
       "footerText": "© 2025 KROA. Todos os direitos reservados."
+    },
+    "firstExperience": {
+      "stepIndicator": "Passo",
+      "of": "de",
+      "skip": "Pular",
+      "back": "Voltar",
+      "continue": "Continuar",
+      "startSetup": "Começar configuração",
+      "welcome": {
+        "title": "Bem-vindo ao KROA! 🎉",
+        "subtitle": "Estamos muito felizes em tê-lo conosco! O KROA foi desenvolvido para transformar sua clínica odontológica em uma operação de alta performance.",
+        "howToStart": "Como você gostaria de começar?",
+        "guidedTour": {
+          "title": "🎯 Quero o tour guiado completo",
+          "description": "Vamos te explicar os 4 estágios evolutivos do sistema e como maximizar seus resultados desde o primeiro dia. Recomendado!"
+        },
+        "skipTour": {
+          "title": "⚡ Ir direto para configuração",
+          "description": "Pular a explicação e ir direto para criar minha conta. Posso ver o tour depois nas configurações."
+        }
+      },
+      "stages": {
+        "title": "🎮 Sistema de Níveis Progressivos",
+        "subtitle": "Como em um jogo, você evolui conforme domina cada funcionalidade. Cada nível desbloqueia novos recursos e poderes especiais para sua clínica.",
+        "whyGaming": {
+          "title": "Por que funciona como um jogo?",
+          "description": "Você ganha XP usando o sistema consistentemente. Quanto mais você pratica, mais rápido evolui. Em apenas 7 dias de uso ativo você pode fazer seu primeiro Level Up!"
+        },
+        "levels": {
+          "beginner": {
+            "name": "Iniciante",
+            "shortName": "LV1",
+            "description": "Primeiros passos no sistema",
+            "goals": ["Cadastrar pacientes", "Agendar consultas", "Usar agenda básica"]
+          },
+          "exploring": {
+            "name": "Explorando",
+            "shortName": "LV2",
+            "description": "Dominando o básico",
+            "goals": ["Procedimentos avançados", "Orçamentos digitais", "Alertas automáticos"]
+          },
+          "professional": {
+            "name": "Profissional",
+            "shortName": "LV3",
+            "description": "Sistema otimizado",
+            "goals": ["Controle financeiro", "Relatórios detalhados", "Integração completa"]
+          },
+          "master": {
+            "name": "Mestre",
+            "shortName": "LV4",
+            "description": "Clínica de elite",
+            "goals": ["IA avançada", "Marketing automático", "Crescimento escalável"]
+          }
+        },
+        "missionInfo": "missões de treinamento • Level Up automático toda segunda-feira",
+        "fastLevelUp": {
+          "title": "⚡ Level Up Rápido",
+          "description": "É possível evoluir rapidamente! Use o sistema por 7 dias consecutivos e você já pode fazer seu primeiro Level Up. Sua evolução é calculada automaticamente toda segunda-feira."
+        }
+      },
+      "migration": {
+        "title": "📋 Migração de Dados",
+        "subtitle": "Você possui dados de outro sistema que gostaria de migrar para o KROA?",
+        "options": {
+          "yes": {
+            "title": "✅ Sim, quero migrar dados primeiro",
+            "description": "Recomendado! Vamos migrar seus dados (pacientes, histórico, etc.) antes de você começar a testar. Assim você já inicia com seus dados reais."
+          },
+          "no": {
+            "title": "🚀 Não, quero testar sem migrar",
+            "description": "Vou começar a testar agora e criar dados do zero. Posso solicitar migração depois, mas os dados de teste serão perdidos."
+          },
+          "later": {
+            "title": "⏰ Decidir depois",
+            "description": "Quero primeiro conhecer o sistema e depois decidir sobre a migração. Posso solicitar a qualquer momento."
+          }
+        },
+        "successMessage": {
+          "title": "Ótima escolha!",
+          "description": "Nossa equipe entrará em contato nas próximas 24h para agendar a migração. Enquanto isso, você pode começar a configurar sua conta."
+        }
+      }
     },
     "hipaaTerms": {
       "title": "ACORDO DE CONFORMIDADE HIPAA",
@@ -318,13 +415,17 @@
       "phonePlaceholder": "Enter your phone number",
       "phonePlaceholderUS": "Enter your best phone number",
       "signInWithGoogle": "Sign in with Google",
+      "signInWithApple": "Sign in with Apple",
       "or": "or",
       "validation": {
         "nameRequired": "Name is required",
         "emailRequired": "Email is required",
         "emailInvalid": "Invalid email",
         "phoneRequired": "Phone is required",
-        "phoneInvalid": "Invalid phone"
+        "phoneInvalid": "Invalid phone",
+        "phoneIncomplete": "Phone incomplete",
+        "phoneCellInvalid": "For mobile, enter 9 after area code",
+        "phoneTooLong": "Phone has too many digits"
       },
       "security": {
         "sslSecure": "SSL Secure",
@@ -334,8 +435,8 @@
       }
     },
     "step2": {
-      "title": "Payment Information",
-      "subtitle": "Try all features without commitment",
+      "title": "Choose your plan",
+      "subtitle": "7-day free trial, no commitment",
       "benefits": [
         "✓ Full access to all features",
         "✓ Technical support included",
@@ -384,40 +485,50 @@
       "adminResponsibilityDescription": "I assume full responsibility for the configurations and data entered in the system, committing to maintain the security and confidentiality of patient information.",
       "viewResponsibilityDocument": "View responsibility terms",
       "acceptTerms": "Accept Terms",
+      "planDescription": "Everything you need to manage your practice",
+      "choosePeriod": "Choose billing period:",
+      "addOns": "Additional features (optional):",
+      "whatsappAddon": "Additional WhatsApp communication channel",
+      "whatsappDescription": "Connect more WhatsApp numbers for patient support",
+      "aiAddon": "Additional AI Assistant",
+      "aiDescription": "More artificial intelligence features for optimization",
+      "removeCoupon": "Remove",
+      "yearlyDiscount": "Save 2 months",
+      "selectedPeriod": "Selected period:",
+      "quarterlyBenefit": "Payment every 3 months",
+      "monthlyBenefit": "Monthly flexibility",
+      "economicalBadge": "+ Economical",
+      "additionalResources": "Additional resources available",
+      "additionalResourcesDescription": "After subscribing to the plan, you can add extra features as needed:",
+      "storageAddon": "Additional storage",
+      "storageDescription": "More space for documents and images (beyond the included 15GB)",
+      "additionalNote": "You can subscribe to these features at any time after starting your plan.",
+      "learnMoreAddons": "Learn more about additional features",
+      "planFeaturesTitle": "Plan included features",
+      "includedFeatures": "Included in your plan:",
       "plans": {
-        "basic": {
-          "name": "Starter",
-          "price": "$49.00",
-          "period": "/month",
+        "complete": {
+          "name": "Complete Plan",
           "features": [
-            "Up to 2 providers",
-            "Basic scheduling",
-            "Simple reports"
-          ]
-        },
-        "professional": {
-          "name": "Professional",
-          "price": "$99.00",
-          "period": "/month",
-          "features": [
-            "Up to 5 providers",
-            "Advanced scheduling",
-            "Detailed reports",
+            "Unlimited users",
+            "Unlimited chairs",
             "Cost centers",
-            "Insurance billing"
-          ]
-        },
-        "enterprise": {
-          "name": "Enterprise",
-          "price": "$199.00",
-          "period": "/month",
-          "features": [
-            "Unlimited providers",
-            "Multiple locations",
-            "HIPAA compliant",
-            "Full API access"
+            "Unlimited locations",
+            "Scheduling modules",
+            "Financial module",
+            "15GB storage",
+            "Digital signature available"
           ]
         }
+      },
+      "periods": {
+        "monthly": "Monthly",
+        "monthlySuffix": "/month",
+        "quarterly": "Quarterly",
+        "quarterlySuffix": "/quarter",
+        "yearly": "Yearly",
+        "yearlySuffix": "/year",
+        "yearlyDiscount": "+ Economical"
       }
     },
     "step3": {
@@ -569,18 +680,100 @@
       ]
     },
     "layout": {
-      "sidebarTitle": "You're just a few steps away from transforming your clinic",
-      "sidebarSubtitle": "Join over 1,000 professionals who have already revolutionized their dental practice management.",
-      "feature1Title": "5-minute setup",
-      "feature1Description": "Set up your clinic quickly with our guided process",
-      "feature2Title": "Immediate results",
-      "feature2Description": "Start using on the same day with all features",
-      "feature3Title": "Specialized support",
-      "feature3Description": "Team of dental management specialists at your disposal",
-      "testimonialAuthor": "Dr. Carlos Mendes",
-      "testimonialClinic": "OdontoCare Clinic",
-      "testimonialText": "\"In 3 months with KROA, our productivity increased 40% and we reduced administrative costs by half.\"",
+      "sidebarTitle": "Streamline your practice from day one",
+      "sidebarSubtitle": "Krooa was built inside real healthcare offices to fix what truly hurts: fragmented systems, missed messages, and endless admin work.",
+      "feature1Title": "Quick access",
+      "feature1Description": "Get started in under 5 minutes and experience a system that simply works from day one",
+      "feature2Title": "Results within weeks",
+      "feature2Description": "Reduce manual work, improve team focus and see measurable patient retention early on",
+      "feature3Title": "24/7 AI assistant",
+      "feature3Description": "Manages messages, confirms, reschedules and keeps patients engaged — even after hours",
+      "testimonialAuthor": "Dr. Charles Newman",
+      "testimonialClinic": "Midtown Dental Group",
+      "testimonialText": "\"With Krooa, our coordination improved immediately. We deliver care faster and communicate better with every patient.\"",
       "footerText": "© 2025 KROA. All rights reserved."
+    },
+    "firstExperience": {
+      "stepIndicator": "Step",
+      "of": "of",
+      "skip": "Skip",
+      "back": "Back",
+      "continue": "Continue",
+      "startSetup": "Start setup",
+      "welcome": {
+        "title": "Welcome to KROA! 🎉",
+        "subtitle": "We're very happy to have you with us! KROA was developed to transform your dental practice into a high-performance operation.",
+        "howToStart": "How would you like to get started?",
+        "guidedTour": {
+          "title": "🎯 I want the complete guided tour",
+          "description": "We'll explain the 4 evolutionary stages of the system and how to maximize your results from day one. Recommended!"
+        },
+        "skipTour": {
+          "title": "⚡ Go straight to setup",
+          "description": "Skip the explanation and go straight to creating my account. I can see the tour later in settings."
+        }
+      },
+      "stages": {
+        "title": "🎮 Progressive Level System",
+        "subtitle": "Like in a game, you evolve as you master each functionality. Each level unlocks new features and special powers for your clinic.",
+        "whyGaming": {
+          "title": "Why does it work like a game?",
+          "description": "You gain XP by using the system consistently. The more you practice, the faster you evolve. In just 7 days of active use you can make your first Level Up!"
+        },
+        "levels": {
+          "beginner": {
+            "name": "Beginner",
+            "shortName": "LV1",
+            "description": "First steps in the system",
+            "goals": ["Register patients", "Schedule appointments", "Use basic calendar"]
+          },
+          "exploring": {
+            "name": "Exploring",
+            "shortName": "LV2",
+            "description": "Mastering the basics",
+            "goals": ["Advanced procedures", "Digital estimates", "Automatic alerts"]
+          },
+          "professional": {
+            "name": "Professional",
+            "shortName": "LV3",
+            "description": "Optimized system",
+            "goals": ["Financial control", "Detailed reports", "Complete integration"]
+          },
+          "master": {
+            "name": "Master",
+            "shortName": "LV4",
+            "description": "Elite clinic",
+            "goals": ["Advanced AI", "Automatic marketing", "Scalable growth"]
+          }
+        },
+        "missionInfo": "training missions • Automatic Level Up every Monday",
+        "fastLevelUp": {
+          "title": "⚡ Fast Level Up",
+          "description": "It's possible to evolve quickly! Use the system for 7 consecutive days and you can already make your first Level Up. Your evolution is calculated automatically every Monday."
+        }
+      },
+      "migration": {
+        "title": "📋 Data Migration",
+        "subtitle": "Do you have data from another system that you would like to migrate to KROA?",
+        "options": {
+          "yes": {
+            "title": "✅ Yes, I want to migrate data first",
+            "description": "Recommended! We'll migrate your data (patients, history, etc.) before you start testing. This way you start with your real data."
+          },
+          "no": {
+            "title": "🚀 No, I want to test without migrating",
+            "description": "I'll start testing now and create data from scratch. I can request migration later, but test data will be lost."
+          },
+          "later": {
+            "title": "⏰ Decide later",
+            "description": "I want to first get to know the system and then decide about migration. I can request it at any time."
+          }
+        },
+        "successMessage": {
+          "title": "Great choice!",
+          "description": "Our team will contact you within the next 24h to schedule the migration. Meanwhile, you can start setting up your account."
+        }
+      }
     }
   },
   "ES": {
@@ -758,6 +951,88 @@
       "testimonialClinic": "Clínica OdontoCare",
       "testimonialText": "\"En 3 meses con KROA, nuestra productividad aumentó 40% y redujimos los costos administrativos a la mitad.\"",
       "footerText": "© 2025 KROA. Todos los derechos reservados."
+    },
+    "firstExperience": {
+      "stepIndicator": "Paso",
+      "of": "de",
+      "skip": "Saltar",
+      "back": "Volver",
+      "continue": "Continuar",
+      "startSetup": "Comenzar configuración",
+      "welcome": {
+        "title": "¡Bienvenido a KROA! 🎉",
+        "subtitle": "¡Estamos muy felices de tenerte con nosotros! KROA fue desarrollado para transformar tu clínica dental en una operación de alto rendimiento.",
+        "howToStart": "¿Cómo te gustaría comenzar?",
+        "guidedTour": {
+          "title": "🎯 Quiero el tour guiado completo",
+          "description": "Te explicaremos las 4 etapas evolutivas del sistema y cómo maximizar tus resultados desde el primer día. ¡Recomendado!"
+        },
+        "skipTour": {
+          "title": "⚡ Ir directo a la configuración",
+          "description": "Saltar la explicación e ir directo a crear mi cuenta. Puedo ver el tour después en configuraciones."
+        }
+      },
+      "stages": {
+        "title": "🎮 Sistema de Niveles Progresivos",
+        "subtitle": "Como en un juego, evolucionas conforme dominas cada funcionalidad. Cada nivel desbloquea nuevas características y poderes especiales para tu clínica.",
+        "whyGaming": {
+          "title": "¿Por qué funciona como un juego?",
+          "description": "Ganas XP usando el sistema consistentemente. Mientras más practicas, más rápido evolucionas. ¡En solo 7 días de uso activo puedes hacer tu primer Level Up!"
+        },
+        "levels": {
+          "beginner": {
+            "name": "Principiante",
+            "shortName": "LV1",
+            "description": "Primeros pasos en el sistema",
+            "goals": ["Registrar pacientes", "Agendar citas", "Usar agenda básica"]
+          },
+          "exploring": {
+            "name": "Explorando",
+            "shortName": "LV2",
+            "description": "Dominando lo básico",
+            "goals": ["Procedimientos avanzados", "Presupuestos digitales", "Alertas automáticas"]
+          },
+          "professional": {
+            "name": "Profesional",
+            "shortName": "LV3",
+            "description": "Sistema optimizado",
+            "goals": ["Control financiero", "Reportes detallados", "Integración completa"]
+          },
+          "master": {
+            "name": "Maestro",
+            "shortName": "LV4",
+            "description": "Clínica de élite",
+            "goals": ["IA avanzada", "Marketing automático", "Crecimiento escalable"]
+          }
+        },
+        "missionInfo": "misiones de entrenamiento • Level Up automático todos los lunes",
+        "fastLevelUp": {
+          "title": "⚡ Level Up Rápido",
+          "description": "¡Es posible evolucionar rápidamente! Usa el sistema por 7 días consecutivos y ya puedes hacer tu primer Level Up. Tu evolución se calcula automáticamente todos los lunes."
+        }
+      },
+      "migration": {
+        "title": "📋 Migración de Datos",
+        "subtitle": "¿Tienes datos de otro sistema que te gustaría migrar a KROA?",
+        "options": {
+          "yes": {
+            "title": "✅ Sí, quiero migrar datos primero",
+            "description": "¡Recomendado! Migraremos tus datos (pacientes, historial, etc.) antes de que comiences a probar. Así inicias con tus datos reales."
+          },
+          "no": {
+            "title": "🚀 No, quiero probar sin migrar",
+            "description": "Voy a comenzar a probar ahora y crear datos desde cero. Puedo solicitar migración después, pero los datos de prueba se perderán."
+          },
+          "later": {
+            "title": "⏰ Decidir después",
+            "description": "Quiero primero conocer el sistema y después decidir sobre la migración. Puedo solicitarla en cualquier momento."
+          }
+        },
+        "successMessage": {
+          "title": "¡Excelente elección!",
+          "description": "Nuestro equipo se pondrá en contacto contigo en las próximas 24h para programar la migración. Mientras tanto, puedes comenzar a configurar tu cuenta."
+        }
+      }
     }
   }
 }
