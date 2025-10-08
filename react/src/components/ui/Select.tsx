@@ -3,6 +3,102 @@ import { Search, ChevronDown, Plus, Edit2, Trash2, X, Check, AlertTriangle, Chev
 import { Button, IconButton } from './Button';
 import { useUITranslation } from '../../hooks/useUITranslation';
 
+// Componente para exibir chips com contador dinâmico
+const MultipleChipsDisplay: React.FC<{
+  selectedOptions: Option[];
+  onRemove: (option: Option) => void;
+}> = ({ selectedOptions, onRemove }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [visibleChips, setVisibleChips] = useState<number>(selectedOptions.length);
+
+  useEffect(() => {
+    const calculateVisibleChips = () => {
+      if (!containerRef.current || selectedOptions.length === 0) return;
+
+      const container = containerRef.current;
+      const containerWidth = container.offsetWidth;
+
+      // Se a largura ainda não foi calculada, aguardar
+      if (containerWidth === 0) {
+        setTimeout(calculateVisibleChips, 10);
+        return;
+      }
+
+      // Largura mais realista baseada no design atual
+      const chipWidth = 95; // largura mais generosa para cada chip
+      const counterWidth = 50; // largura do contador "+X" (mais compacto)
+      const gap = 6; // gap entre chips
+      const padding = 10; // margem de segurança
+      const arrowSpace = 40; // espaço reservado para a seta do dropdown
+
+      // Largura útil (descontando padding interno e espaço da seta)
+      const usableWidth = containerWidth - padding - arrowSpace;
+
+      // Calcular de forma mais antecipada
+      let fitsWithoutCounter = Math.floor(usableWidth / (chipWidth + gap));
+      let fitsWithCounter = Math.floor((usableWidth - counterWidth - gap) / (chipWidth + gap));
+
+      // Ativar contador mais cedo para evitar overflow
+      if (selectedOptions.length <= 2) {
+        // Para 1-2 itens, sempre mostrar todos
+        setVisibleChips(selectedOptions.length);
+      } else if (fitsWithoutCounter >= selectedOptions.length) {
+        // Se definitivamente cabem todos
+        setVisibleChips(selectedOptions.length);
+      } else if (fitsWithoutCounter >= selectedOptions.length - 1) {
+        // Se está no limite, já ativar contador (mais antecipado)
+        setVisibleChips(Math.max(1, Math.min(fitsWithCounter, selectedOptions.length - 1)));
+      } else {
+        // Caso geral - mostrar alguns + contador
+        setVisibleChips(Math.max(1, fitsWithCounter));
+      }
+    };
+
+    // Aguardar o DOM estar pronto
+    setTimeout(calculateVisibleChips, 0);
+
+    // Recalcular quando o container ou itens mudarem
+    const resizeObserver = new ResizeObserver(() => {
+      setTimeout(calculateVisibleChips, 10);
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => resizeObserver.disconnect();
+  }, [selectedOptions.length]);
+
+  const showCounter = visibleChips < selectedOptions.length;
+  const remainingCount = selectedOptions.length - visibleChips;
+
+  return (
+    <div ref={containerRef} className="flex gap-1.5 items-center min-h-[24px]">
+      {selectedOptions.slice(0, visibleChips).map(opt => (
+        <span
+          key={opt.value}
+          className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-krooa-green/15 text-krooa-blue text-sm rounded-lg font-medium flex-shrink-0 border border-krooa-green/30"
+        >
+          <span className="truncate max-w-[80px]">{opt.label}</span>
+          <X
+            className="w-3.5 h-3.5 cursor-pointer hover:text-krooa-blue/70 flex-shrink-0 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove(opt);
+            }}
+          />
+        </span>
+      ))}
+
+      {showCounter && (
+        <span className="inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-600 text-sm rounded-lg font-medium flex-shrink-0 border border-gray-300">
+          +{remainingCount}
+        </span>
+      )}
+    </div>
+  );
+};
+
 interface Option {
   value: string;
   label: string;
@@ -45,6 +141,10 @@ interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>
   deleteConfirmationText?: string; // Texto customizado para confirmação
   allowDeleteWithoutTransfer?: boolean; // Permitir exclusão sem transferir registros (padrão: true)
   getAffectedRecordsCount?: (option: Option) => number; // Função para obter quantidade de registros afetados
+  // Props para comportamento "Todos"
+  showAllOption?: boolean; // Se true, quando nada selecionado = todos selecionados
+  allOptionText?: string; // Texto para a opção "Todos" (padrão: placeholder)
+  minWidth?: string; // Largura mínima do componente
 }
 
 // Função para normalizar texto removendo acentos
@@ -86,6 +186,10 @@ export function Select({
   deleteConfirmationText,
   allowDeleteWithoutTransfer = true,
   getAffectedRecordsCount,
+  // Props para comportamento "Todos"
+  showAllOption = false,
+  allOptionText,
+  minWidth = 'min-w-32',
   ...props
 }: SelectProps) {
   const uiTranslations = useUITranslation();
@@ -123,6 +227,19 @@ export function Select({
 
   const selectedOptions = options.filter(opt => selectedValues.includes(opt.value));
   const selectedOption = !multiple ? options.find(opt => opt.value === value) : null;
+
+  // Lógica para comportamento "Todos"
+  const isAllSelected = showAllOption && multiple && selectedValues.length === 0;
+  const displayText = (() => {
+    if (multiple) {
+      if (selectedValues.length === 0 && showAllOption) {
+        return allOptionText || placeholder || 'Todos';
+      }
+      return null; // Use o comportamento normal de chips
+    } else {
+      return selectedOption?.label;
+    }
+  })();
 
   // Organizar opções hierarquicamente
   const getHierarchicalOptions = (): Option[] => {
@@ -449,8 +566,9 @@ export function Select({
       <div className="relative">
         <div
           className={`
-            peer border rounded-lg bg-white cursor-pointer flex items-center h-10
-            ${fullWidth ? 'w-full' : ''}
+            peer border rounded-lg bg-white cursor-pointer flex items-center
+            h-10
+            ${fullWidth ? 'w-full' : minWidth}
             ${error ? 'border-red-300' : 'border-gray-300'}
             ${disabled ? 'bg-gray-50 cursor-not-allowed' : ''}
             ${isFocused ? 'border-krooa-green ring-2 ring-krooa-green/20' : ''}
@@ -465,26 +583,13 @@ export function Select({
         >
           <div className="flex-1 px-3 py-2 pr-10 overflow-hidden">
             {multiple && selectedValues.length > 0 ? (
-              <div className="flex flex-wrap gap-1">
-                {selectedOptions.map(opt => (
-                  <span
-                    key={opt.value}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 bg-krooa-blue/10 text-krooa-blue text-sm rounded-md max-w-full"
-                  >
-                    <span className="truncate">{opt.label}</span>
-                    <X
-                      className="w-3 h-3 cursor-pointer hover:text-krooa-green flex-shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSelect(opt, e);
-                      }}
-                    />
-                  </span>
-                ))}
-              </div>
+              <MultipleChipsDisplay
+                selectedOptions={selectedOptions}
+                onRemove={(opt) => handleSelect(opt, null)}
+              />
             ) : (
-              <span className={`truncate block ${hasValue ? '' : 'invisible'}`}>
-                {selectedOption?.label || ' '}
+              <span className={`truncate block ${hasValue || isAllSelected ? 'text-gray-900' : 'text-gray-500'}`}>
+                {displayText || placeholder || ' '}
               </span>
             )}
           </div>
@@ -593,12 +698,15 @@ export function Select({
                         {multiple && isSelectable && (
                           <div
                             className={`
-                              w-4 h-4 border rounded
-                              ${isSelected ? 'bg-krooa-green border-krooa-green' : 'border-gray-300'}
+                              w-5 h-5 border-2 rounded-md flex items-center justify-center transition-all
+                              ${isSelected
+                                ? 'bg-krooa-blue border-krooa-blue shadow-sm'
+                                : 'border-gray-400 hover:border-krooa-blue'
+                              }
                             `}
                           >
                             {isSelected && (
-                              <Check className="w-3 h-3 text-white" />
+                              <Check className="w-3.5 h-3.5 text-white font-bold" strokeWidth={3} />
                             )}
                           </div>
                         )}
