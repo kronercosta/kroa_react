@@ -82,7 +82,7 @@ const detectCardBrand = (number: string) => {
 };
 
 // Aplicar máscara de telefone internacional
-const applyInternationalPhoneMask = (value: string, country: ReturnType<typeof getCountries>[0]) => {
+const applyInternationalPhoneMask = (value: string, country: { code: string; name: string; flag: string; phoneCode: string; mask: string }) => {
   const cleaned = value.replace(/\D/g, '');
 
   // Tratamento especial para Brasil

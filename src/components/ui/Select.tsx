@@ -587,7 +587,7 @@ export function Select({
             {multiple && selectedValues.length > 0 ? (
               <MultipleChipsDisplay
                 selectedOptions={selectedOptions}
-                onRemove={(opt) => handleSelect(opt)}
+                onRemove={(opt) => handleSelect(opt, undefined)}
               />
             ) : (
               <span className={`truncate block ${hasValue || isAllSelected ? 'text-gray-900' : 'text-gray-500'}`}>
@@ -775,7 +775,7 @@ export function Select({
                           ) : (
                             <>
                               {editable && (
-                                <Edit2
+                                <div
                                   className="w-3 h-3 text-gray-400 hover:text-krooa-blue cursor-pointer"
                                   onClick={() => {
                                     if (advancedEdit && editModalContent) {
@@ -788,7 +788,9 @@ export function Select({
                                       setEditValue(option.label);
                                     }
                                   }}
-                                />
+                                >
+                                  <Edit2 className="w-3 h-3" />
+                                </div>
                               )}
                               {editable && (
                                 <Trash2

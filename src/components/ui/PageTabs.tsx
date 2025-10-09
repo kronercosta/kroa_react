@@ -10,7 +10,7 @@ export interface TabItem {
 interface PageTabsProps {
   items: TabItem[];
   activeTab: string;
-  variant?: 'default' | 'compact';
+  variant?: 'default' | 'compact' | 'pills';
 }
 
 export function PageTabs({ items, activeTab, variant = 'default' }: PageTabsProps) {
@@ -23,13 +23,16 @@ export function PageTabs({ items, activeTab, variant = 'default' }: PageTabsProp
     }
   };
 
+  // Map 'pills' variant to 'default' for SubMenu compatibility
+  const subMenuVariant = variant === 'pills' ? 'default' : variant;
+
   return (
     <div className="w-full max-w-[100dvw] overflow-hidden">
       <SubMenu
         items={items.map(item => ({ id: item.id, label: item.label }))}
         activeItem={activeTab}
         onItemClick={handleTabChange}
-        variant={variant}
+        variant={subMenuVariant}
         className="w-full max-w-[100dvw]"
       />
     </div>

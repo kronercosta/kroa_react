@@ -12,7 +12,8 @@
       "Bash(git mv:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nrefactor: Implementar sistema de layout reutilizável com PageLayout\n\n- Criar PageLayout genérico com suporte a dois tipos de header (default e avatar)\n- Criar PageHeaderWithAvatar para headers com foto e botão voltar\n- Refatorar ColaboradorLayout para usar PageLayout com header avatar\n- Refatorar ConfiguracoesClinicaLayout para usar PageLayout\n- Atualizar todas as páginas de colaborador para usar novo sistema\n- Atualizar todas as páginas de clínica para usar ConfiguracoesClinicaLayout\n- Remover ColaboradorLayout da página de lista (page.tsx)\n- Adicionar botões Salvar/Cancelar em dados-pessoais, permissões e parâmetros\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(timeout 30 npx tsc --noEmit)"
     ],
     "deny": [],
     "ask": []

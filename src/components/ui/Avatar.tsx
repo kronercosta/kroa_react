@@ -100,7 +100,7 @@ export function AvatarGroup({
     <div className={`flex -space-x-2 ${className}`}>
       {visibleChildren.map((child, index) => (
         <div key={index} className="relative z-0 hover:z-10 transition-all">
-          {React.cloneElement(child as React.ReactElement<AvatarProps>, { size })}
+          {React.cloneElement(child as React.ReactElement<any>, { size })}
         </div>
       ))}
       {remainingCount > 0 && (

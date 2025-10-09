@@ -29,6 +29,7 @@ export const Table: React.FC<TableProps> = ({
   hoverable = true,
   striped = false,
   sticky = false,
+  loading = false,
   emptyMessage,
   responsive = 'scroll',
   mobileBreakpoint = 'md'

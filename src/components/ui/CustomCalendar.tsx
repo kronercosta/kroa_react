@@ -140,7 +140,7 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
   };
 
   const handleDateClick = (day: number) => {
-    let newDate = new Date(currentYear, currentMonth, day);
+    const newDate = new Date(currentYear, currentMonth, day);
 
     if (showTime && selectedTime) {
       const [hours, minutes] = selectedTime.split(':').map(Number);

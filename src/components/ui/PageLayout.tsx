@@ -26,7 +26,7 @@ interface PageLayoutProps {
   // Page Tabs props (optional)
   tabs?: TabItem[];
   activeTab?: string;
-  tabsVariant?: 'default' | 'compact';
+  tabsVariant?: 'default' | 'compact' | 'pills';
 
   // Content
   children: React.ReactNode;
