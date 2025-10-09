@@ -587,7 +587,7 @@ export function Select({
             {multiple && selectedValues.length > 0 ? (
               <MultipleChipsDisplay
                 selectedOptions={selectedOptions}
-                onRemove={(opt) => handleSelect(opt, undefined)}
+                onRemove={(opt) => handleSelect(opt)}
               />
             ) : (
               <span className={`truncate block ${hasValue || isAllSelected ? 'text-gray-900' : 'text-gray-500'}`}>

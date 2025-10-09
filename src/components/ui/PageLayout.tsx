@@ -1,4 +1,3 @@
-import React from 'react';
 import { PageHeader } from './PageHeader';
 import { PageHeaderWithAvatar } from './PageHeaderWithAvatar';
 import { PageTabs } from './PageTabs';
