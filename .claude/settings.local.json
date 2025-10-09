@@ -1,25 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run build:*)",
+      "Bash(mkdir:*)",
       "Bash(npm run dev:*)",
-      "Bash(npm run type-check:*)",
-      "Bash(npx tsc:*)",
-      "Bash(curl:*)",
-      "Bash(find:*)",
-      "Bash(git add:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nrefactor: Substituir tabelas HTML pelo componente Table padronizado\n\nConversão de tabelas HTML nativas para o componente Table unificado em:\n- cadeiras/page.tsx: 2 tabelas (principal de cadeiras e horários configurados)\n- centro-custo/page.tsx: 1 tabela (centros de custo com edição inline)\n- colaborador/page.tsx: 1 tabela (colaboradores com avatars e ações)\n\nBenefícios:\n- Código mais limpo e manutenível\n- Estilo consistente em todas as tabelas\n- Funcionalidades padronizadas (hover, sticky header)\n- Remoção de arquivo obsoleto _old_page.tsx\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git commit:*)",
-      "Bash(git pull:*)",
-      "Bash(if [ -d \"demonstracao\" ])",
-      "Bash(then rm -rf demonstracao)",
-      "Bash(fi)",
-      "Bash(git push:*)",
       "Bash(npm install:*)",
-      "Bash(npm uninstall:*)",
-      "Bash(node:*)",
-      "Bash(grep:*)",
-      "Bash(pkill:*)"
+      "Bash(dir:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(git restore:*)",
+      "Bash(rm:*)",
+      "Bash(git mv:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nrefactor: Implementar sistema de layout reutilizável com PageLayout\n\n- Criar PageLayout genérico com suporte a dois tipos de header (default e avatar)\n- Criar PageHeaderWithAvatar para headers com foto e botão voltar\n- Refatorar ColaboradorLayout para usar PageLayout com header avatar\n- Refatorar ConfiguracoesClinicaLayout para usar PageLayout\n- Atualizar todas as páginas de colaborador para usar novo sistema\n- Atualizar todas as páginas de clínica para usar ConfiguracoesClinicaLayout\n- Remover ColaboradorLayout da página de lista (page.tsx)\n- Adicionar botões Salvar/Cancelar em dados-pessoais, permissões e parâmetros\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
