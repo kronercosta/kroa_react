@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, IconButton } from '../../../../components/ui/Button';
 import { Check, Edit, Trash2 } from 'lucide-react';
 import { Input } from '../../../../components/ui/Input';
@@ -14,9 +14,9 @@ import { useTranslation } from '../../../../hooks/useTranslation';
 import translations from './translation.json';
 
 const MultiplasUnidades: React.FC = () => {
-  const { multiplasUnidadesEnabled, setMultiplasUnidadesEnabled } = useClinic();
   const { config } = useRegion();
   const { t } = useTranslation(translations);
+  const { units: globalUnits, setUnits: setGlobalUnits } = useClinic();
 
   const [editingUnit, setEditingUnit] = useState<number | null>(null);
 
@@ -69,62 +69,28 @@ const MultiplasUnidades: React.FC = () => {
     }
   ]);
 
+  // Sync local state with global context
+  useEffect(() => {
+    const simplifiedUnits = unidades.map(unit => ({
+      id: unit.id,
+      titulo: unit.titulo,
+      isMaster: unit.isMaster
+    }));
+    setGlobalUnits(simplifiedUnits);
+  }, [unidades, setGlobalUnits]);
+
   return (
     <ConfiguracoesClinicaLayout>
       <div className="space-y-6">
-        {/* Unidade Principal - Sempre Disponível */}
+
+        {/* Units Section - sempre aberto */}
         <Card>
-          <h2 className="text-lg font-bold text-gray-900 mb-4">{t?.masterUnit?.title || 'Unidade Principal'}</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            {t?.masterUnit?.description || 'Configure a unidade principal da sua clínica. Esta unidade sempre estará disponível e não pode ser excluída.'}
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Input
-              label={t?.masterUnit?.name || 'Nome da Unidade'}
-              value={unidades[0]?.titulo || ''}
-              onChange={(value) => {
-                const newUnidades = [...unidades];
-                newUnidades[0] = { ...newUnidades[0], titulo: value };
-                setUnidades(newUnidades);
-              }}
-              fullWidth
-            />
-
-            <Select
-              label={t?.masterUnit?.timezone || 'Fuso Horário'}
-              value={unidades[0]?.timezone || 'America/Sao_Paulo'}
-              onChange={(e) => {
-                const value = Array.isArray(e.target.value) ? e.target.value[0] : e.target.value;
-                const newUnidades = [...unidades];
-                newUnidades[0] = { ...newUnidades[0], timezone: value };
-                setUnidades(newUnidades);
-              }}
-              options={timezoneOptions}
-            />
-          </div>
-        </Card>
-
-        {/* Múltiplas Unidades Toggle */}
-        <Card>
-          <div className="flex items-center justify-between">
+          <div className="flex justify-between items-start mb-4">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">{t?.title || 'Múltiplas Unidades'}</h2>
-              <p className="text-sm text-gray-500 mt-1">{t?.description || 'Habilite para gerenciar unidades adicionais da sua clínica'}</p>
+              <h2 className="text-lg font-bold text-gray-900">{t?.pageTitle || 'Units'}</h2>
+              <p className="text-sm text-gray-500 mt-1">{t?.pageDescription || 'One unit is the default, but if you have more you can add and manage them here to organize your clinic operations'}</p>
             </div>
-            <Switch
-              checked={multiplasUnidadesEnabled}
-              onChange={setMultiplasUnidadesEnabled}
-            />
-          </div>
-        </Card>
-
-        {/* Unidades Adicionais Section */}
-        {multiplasUnidadesEnabled && (
-          <Card>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-gray-900">{t?.additionalUnits?.title || 'Unidades Adicionais'}</h2>
-              <Button
+            <Button
                 onClick={() => setUnidades([...unidades, {
                   id: Date.now(),
                   titulo: t?.newUnit || 'Nova Unidade',
@@ -134,13 +100,14 @@ const MultiplasUnidades: React.FC = () => {
                   timezone: 'America/Sao_Paulo'
                 }])}
                 variant="primary"
+                size="sm"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 {t?.newUnit || 'Nova Unidade'}
               </Button>
-            </div>
+          </div>
 
             <div className="overflow-x-auto rounded-lg border border-gray-200">
               <table className="min-w-full">
@@ -169,7 +136,7 @@ const MultiplasUnidades: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {unidades.slice(1).map((unidade) => (
+                  {unidades.map((unidade) => (
                     <tr key={unidade.id} className="hover:bg-gray-50">
                       <td className="py-2.5 px-4 text-sm text-gray-900">
                         {editingUnit === unidade.id ? (
@@ -300,9 +267,9 @@ const MultiplasUnidades: React.FC = () => {
                             }}
                             variant="ghost"
                             size="sm"
-                            title={unidade.isMaster ? (t?.actions?.masterUnitCannotBeDeleted || 'Unidade principal não pode ser excluída') : (t?.actions?.delete || 'Excluir')}
-                            disabled={unidade.isMaster}
-                            className={unidade.isMaster ? "text-gray-300" : "text-red-600 hover:text-red-700"}
+                            title={unidade.isMaster ? (t?.actions?.masterUnitCannotBeDeleted || 'Unidade principal não pode ser excluída') : unidades.length === 1 ? 'Não é possível excluir a única unidade' : (t?.actions?.delete || 'Excluir')}
+                            disabled={unidade.isMaster || unidades.length === 1}
+                            className={unidade.isMaster || unidades.length === 1 ? "text-gray-300" : "text-red-600 hover:text-red-700"}
                           >
                             <Trash2 className="w-4 h-4" />
                           </IconButton>
@@ -313,8 +280,7 @@ const MultiplasUnidades: React.FC = () => {
                 </tbody>
               </table>
             </div>
-          </Card>
-        )}
+        </Card>
       </div>
 
       {/* Delete Unit Modal */}

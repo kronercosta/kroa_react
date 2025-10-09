@@ -5,6 +5,7 @@ interface PageHeaderWithAvatarProps {
   title: string;
   subtitle?: string;
   avatarUrl?: string;
+  avatarColor?: string;
   onBack?: () => void;
   actions?: React.ReactNode;
 }
@@ -13,6 +14,7 @@ export function PageHeaderWithAvatar({
   title,
   subtitle,
   avatarUrl,
+  avatarColor = '#10B981',
   onBack,
   actions
 }: PageHeaderWithAvatarProps) {
@@ -46,13 +48,16 @@ export function PageHeaderWithAvatar({
               className="w-12 h-12 rounded-full object-cover"
             />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-krooa-green/20 flex items-center justify-center">
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: avatarColor }}
+            >
               {title ? (
-                <span className="text-krooa-dark font-bold">
+                <span className="text-white font-bold">
                   {getInitials(title)}
                 </span>
               ) : (
-                <User className="w-6 h-6 text-krooa-dark" />
+                <User className="w-6 h-6 text-white" />
               )}
             </div>
           )}

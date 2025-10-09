@@ -76,14 +76,14 @@ const regionConfigs: Record<RegionCode, RegionConfig> = {
 export function useTranslation(translationsObject?: Record<LanguageCode, Translations>) {
   const { currentRegion } = useRegion();
 
-  // Idioma completamente independente da região
+  // Idioma baseado na região se não houver preferência salva
   const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>(() => {
     const savedLanguage = localStorage.getItem('krooa_language') as LanguageCode;
     if (savedLanguage && ['PT', 'EN', 'ES'].includes(savedLanguage)) {
       return savedLanguage;
     }
-    // Padrão sempre português, independente da região
-    return 'PT';
+    // Padrão baseado na região: US = EN, BR = PT
+    return currentRegion === 'US' ? 'EN' : 'PT';
   });
 
   const [translations, setTranslations] = useState<Translations>({});

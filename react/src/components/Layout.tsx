@@ -13,7 +13,16 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
-  const { multiplasUnidadesEnabled, centroCustoEnabled } = useClinic();
+  const {
+    multiplasUnidadesEnabled,
+    centroCustoEnabled,
+    units,
+    costCenters,
+    selectedUnitIds,
+    setSelectedUnitIds,
+    selectedCostCenterIds,
+    setSelectedCostCenterIds
+  } = useClinic();
   const { t } = useTranslation(layoutTranslations);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -61,21 +70,29 @@ export function Layout({ children }: LayoutProps) {
     window.location.href = '/login';
   };
 
-  const unidadesOptions = [
-    { value: '1', label: 'Unidade Principal' },
-    { value: '2', label: 'Unidade Setor Oeste' },
-    { value: '3', label: 'Unidade Centro' },
-    { value: '4', label: 'Unidade Norte' },
-    { value: '5', label: 'Unidade Sul' }
-  ];
+  // Convert units and cost centers to select options
+  const unidadesOptions = units.map(unit => ({
+    value: unit.id.toString(),
+    label: unit.titulo
+  }));
 
-  const centrosOptions = [
-    { value: '1', label: 'Ortodontia' },
-    { value: '2', label: 'Endodontia' },
-    { value: '3', label: 'Cirurgia' },
-    { value: '4', label: 'Periodontia' },
-    { value: '5', label: 'Implantodontia' }
-  ];
+  const centrosOptions = costCenters.map(center => ({
+    value: center.id.toString(),
+    label: center.name
+  }));
+
+  // Show filters based on quantity, not enabled state
+  const showUnitsFilter = units.length > 1;
+  const showCostCentersFilter = costCenters.length > 1;
+
+  console.log('Layout Debug:', {
+    unitsLength: units.length,
+    costCentersLength: costCenters.length,
+    showUnitsFilter,
+    showCostCentersFilter,
+    units: units,
+    costCenters: costCenters
+  });
 
   // Menu de configurações - Array simples com Iconify
   const configItems = [
@@ -219,10 +236,12 @@ export function Layout({ children }: LayoutProps) {
         {/* Header */}
         <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 h-16">
           <div className="flex items-center justify-between h-full">
-            {/* Logo Principal */}
-            <div className="flex items-center gap-2 sm:gap-4">
-              {/* Menu Hambúrguer Mobile */}
-              <div className="relative md:hidden" ref={menuRef}>
+            {/* Seção Esquerda: Logo + Filtros */}
+            <div className="flex items-center gap-4">
+              {/* Logo Principal */}
+              <div className="flex items-center gap-2 sm:gap-4">
+                {/* Menu Hambúrguer Mobile */}
+                <div className="relative md:hidden" ref={menuRef}>
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                   className="text-gray-500 hover:text-gray-700 transition-colors p-1.5 rounded-lg hover:bg-gray-100"
@@ -234,26 +253,50 @@ export function Layout({ children }: LayoutProps) {
                 {mobileMenuOpen && (
                   <div className="absolute left-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-[calc(100vh-100px)] overflow-y-auto">
                     {/* Superfiltros no mobile */}
-                    {(multiplasUnidadesEnabled || centroCustoEnabled) && (
+                    {(showUnitsFilter || showCostCentersFilter) && (
                       <div className="p-4 border-b border-gray-200 space-y-3">
                         <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider">{t?.actions?.filters || 'Filtros'}</h3>
-                        {multiplasUnidadesEnabled && (
-                          <Select
-                            placeholder={t?.actions?.allUnits || 'Todas as Unidades'}
-                            options={unidadesOptions}
-                            value={selectedUnidades}
-                            onChange={(e) => setSelectedUnidades(Array.isArray(e.target.value) ? e.target.value : [])}
-                            multiple={true}
-                          />
+                        {showUnitsFilter && (
+                          <select
+                            value={selectedUnitIds.length === 1 ? selectedUnitIds[0] : ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (!value) {
+                                setSelectedUnitIds([]);
+                              } else {
+                                setSelectedUnitIds([parseInt(value)]);
+                              }
+                            }}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-krooa-green focus:border-transparent"
+                          >
+                            <option value="">{t?.actions?.allUnits || 'Todas as Unidades'}</option>
+                            {unidadesOptions.map(option => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
                         )}
-                        {centroCustoEnabled && (
-                          <Select
-                            placeholder={t?.actions?.allCenters || 'Todos os Centros'}
-                            options={centrosOptions}
-                            value={selectedCentros}
-                            onChange={(e) => setSelectedCentros(Array.isArray(e.target.value) ? e.target.value : [])}
-                            multiple={true}
-                          />
+                        {showCostCentersFilter && (
+                          <select
+                            value={selectedCostCenterIds.length === 1 ? selectedCostCenterIds[0] : ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (!value) {
+                                setSelectedCostCenterIds([]);
+                              } else {
+                                setSelectedCostCenterIds([parseInt(value)]);
+                              }
+                            }}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-krooa-green focus:border-transparent"
+                          >
+                            <option value="">{t?.actions?.allCenters || 'Todos os Centros'}</option>
+                            {centrosOptions.map(option => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
                         )}
                       </div>
                     )}
@@ -307,54 +350,74 @@ export function Layout({ children }: LayoutProps) {
                 alt="Krooa"
                 className="hidden sm:block h-14 object-contain"
               />
+              </div>
+
+              {/* Superfiltros - Desktop */}
+              {(showUnitsFilter || showCostCentersFilter) && (
+                <div className="hidden md:flex items-center gap-2">
+                  {/* Seletor de Unidades */}
+                  {showUnitsFilter && (
+                    <select
+                      value={selectedUnitIds.length === 1 ? selectedUnitIds[0] : ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (!value) {
+                          setSelectedUnitIds([]);
+                        } else {
+                          setSelectedUnitIds([parseInt(value)]);
+                        }
+                      }}
+                      className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-krooa-green focus:border-transparent"
+                    >
+                      <option value="">{t?.actions?.allUnits || 'Todas as Unidades'}</option>
+                      {unidadesOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+
+                  {/* Seletor de Centro de Custo */}
+                  {showCostCentersFilter && (
+                    <select
+                      value={selectedCostCenterIds.length === 1 ? selectedCostCenterIds[0] : ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (!value) {
+                          setSelectedCostCenterIds([]);
+                        } else {
+                          setSelectedCostCenterIds([parseInt(value)]);
+                        }
+                      }}
+                      className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-krooa-green focus:border-transparent"
+                    >
+                      <option value="">{t?.actions?.allCenters || 'Todos os Centros'}</option>
+                      {centrosOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Ações do header - Lado direito */}
             <div className="flex items-center gap-2 sm:gap-4">
-              {/* 1. Superfiltros - Ocultos no mobile */}
-              {(multiplasUnidadesEnabled || centroCustoEnabled) && (
-                <div className="hidden md:flex items-center gap-3">
-                  {/* Seletor de Unidades (Múltipla Seleção) */}
-                  {multiplasUnidadesEnabled && (
-                    <Select
-                      placeholder={t?.actions?.allUnits || 'Todas as Unidades'}
-                      options={unidadesOptions}
-                      value={selectedUnidades}
-                      onChange={(e) => setSelectedUnidades(Array.isArray(e.target.value) ? e.target.value : [])}
-                      multiple={true}
-                    />
-                  )}
-
-                  {/* Seletor de Centro de Custo (Seleção Múltipla) */}
-                  {centroCustoEnabled && (
-                    <Select
-                      placeholder={t?.actions?.allCenters || 'Todos os Centros'}
-                      options={centrosOptions}
-                      value={selectedCentros}
-                      onChange={(e) => setSelectedCentros(Array.isArray(e.target.value) ? e.target.value : [])}
-                      multiple={true}
-                    />
-                  )}
-                </div>
-              )}
-
-              {/* Divisor sutil - Oculto no mobile */}
-              {(multiplasUnidadesEnabled || centroCustoEnabled) && (
-                <div className="hidden md:block h-6 w-px bg-gray-300"></div>
-              )}
-
-              {/* 2. Busca */}
+              {/* Busca */}
               <button className="text-gray-500 hover:text-gray-700 transition-colors p-1">
                 <Icon icon="mdi:magnify" className="w-5 h-5" />
               </button>
 
-              {/* 3. Notificações/Alerta */}
+              {/* Notificações/Alerta */}
               <button className="relative text-gray-500 hover:text-gray-700 transition-colors p-1">
                 <Icon icon="mdi:bell-outline" className="w-5 h-5" />
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></span>
               </button>
 
-              {/* 4. Menu de Configurações */}
+              {/* Menu de Configurações */}
               <div className="relative" ref={configMenuRef}>
                 <button
                   onClick={() => setConfigMenuOpen(!configMenuOpen)}

@@ -17,6 +17,7 @@ export default function Step2Page() {
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setCouponError] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{discount: number, type: 'percentage' | 'fixed'} | null>(null);
+  const [showCouponField, setShowCouponField] = useState(false);
   const [lgpdAccepted, setLgpdAccepted] = useState(false);
   const [hipaaAccepted, setHipaaAccepted] = useState(false);
   const [adminAccepted, setAdminAccepted] = useState(false);
@@ -121,30 +122,39 @@ export default function Step2Page() {
     setCouponError('');
     setAppliedCoupon(null);
 
-    // Cupons válidos por região com valores ajustados
-    const validCoupons = currentRegion === 'BR' ? {
-      'DESCONTO10': { discount: 10, type: 'percentage' as const },
-      'PRIMEIRA50': { discount: 50, type: 'fixed' as const },
-      'TESTE30': { discount: 30, type: 'percentage' as const },
-      'BEMVINDO': { discount: 15, type: 'percentage' as const },
-      'PROMO20': { discount: 20, type: 'percentage' as const },
-      // Aceitar cupons em inglês para região BR
-      'DISCOUNT10': { discount: 10, type: 'percentage' as const },
-      'FIRST50': { discount: 50, type: 'fixed' as const },
-      'TEST30': { discount: 30, type: 'percentage' as const },
-      'WELCOME': { discount: 15, type: 'percentage' as const },
-      'PROMO20': { discount: 20, type: 'percentage' as const }
-    } : {
-      'DISCOUNT10': { discount: 10, type: 'percentage' as const },
-      'FIRST50': { discount: 50, type: 'fixed' as const },
-      'TEST30': { discount: 30, type: 'percentage' as const },
-      'WELCOME': { discount: 15, type: 'percentage' as const },
-      'PROMO20': { discount: 20, type: 'percentage' as const },
-      // Aceitar cupons em português para região US
-      'DESCONTO10': { discount: 10, type: 'percentage' as const },
-      'PRIMEIRA50': { discount: 50, type: 'fixed' as const },
-      'TESTE30': { discount: 30, type: 'percentage' as const },
-      'BEMVINDO': { discount: 15, type: 'percentage' as const }
+    // Cupons válidos por período e região
+    const validCoupons = {
+      monthly: currentRegion === 'BR' ? {
+        'MENSAL10': { discount: 10, type: 'percentage' as const },
+        'PRIMEIROMES': { discount: 50, type: 'fixed' as const },
+        'MONTHLY10': { discount: 10, type: 'percentage' as const },
+        'FIRSTMONTH': { discount: 50, type: 'fixed' as const }
+      } : {
+        'MONTHLY10': { discount: 10, type: 'percentage' as const },
+        'FIRSTMONTH': { discount: 50, type: 'fixed' as const },
+        'MENSAL10': { discount: 10, type: 'percentage' as const },
+        'PRIMEIROMES': { discount: 50, type: 'fixed' as const }
+      },
+      quarterly: currentRegion === 'BR' ? {
+        'TRIMESTRE15': { discount: 15, type: 'percentage' as const },
+        'QUARTERLY15': { discount: 15, type: 'percentage' as const },
+        'DESCONTO3M': { discount: 100, type: 'fixed' as const }
+      } : {
+        'QUARTERLY15': { discount: 15, type: 'percentage' as const },
+        'TRIMESTRE15': { discount: 15, type: 'percentage' as const },
+        'DISCOUNT3M': { discount: 100, type: 'fixed' as const }
+      },
+      yearly: currentRegion === 'BR' ? {
+        'ANUAL20': { discount: 20, type: 'percentage' as const },
+        'YEARLY20': { discount: 20, type: 'percentage' as const },
+        'DESCONTO12M': { discount: 500, type: 'fixed' as const },
+        'PLANO1ANO': { discount: 25, type: 'percentage' as const }
+      } : {
+        'YEARLY20': { discount: 20, type: 'percentage' as const },
+        'ANUAL20': { discount: 20, type: 'percentage' as const },
+        'DISCOUNT12M': { discount: 500, type: 'fixed' as const },
+        'PLAN1YEAR': { discount: 25, type: 'percentage' as const }
+      }
     };
 
     if (!couponCode.trim()) {
@@ -152,11 +162,13 @@ export default function Step2Page() {
       return;
     }
 
-    const coupon = validCoupons[couponCode.toUpperCase() as keyof typeof validCoupons];
+    const periodCoupons = validCoupons[selectedPeriod];
+    const coupon = periodCoupons[couponCode.toUpperCase() as keyof typeof periodCoupons];
+
     if (coupon) {
       setAppliedCoupon(coupon);
     } else {
-      setCouponError(t?.step2?.couponInvalid || 'Cupom inválido ou expirado');
+      setCouponError(t?.step2?.couponInvalidForPeriod || `Cupom inválido para o período ${periodOptions.find(p => p.key === selectedPeriod)?.name.toLowerCase()}`);
     }
   };
 
@@ -164,6 +176,7 @@ export default function Step2Page() {
     setAppliedCoupon(null);
     setCouponCode('');
     setCouponError('');
+    setShowCouponField(false);
   };
 
   const validateForm = () => {
@@ -284,7 +297,14 @@ export default function Step2Page() {
                   {periodOptions.map((period) => (
                     <button
                       key={period.key}
-                      onClick={() => setSelectedPeriod(period.key)}
+                      onClick={() => {
+                        setSelectedPeriod(period.key);
+                        // Reset cupom quando mudar período
+                        setAppliedCoupon(null);
+                        setCouponCode('');
+                        setCouponError('');
+                        setShowCouponField(false);
+                      }}
                       className={`relative flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all ${
                         selectedPeriod === period.key
                           ? 'bg-white text-krooa-blue shadow-sm'
@@ -323,86 +343,117 @@ export default function Step2Page() {
                 </div>
               </div>
 
-              {/* Plan Features */}
+              {/* Coupon Section - Discreto */}
               <div className="mb-6">
-                <h4 className="font-semibold text-gray-900 mb-3">{t?.step2?.includedFeatures || 'Incluído no plano:'}</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  {planDetails.features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <svg className="w-2 h-2 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                {!appliedCoupon ? (
+                  <div>
+                    {/* Botão discreto para mostrar campo de cupom */}
+                    {!showCouponField && (
+                      <button
+                        type="button"
+                        onClick={() => setShowCouponField(true)}
+                        className="text-sm text-gray-600 hover:text-krooa-blue flex items-center gap-1 transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                         </svg>
+                        <span>{t?.step2?.haveCoupon || 'Tenho um cupom de desconto'}</span>
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    )}
+
+                    {/* Campo de cupom expansível */}
+                    {showCouponField && (
+                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 mt-3 animate-in slide-in-from-top-2 duration-200">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-medium text-gray-700">{t?.step2?.coupon || 'Cupom de desconto'}</h4>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowCouponField(false);
+                              setCouponCode('');
+                              setCouponError('');
+                            }}
+                            className="text-gray-400 hover:text-gray-600"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+
+                        <div className="flex gap-3">
+                          <div className="flex-1">
+                            <Input
+                              value={couponCode}
+                              onChange={(value) => setCouponCode(value.toUpperCase())}
+                              placeholder={t?.step2?.couponPlaceholder || 'Digite seu código'}
+                              error={couponError}
+                            />
+                          </div>
+                          <div className="flex-1 max-w-[120px]">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={applyCoupon}
+                              disabled={!couponCode.trim()}
+                              className="w-full h-10"
+                            >
+                              {t?.step2?.applyCoupon || 'Aplicar'}
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="mt-2 text-xs text-gray-500">
+                          {t?.step2?.couponExamples || 'Exemplos:'} {' '}
+                          {selectedPeriod === 'monthly' && (currentRegion === 'BR' ? 'MENSAL10, PRIMEIROMES' : 'MONTHLY10, FIRSTMONTH')}
+                          {selectedPeriod === 'quarterly' && (currentRegion === 'BR' ? 'TRIMESTRE15, DESCONTO3M' : 'QUARTERLY15, DISCOUNT3M')}
+                          {selectedPeriod === 'yearly' && (currentRegion === 'BR' ? 'ANUAL20, PLANO1ANO' : 'YEARLY20, PLAN1YEAR')}
+                        </div>
                       </div>
-                      <span className="text-sm text-gray-700">{feature}</span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <div className="font-medium text-emerald-800">
+                          {couponCode} - {appliedCoupon.type === 'percentage'
+                            ? `${appliedCoupon.discount}% off`
+                            : `${formatCurrency(appliedCoupon.discount)} off`
+                          }
+                        </div>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                    <button
+                      type="button"
+                      onClick={removeCoupon}
+                      className="text-red-600 hover:text-red-800 text-sm font-medium"
+                    >
+                      {t?.step2?.removeCoupon || 'Remover'}
+                    </button>
+                  </div>
+                )}
               </div>
 
-              {/* Additional Resources Link */}
+              {/* Learn More Link */}
               <div className="text-center pt-4 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setDocumentModal({ isOpen: true, type: 'addons' })}
                   className="text-krooa-blue hover:text-krooa-blue/80 text-sm font-medium underline"
                 >
-                  {t?.step2?.learnMoreAddons || 'Saiba mais sobre recursos adicionais'} →
+                  {t?.step2?.learnMore || 'Saiba mais'} →
                 </button>
               </div>
             </div>
 
 
-            {/* Coupon Section */}
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              <h3 className="font-semibold text-gray-900 mb-3">{t?.step2?.coupon || 'Cupom de desconto'}</h3>
-              {!appliedCoupon ? (
-                <div className="flex gap-3">
-                  <div className="flex-1">
-                    <Input
-                      value={couponCode}
-                      onChange={(value) => setCouponCode(value.toUpperCase())}
-                      placeholder={t?.step2?.couponPlaceholder || 'Digite seu código'}
-                      error={couponError}
-                    />
-                  </div>
-                  <div className="flex-1 max-w-[120px]">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={applyCoupon}
-                      disabled={!couponCode.trim()}
-                      className="w-full h-10"
-                    >
-                      {t?.step2?.applyCoupon || 'Aplicar'}
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <div>
-                      <div className="font-medium text-emerald-800">
-                        {couponCode} - {appliedCoupon.type === 'percentage'
-                          ? `${appliedCoupon.discount}% off`
-                          : `${formatCurrency(appliedCoupon.discount)} off`
-                        }
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={removeCoupon}
-                    className="text-red-600 hover:text-red-800 text-sm font-medium"
-                  >
-                    {t?.step2?.removeCoupon || 'Remover'}
-                  </button>
-                </div>
-              )}
-            </div>
 
             {/* Terms and Conditions */}
             <div className="space-y-4">
@@ -587,9 +638,30 @@ export default function Step2Page() {
             {documentModal.type === 'addons' && (
               <div>
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
-                  {t?.step2?.additionalResources || 'Recursos adicionais disponíveis'}
+                  {t?.step2?.planDetails || 'Detalhes do plano'}
                 </h2>
-                <p className="text-sm text-gray-600 mb-6">
+
+                {/* Included Features */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-gray-900 mb-3">{t?.step2?.includedFeatures || 'Incluído no seu plano:'}</h3>
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {planDetails.features.map((feature: string, index: number) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <svg className="w-2 h-2 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <span className="text-sm text-gray-700">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <h3 className="font-semibold text-gray-900 mb-3">
+                  {t?.step2?.additionalResources || 'Recursos adicionais disponíveis'}
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
                   {t?.step2?.additionalResourcesDescription || 'Após contratar o plano, você pode adicionar recursos extras conforme sua necessidade:'}
                 </p>
 

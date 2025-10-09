@@ -9,6 +9,7 @@ interface ColaboradorData {
   nome?: string;
   cargo?: string;
   foto?: string;
+  corAvatar?: string;
 }
 
 interface ColaboradorLayoutProps {
@@ -53,9 +54,10 @@ export function ColaboradorLayout({ colaboradorData, headerControls, children }:
 
       // Props para header com avatar
       avatarData={colaboradorData ? {
-        title: 'Novo Colaborador',
-        subtitle: "Preencha os dados do colaborador",
+        title: colaboradorData.nome || (isNew ? 'Novo Colaborador' : 'Colaborador'),
+        subtitle: colaboradorData.cargo || (isNew ? "Preencha os dados do colaborador" : "Dados do colaborador"),
         avatarUrl: colaboradorData.foto,
+        avatarColor: colaboradorData.corAvatar,
         onBack: handleBack
       } : undefined}
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card } from '../../../../components/ui/Card';
 import { Select } from '../../../../components/ui/Select';
 import { Switch } from '../../../../components/ui/Switch';
@@ -109,40 +109,28 @@ export default function ParametrosColaborador() {
               label={t?.defaultValues?.defaultUnit || 'Unidade Padrão'}
               value={formData.unidadePadrao}
               onChange={(e) => handleInputChange('unidadePadrao', e.target.value)}
-              options={[
-                { value: '', label: t?.defaultValues?.defaultUnitPlaceholder || 'Selecione a unidade padrão' },
-                ...unidadeOptions
-              ]}
+              options={unidadeOptions}
             />
 
             <Select
               label={t?.defaultValues?.defaultCostCenter || 'Centro de Custo Padrão'}
               value={formData.centroCustoPadrao}
               onChange={(e) => handleInputChange('centroCustoPadrao', e.target.value)}
-              options={[
-                { value: '', label: t?.defaultValues?.defaultCostCenterPlaceholder || 'Selecione o centro de custo padrão' },
-                ...centroCustoOptions
-              ]}
+              options={centroCustoOptions}
             />
 
             <Select
               label={t?.defaultValues?.linkedProfessional || 'Profissional Vinculado'}
               value={formData.profissionalPadrao}
               onChange={(e) => handleInputChange('profissionalPadrao', e.target.value)}
-              options={[
-                { value: '', label: t?.defaultValues?.linkedProfessionalPlaceholder || 'Selecione o profissional' },
-                ...profissionalOptions
-              ]}
+              options={profissionalOptions}
             />
 
             <Select
               label={t?.defaultValues?.defaultBank || 'Banco/Conta Padrão'}
               value={formData.bancoPadrao}
               onChange={(e) => handleInputChange('bancoPadrao', e.target.value)}
-              options={[
-                { value: '', label: t?.defaultValues?.defaultBankPlaceholder || 'Selecione o banco/conta' },
-                ...bancoOptions
-              ]}
+              options={bancoOptions}
             />
 
             <Select
@@ -226,11 +214,10 @@ export default function ParametrosColaborador() {
               <div className="relative">
                 <input
                   className="peer w-full h-10 rounded-lg border border-gray-300 px-3 py-2 focus:border-krooa-green focus:outline-none focus:ring-2 focus:ring-krooa-green/20"
-                  placeholder=" "
                   value={formData.comissao}
                   onChange={(e) => handleInputChange('comissao', e.target.value)}
                 />
-                <label className="absolute left-3 transition-all duration-200 pointer-events-none top-1/2 -translate-y-1/2 text-sm text-gray-500 peer-focus:top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-gray-600 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm">
+                <label className="absolute left-3 transition-all duration-200 pointer-events-none top-0 -translate-y-1/2 text-xs bg-white px-1 text-gray-600">
                   {formData.tipoComissao === 'percentual' ? (t?.commission?.percentageLabel || 'Percentual (%)') : (t?.commission?.fixedLabel || 'Valor (R$)')}
                 </label>
               </div>

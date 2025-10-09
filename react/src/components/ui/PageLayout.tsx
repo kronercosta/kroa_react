@@ -8,6 +8,7 @@ interface PageHeaderAvatarData {
   title: string;
   subtitle?: string;
   avatarUrl?: string;
+  avatarColor?: string;
   onBack?: () => void;
 }
 
@@ -53,6 +54,7 @@ export function PageLayout({
               title={avatarData.title}
               subtitle={avatarData.subtitle}
               avatarUrl={avatarData.avatarUrl}
+              avatarColor={avatarData.avatarColor}
               onBack={avatarData.onBack}
               actions={headerControls}
             />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { GripVertical, TrendingUp, TrendingDown, Minus, Trash2, Clock, X, Plus } from 'lucide-react';
 import { Button, IconButton } from '../../../../components/ui/Button';
 import { Input } from '../../../../components/ui/Input';
@@ -10,6 +10,7 @@ import { ConfiguracoesClinicaLayout } from '../ConfiguracoesClinicaLayout';
 import { HeaderControls } from '../../../../components/ui/HeaderControls';
 import { Aside } from '../../../../components/ui/Aside';
 import { useTranslation } from '../../../../hooks/useTranslation';
+import { useClinic } from '../../../../contexts/ClinicContext';
 import translations from './translation.json';
 
 interface Professional {
@@ -30,6 +31,7 @@ interface Slot {
 interface Chair {
   id: number;
   name: string;
+  unitId: number;
   order: number;
   slots: {
     [day: string]: Slot[];
@@ -45,11 +47,15 @@ const CadeirasClinica: React.FC = () => {
   // Hook de traduções
   const { t } = useTranslation(translations);
 
+  // Hook de unidades
+  const { units } = useClinic();
+
   // Estados para Cadeiras
   const [chairs, setChairs] = useState<Chair[]>([
     {
       id: 1,
       name: 'CONSULT. 1',
+      unitId: 1,
       order: 1,
       slots: {
         ter: [
@@ -81,6 +87,7 @@ const CadeirasClinica: React.FC = () => {
     {
       id: 2,
       name: 'CONSULT. 2',
+      unitId: 1,
       order: 2,
       slots: {
         ter: [
@@ -105,9 +112,12 @@ const CadeirasClinica: React.FC = () => {
 
   // Estados do aside content
   const [hasSpecificDates, setHasSpecificDates] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
-  const [calendarDate, setCalendarDate] = useState(new Date());
+
+  // Estados para modal de exclusão
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [chairToDelete, setChairToDelete] = useState<any>(null);
+  const [transferToChair, setTransferToChair] = useState('');
 
   // Mock professionals list
   const professionals = [
@@ -118,17 +128,6 @@ const CadeirasClinica: React.FC = () => {
     { id: '5', name: 'Dra. Ana Oliveira', duration: 40, email: 'ana.oliveira@clinica.com' }
   ];
 
-  // Close date picker when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (showDatePicker && !(e.target as Element).closest('.date-picker-container')) {
-        setShowDatePicker(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showDatePicker]);
 
   const getDayAbbreviation = (day: string) => {
     const days: { [key: string]: string } = {
@@ -141,6 +140,25 @@ const CadeirasClinica: React.FC = () => {
       dom: 'Domingo'
     };
     return days[day] || day;
+  };
+
+  // Helper para formatar datas corretamente
+  const formatDateDisplay = (date: string) => {
+    if (!date) return '';
+    try {
+      // Se a data já está no formato dd/mm/yyyy, use diretamente
+      if (date.includes('/')) {
+        return date;
+      }
+      // Se está no formato yyyy-mm-dd, converta
+      if (date.includes('-') && date.length === 10) {
+        const [year, month, day] = date.split('-');
+        return `${day}/${month}/${year}`;
+      }
+      return date;
+    } catch {
+      return date; // Retorna a data original se houver erro
+    }
   };
 
   // Drag and Drop functions
@@ -190,6 +208,7 @@ const CadeirasClinica: React.FC = () => {
         setEditingChair({
           id: chair.id,
           name: chair.name,
+          unitId: chair.unitId,
           slots: chair.slots || {},
           selectedDays: [],
           startTime: '',
@@ -202,6 +221,7 @@ const CadeirasClinica: React.FC = () => {
     } else {
       setEditingChair({
         name: '',
+        unitId: units[0]?.id || 1,
         slots: {},
         selectedDays: [],
         startTime: '',
@@ -229,7 +249,7 @@ const CadeirasClinica: React.FC = () => {
       // Update existing chair
       setChairs(chairs.map((chair: any) => {
         if (chair.id === editingChair.id) {
-          return { ...chair, name: editingChair.name, slots: editingChair.slots };
+          return { ...chair, name: editingChair.name, unitId: editingChair.unitId, slots: editingChair.slots };
         }
         return chair;
       }));
@@ -238,6 +258,7 @@ const CadeirasClinica: React.FC = () => {
       const newChair: Chair = {
         id: Date.now(),
         name: editingChair.name,
+        unitId: editingChair.unitId || units[0]?.id || 1,
         order: chairs.length + 1,
         slots: editingChair.slots || {},
         metrics: {
@@ -256,6 +277,30 @@ const CadeirasClinica: React.FC = () => {
     const chair = chairs.find(c => c.id === chairId);
     if (chair) {
       openAside(chairId);
+    }
+  };
+
+  const handleDeleteChair = () => {
+    setChairToDelete(editingChair);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteChair = () => {
+    if (chairToDelete) {
+      // Aqui você implementaria a lógica de transferência dos registros
+      if (transferToChair) {
+        console.log(`Transferindo registros da cadeira ${chairToDelete.name} para a cadeira ${transferToChair}`);
+        // Implementar lógica de transferência
+      }
+
+      // Remove a cadeira
+      setChairs(chairs.filter(c => c.id !== chairToDelete.id));
+
+      // Fecha o modal e o aside
+      setShowDeleteModal(false);
+      setChairToDelete(null);
+      setTransferToChair('');
+      closeAside();
     }
   };
 
@@ -294,7 +339,7 @@ const CadeirasClinica: React.FC = () => {
 
   return (
     <ConfiguracoesClinicaLayout>
-      <div className="w-full max-w-full space-y-6">
+      <div className="w-full max-w-full">
         {/* Status da Configuração */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
         <div className="flex items-center gap-4">
@@ -353,14 +398,14 @@ const CadeirasClinica: React.FC = () => {
         </div>
       </div>
 
-      <Card className="w-full max-w-full overflow-hidden">
+      <Card className="w-full max-w-full overflow-hidden mt-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
           <div className="flex-1 min-w-0">
             <h2 className="text-lg font-bold text-gray-900">{t.pageTitle || 'Configuração de Cadeiras'}</h2>
             <p className="text-sm text-gray-600 mt-1">{t.pageSubtitle || 'Configure horários e profissionais para cada cadeira'}</p>
           </div>
           <div className="flex-shrink-0">
-            <Button onClick={() => openAside()} variant="primary" className="w-full sm:w-auto">
+            <Button onClick={() => openAside()} variant="primary" size="sm" className="w-full sm:w-auto">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
@@ -400,6 +445,18 @@ const CadeirasClinica: React.FC = () => {
                   {getStatusIndicator(row.metrics.status)}
                 </div>
               )
+            },
+            {
+              key: 'unit',
+              title: t.table?.columns?.unit || 'Unidade',
+              render: (_, row) => {
+                const unit = units.find(u => u.id === row.unitId);
+                return (
+                  <span className="text-sm text-gray-600">
+                    {unit?.titulo || 'N/A'}
+                  </span>
+                );
+              }
             },
             {
               key: 'seg',
@@ -672,12 +729,7 @@ const CadeirasClinica: React.FC = () => {
             <h3 className="text-xl font-semibold text-gray-900">{t.aside?.configureSchedules || 'Configurar Horários'}</h3>
             {editingChair?.id && (
               <IconButton
-                onClick={() => {
-                  if (confirm(t.aside?.confirmDelete || 'Tem certeza que deseja excluir esta cadeira?')) {
-                    setChairs(chairs.filter(c => c.id !== editingChair.id));
-                    closeAside();
-                  }
-                }}
+                onClick={handleDeleteChair}
                 variant="ghost"
                 size="md"
                 className="text-red-600 hover:bg-red-100"
@@ -694,10 +746,33 @@ const CadeirasClinica: React.FC = () => {
               label={t.aside?.chairName || 'Nome da Cadeira'}
               value={editingChair.name || ''}
               onChange={(value) => setEditingChair({ ...editingChair, name: value })}
-              placeholder={t.aside?.chairNamePlaceholder || 'Nome da Cadeira'}
               floating
               fullWidth
             />
+          </div>
+
+          {/* Unidade */}
+          <div>
+            <Select
+              label={t.aside?.unit || 'Unidade'}
+              value={editingChair.unitId?.toString() || ''}
+              onChange={(e) => setEditingChair({
+                ...editingChair,
+                unitId: parseInt(Array.isArray(e.target.value) ? e.target.value[0] : e.target.value)
+              })}
+              options={units.map(unit => ({
+                value: unit.id.toString(),
+                label: unit.titulo
+              }))}
+              disabled={units.length <= 1}
+              required
+              fullWidth
+            />
+            {units.length <= 1 && (
+              <p className="text-xs text-gray-500 mt-1">
+                {t.aside?.singleUnit || 'Cadeira será vinculada à única unidade disponível'}
+              </p>
+            )}
           </div>
 
           {/* Toggle de Datas Específicas */}
@@ -738,8 +813,8 @@ const CadeirasClinica: React.FC = () => {
                     }}
                     className={`flex-1 px-3 py-2 text-sm font-medium rounded-xl border-2 transition-all duration-200 transform ${
                       editingChair.selectedDays?.includes(day)
-                        ? 'bg-krooa-green text-white border-krooa-green shadow-lg scale-105'
-                        : 'bg-white text-gray-600 border-gray-200 hover:border-krooa-green hover:bg-krooa-green/5 hover:text-krooa-dark hover:shadow-md hover:scale-105'
+                        ? 'bg-krooa-blue text-white border-krooa-blue shadow-lg scale-105'
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-krooa-blue hover:bg-krooa-blue/5 hover:text-krooa-blue hover:shadow-md hover:scale-105'
                     }`}
                   >
                     {getDayAbbreviation(day).substring(0, 3)}
@@ -751,27 +826,18 @@ const CadeirasClinica: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t.aside?.specificDatesList || 'Datas Específicas'}</label>
               <div className="space-y-2">
-                <div className="relative date-picker-container">
-                  <div className="flex gap-2">
-                    <div
-                      className="flex-1 relative"
-                      onClick={() => setShowDatePicker(!showDatePicker)}
-                    >
-                      <input
-                        type="text"
-                        value={selectedDate ? new Date(selectedDate + 'T00:00:00').toLocaleDateString('pt-BR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric'
-                        }) : ''}
-                        placeholder={t.aside?.selectDate || 'Selecione uma data'}
-                        readOnly
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-krooa-green/20 focus:border-krooa-green"
-                      />
-                      <svg className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
+                <div className="flex gap-2">
+                    <Input
+                      label="Data Específica"
+                      mask="datepicker"
+                      validation="none"
+                      required={false}
+                      disabled={false}
+                      fullWidth={true}
+                      value={selectedDate}
+                      onChange={(value, isValid, data) => setSelectedDate(value)}
+                      excludedDates={editingChair.specificDates || []}
+                    />
                     <Button
                       onClick={() => {
                         if (selectedDate) {
@@ -786,128 +852,16 @@ const CadeirasClinica: React.FC = () => {
                         }
                       }}
                       variant="primary"
+                      size="sm"
                     >
                       {t.buttons?.add || 'Adicionar'}
                     </Button>
                   </div>
-
-                  {/* Custom Calendar */}
-                  {showDatePicker && (
-                    <div
-                      className="absolute z-50 mt-1 bg-gray-50 border border-gray-200 rounded-lg shadow-xl p-3"
-                      style={{ minWidth: '300px' }}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center justify-between mb-3 gap-2">
-                        <IconButton
-                          onClick={() => {
-                            const newDate = new Date(calendarDate);
-                            newDate.setMonth(newDate.getMonth() - 1);
-                            setCalendarDate(newDate);
-                          }}
-                          variant="ghost"
-                          size="sm"
-                          className="flex-shrink-0"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                          </svg>
-                        </IconButton>
-                        <div className="flex items-center gap-2 flex-1 justify-center">
-                          <span className="font-medium">
-                            {calendarDate.toLocaleDateString('pt-BR', { month: 'long' }).charAt(0).toUpperCase() +
-                             calendarDate.toLocaleDateString('pt-BR', { month: 'long' }).slice(1)}
-                          </span>
-                          <select
-                            value={calendarDate.getFullYear()}
-                            onChange={(e) => {
-                              const newDate = new Date(calendarDate);
-                              newDate.setFullYear(parseInt(e.target.value));
-                              setCalendarDate(newDate);
-                            }}
-                            className="px-2 py-1 border border-gray-200 rounded text-sm focus:outline-none focus:border-krooa-green bg-white"
-                          >
-                            {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 2 + i).map(year => (
-                              <option key={year} value={year}>{year}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newDate = new Date(calendarDate);
-                            newDate.setMonth(newDate.getMonth() + 1);
-                            setCalendarDate(newDate);
-                          }}
-                          className="p-1 hover:bg-gray-100 rounded transition-colors flex-shrink-0"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-7 gap-1 mb-2">
-                        {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'].map(day => (
-                          <div key={day} className="text-center text-xs font-medium text-gray-600 py-1">
-                            {day}
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="grid grid-cols-7 gap-1">
-                        {(() => {
-                          const firstDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1).getDay();
-                          const daysInMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).getDate();
-                          const days = [];
-
-                          for (let i = 0; i < firstDay; i++) {
-                            days.push(<div key={`empty-${i}`} className="p-2"></div>);
-                          }
-
-                          for (let day = 1; day <= daysInMonth; day++) {
-                            const dateStr = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                            const isToday = new Date().toDateString() === new Date(calendarDate.getFullYear(), calendarDate.getMonth(), day).toDateString();
-                            const isSelected = selectedDate === dateStr;
-                            const isAlreadyAdded = editingChair.specificDates?.includes(dateStr);
-
-                            days.push(
-                              <button
-                                key={day}
-                                type="button"
-                                onClick={() => {
-                                  setSelectedDate(dateStr);
-                                  setShowDatePicker(false);
-                                }}
-                                disabled={isAlreadyAdded}
-                                className={`
-                                  p-2 text-sm rounded transition-colors
-                                  ${isAlreadyAdded ? 'bg-gray-200 text-gray-400 cursor-not-allowed' :
-                                    isSelected ? 'bg-krooa-green text-white font-medium' :
-                                    isToday ? 'bg-gray-200 text-gray-900 font-medium' :
-                                    'hover:bg-gray-100 text-gray-700'}
-                                `}
-                              >
-                                {day}
-                              </button>
-                            );
-                          }
-
-                          return days;
-                        })()}
-                      </div>
-                    </div>
-                  )}
-                </div>
                 {editingChair.specificDates?.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {editingChair.specificDates.map((date: string, index: number) => (
                       <span key={index} className="inline-flex items-center gap-1 px-3 py-1.5 bg-krooa-green/10 text-krooa-dark rounded-lg text-sm">
-                        {new Date(date + 'T00:00:00').toLocaleDateString('pt-BR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric'
-                        })}
+                        {formatDateDisplay(date)}
                         <IconButton
                           onClick={() => {
                             setEditingChair({
@@ -916,7 +870,7 @@ const CadeirasClinica: React.FC = () => {
                             });
                           }}
                           variant="ghost"
-                          size="xs"
+                          size="sm"
                           className="hover:text-red-600"
                         >
                           <X className="w-3 h-3" />
@@ -937,7 +891,6 @@ const CadeirasClinica: React.FC = () => {
                 label={t.aside?.startTime || 'Início'}
                 value={editingChair.startTime || ''}
                 onChange={(value) => setEditingChair({ ...editingChair, startTime: value })}
-                placeholder="Selecione o horário"
                 floating
                 fullWidth
                 timeIntervals={30}
@@ -952,7 +905,6 @@ const CadeirasClinica: React.FC = () => {
               label={t.aside?.endTime || 'Fim'}
               value={editingChair.endTime || ''}
               onChange={(value) => setEditingChair({ ...editingChair, endTime: value })}
-              placeholder="Selecione o horário"
               floating
               fullWidth
               timeIntervals={30}
@@ -964,41 +916,42 @@ const CadeirasClinica: React.FC = () => {
           {/* Duração dos Atendimentos */}
           <Input
             label={t.aside?.duration || 'Duração dos Atendimentos'}
+            mask="timepicker"
+            validation="none"
+            required={false}
+            disabled={false}
+            fullWidth={true}
+            timeIntervals={30}
+            timeStart="00:30"
+            timeEnd="04:00"
             value={editingChair.duration || ''}
             onChange={(value) => setEditingChair({ ...editingChair, duration: value })}
-            placeholder={t.aside?.durationPlaceholder || 'h:min'}
-            floating
-            fullWidth
-            suffix="h:min"
           />
 
           {/* Professionals Select */}
           <Select
             label={t.aside?.professionals || 'Profissionais'}
-            options={[
-              { value: '', label: t.aside?.selectProfessionals || 'Selecione os profissionais' },
-              ...professionals.map(prof => ({
-                value: prof.id,
-                label: prof.name
-              }))
-            ]}
-            value={editingChair.selectedProfessionals?.[0] || ''}
+            options={professionals.map(prof => ({
+              value: prof.id,
+              label: prof.name
+            }))}
+            value={editingChair.selectedProfessionals || []}
             onChange={(e) => {
               const value = e.target.value;
-              if (value) {
-                setEditingChair({
-                  ...editingChair,
-                  selectedProfessionals: [value]
-                });
-              }
+              setEditingChair({
+                ...editingChair,
+                selectedProfessionals: Array.isArray(value) ? value : [value]
+              });
             }}
+            multiple
             fullWidth
           />
 
           {/* Botão Adicionar Horário */}
-          <div className="flex justify-end">
-            <Button
-              variant="primary"
+          <Button
+            variant="primary"
+            size="sm"
+            fullWidth
               onClick={() => {
                 if (editingChair.startTime && editingChair.endTime && editingChair.duration) {
                   const newSlot = {
@@ -1042,7 +995,6 @@ const CadeirasClinica: React.FC = () => {
               <Plus className="w-4 h-4" />
               {t.buttons?.addSchedule || 'Adicionar Horário'}
             </Button>
-          </div>
 
           {/* Tabela de Horários */}
           <div className="mt-6">
@@ -1064,11 +1016,11 @@ const CadeirasClinica: React.FC = () => {
                     title: t.schedulesTable?.dayDate || 'Dia/Data',
                     render: (_, row) => (
                       <div>
-                        <span className="font-medium">
+                        <span className="font-medium text-krooa-blue">
                           {getDayAbbreviation(row.day)}
                         </span>
                         {row.date && (
-                          <span className="ml-2 text-xs text-gray-500">
+                          <span className="ml-2 text-xs text-krooa-blue/70">
                             ({Array.isArray(row.date) ? row.date.join(', ') : row.date})
                           </span>
                         )}
@@ -1105,27 +1057,36 @@ const CadeirasClinica: React.FC = () => {
                       <div className="flex items-center justify-center gap-2">
                         <IconButton
                           onClick={() => {
+                            // Extrair dados do slot para edição
                             const [startTime, endTime] = row.time.split('-');
+
+                            // Atualizar o estado com os dados do slot para edição
                             setEditingChair({
                               ...editingChair,
-                              startTime: startTime,
-                              endTime: endTime,
+                              startTime: startTime.trim(),
+                              endTime: endTime.trim(),
                               duration: row.duration || '30',
                               selectedProfessionals: row.professionals?.map((p: any) => p.id) || [],
                               selectedDays: [row.day],
                               specificDates: row.date ? (Array.isArray(row.date) ? row.date : [row.date]) : []
                             });
 
+                            // Se tem data específica, ativar o toggle
                             if (row.date) {
                               setHasSpecificDates(true);
+                            } else {
+                              setHasSpecificDates(false);
                             }
 
+                            // Remover o slot atual para permitir nova adição
                             const newSlots = { ...editingChair.slots };
-                            newSlots[row.day] = newSlots[row.day].filter((s: any) => s.id !== row.id);
-                            if (newSlots[row.day].length === 0) {
-                              delete newSlots[row.day];
+                            if (newSlots[row.day]) {
+                              newSlots[row.day] = newSlots[row.day].filter((s: any) => s.id !== row.id);
+                              if (newSlots[row.day].length === 0) {
+                                delete newSlots[row.day];
+                              }
                             }
-                            setEditingChair({ ...editingChair, slots: newSlots });
+                            setEditingChair((prev: any) => ({ ...prev, slots: newSlots }));
                           }}
                           variant="ghost"
                           size="sm"
@@ -1169,6 +1130,98 @@ const CadeirasClinica: React.FC = () => {
           </div>
         </div>
       </Aside>
+
+      {/* Modal de Confirmação de Exclusão */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
+            {/* Header */}
+            <div className="border-b border-gray-200 px-6 py-4">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Excluir Cadeira
+              </h3>
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setChairToDelete(null);
+                  setTransferToChair('');
+                }}
+                className="absolute right-4 top-4 p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="px-6 py-4">
+              <div className="space-y-4">
+                {/* Alert */}
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <p className="font-semibold text-amber-800">
+                        Esta ação não pode ser desfeita
+                      </p>
+                      <p className="text-sm text-amber-700 mt-1">
+                        Tem certeza que deseja excluir a cadeira "{chairToDelete?.name}"?
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Transferência */}
+                {chairs.filter(c => c.id !== chairToDelete?.id).length > 0 && (
+                  <div className="space-y-3">
+                    <p className="text-gray-600 text-sm">
+                      Os agendamentos existentes nesta cadeira podem ser transferidos para:
+                    </p>
+
+                    <Select
+                      options={chairs
+                        .filter(c => c.id !== chairToDelete?.id)
+                        .map(chair => ({
+                          value: chair.id.toString(),
+                          label: chair.name
+                        }))}
+                      value={transferToChair}
+                      onChange={(e) => setTransferToChair(Array.isArray(e.target.value) ? e.target.value[0] : e.target.value)}
+                      placeholder="Selecione uma cadeira para transferir os agendamentos"
+                      fullWidth
+                    />
+
+                    <p className="text-xs text-gray-500">
+                      Se não selecionar uma cadeira, os agendamentos serão perdidos.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer com botões */}
+              <div className="flex justify-between mt-6">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setChairToDelete(null);
+                    setTransferToChair('');
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={confirmDeleteChair}
+                >
+                  Excluir Cadeira
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </ConfiguracoesClinicaLayout>
   );

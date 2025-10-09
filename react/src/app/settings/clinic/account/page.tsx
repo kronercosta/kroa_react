@@ -1,47 +1,24 @@
 import React, { useState } from 'react';
-import { Button, IconButton } from '../../../../components/ui/Button';
-import { Check, Edit, Trash2 } from 'lucide-react';
+import { Button } from '../../../../components/ui/Button';
 import { Input } from '../../../../components/ui/Input';
-import { Table } from '../../../../components/ui/Table';
 import { Select } from '../../../../components/ui/Select';
 import { Switch } from '../../../../components/ui/Switch';
 import { Card } from '../../../../components/ui/Card';
-import { Modal } from '../../../../components/ui/Modal';
 import { ConfiguracoesClinicaLayout } from '../ConfiguracoesClinicaLayout';
-import { HeaderControls } from '../../../../components/ui/HeaderControls';
 import { useRegion } from '../../../../contexts/RegionContext';
 import { useTranslation } from '../../../../hooks/useTranslation';
 import translations from './translation.json';
-import { DocumentModal } from './DocumentModal';
 // Importar termos das traduções em vez de arquivos separados
 // Os termos estão incluídos no translation.json
 
 const ContaClinica: React.FC = () => {
   const { currentRegion } = useRegion();
 
-  // Mapear região para idioma
-  const getLanguageByRegion = (region: string) => {
-    switch (region) {
-      case 'BR': return 'PT';
-      case 'US': return 'EN';
-      default: return 'PT';
-    }
-  };
 
-  const language = getLanguageByRegion(currentRegion);
   const { t } = useTranslation(translations);
 
   const [pessoaJuridica, setPessoaJuridica] = useState(true);
 
-  // Document modal states
-  const [documentModal, setDocumentModal] = useState<{
-    isOpen: boolean;
-    type: 'lgpd' | 'admin' | null;
-  }>({ isOpen: false, type: null });
-
-  // Terms acceptance states
-  const [lgpdAccepted, setLgpdAccepted] = useState(false);
-  const [adminResponsibilityAccepted, setAdminResponsibilityAccepted] = useState(false);
 
   // Form data
   const [formData, setFormData] = useState({
@@ -59,7 +36,7 @@ const ContaClinica: React.FC = () => {
     zipCode: '74115060',
     legalName: 'Arantes Comércio de Higiene Oral',
     taxId: '',
-    masterUser: '',
+    masterUsers: [],
   });
 
 
@@ -157,19 +134,19 @@ const ContaClinica: React.FC = () => {
 
             <div className="w-full">
               <Select
-                label={t?.masterUser || 'Usuário Master'}
-                value={formData.masterUser || ''}
-                onChange={(e) => setFormData({ ...formData, masterUser: Array.isArray(e.target.value) ? e.target.value[0] : e.target.value })}
-                options={[
-                  { value: '', label: t?.placeholders?.selectMasterUser || 'Selecione o usuário master' },
-                  ...professionals.map(prof => ({
-                    value: prof.id,
-                    label: `${prof.name} - ${prof.email}`
-                  }))
-                ]}
+                label={t?.masterUser || 'Usuários Administradores'}
+                value={formData.masterUsers}
+                onChange={(e) => setFormData({ ...formData, masterUsers: Array.isArray(e.target.value) ? e.target.value : [e.target.value] })}
+                options={professionals.map(prof => ({
+                  value: prof.id,
+                  label: `${prof.name} - ${prof.email}`
+                }))}
+                multiple
+                minWidth="min-w-80"
+                className="max-w-full"
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">{t?.masterUserDescription || 'O usuário master tem acesso total ao sistema'}</p>
+              <p className="text-xs text-gray-500 mt-1">{t?.masterUserDescription || 'Os usuários administradores têm acesso total ao sistema e podem gerenciar outros usuários'}</p>
             </div>
           </div>
 
@@ -244,6 +221,20 @@ const ContaClinica: React.FC = () => {
                     <div className="w-full">
                       <Input
                         label={currentRegion === 'BR'
+                          ? (t?.regionLabels?.BR?.zipCode || 'CEP')
+                          : (t?.regionLabels?.US?.zipCode || 'ZIP Code')
+                        }
+                        value={formData.zipCode}
+                        onChange={(value) => setFormData({ ...formData, zipCode: value })}
+                        mask={currentRegion === 'BR' ? 'cep' : undefined}
+                        placeholder={currentRegion === 'BR' ? '00000-000' : '12345'}
+                        required
+                      />
+                    </div>
+
+                    <div className="w-full">
+                      <Input
+                        label={currentRegion === 'BR'
                           ? (t?.address?.street || 'Logradouro')
                           : (t?.address?.street || 'Street Address')
                         }
@@ -263,6 +254,9 @@ const ContaClinica: React.FC = () => {
                         value={formData.number}
                         onChange={(value) => setFormData({ ...formData, number: value })}
                         placeholder={currentRegion === 'BR' ? 'Ex: 123' : 'Ex: Suite 456'}
+                        mask="addressNumber"
+                        allowNoNumber={true}
+                        noNumberText={currentRegion === 'BR' ? 'S/N' : 'No number'}
                         required
                       />
                     </div>
@@ -307,20 +301,6 @@ const ContaClinica: React.FC = () => {
                     <div className="w-full">
                       <Input
                         label={currentRegion === 'BR'
-                          ? (t?.regionLabels?.BR?.zipCode || 'CEP')
-                          : (t?.regionLabels?.US?.zipCode || 'ZIP Code')
-                        }
-                        value={formData.zipCode}
-                        onChange={(value) => setFormData({ ...formData, zipCode: value })}
-                        mask={currentRegion === 'BR' ? 'cep' : undefined}
-                        placeholder={currentRegion === 'BR' ? '00000-000' : '12345'}
-                        required
-                      />
-                    </div>
-
-                    <div className="w-full">
-                      <Input
-                        label={currentRegion === 'BR'
                           ? (t?.regionLabels?.BR?.state || 'Estado')
                           : (t?.regionLabels?.US?.state || 'State')
                         }
@@ -336,91 +316,11 @@ const ContaClinica: React.FC = () => {
             )}
           </div>
 
-          {/* Aceite de Termos LGPD */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <h3 className="text-base font-medium text-gray-900 mb-4">{t?.termsSection || 'Aceite de Termos'}</h3>
-            <div className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    id="lgpd-consent"
-                    checked={lgpdAccepted}
-                    onChange={(e) => setLgpdAccepted(e.target.checked)}
-                    className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
-                  />
-                  <div className="flex-1">
-                    <label htmlFor="lgpd-consent" className="text-sm font-medium text-blue-900 cursor-pointer block">
-                      {t?.lgpdConsent || 'Aceite dos Termos LGPD'}
-                    </label>
-                    <p className="text-xs text-blue-700 mt-1 leading-relaxed">
-                      {t?.lgpdDescription || 'Declaro estar ciente e concordo com os termos da Lei Geral de Proteção de Dados (LGPD) e autorizo o tratamento dos dados pessoais conforme descrito na política de privacidade.'}
-                    </p>
-                    <button
-                      onClick={() => setDocumentModal({ isOpen: true, type: 'lgpd' })}
-                      className="text-xs text-blue-600 underline mt-2 hover:text-blue-800 transition-colors"
-                    >
-                      {t?.viewLgpdDocument || 'Ver documento completo →'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4">
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    id="admin-responsibility"
-                    checked={adminResponsibilityAccepted}
-                    onChange={(e) => setAdminResponsibilityAccepted(e.target.checked)}
-                    className="mt-1 w-4 h-4 text-amber-600 bg-gray-100 border-gray-300 rounded focus:ring-amber-500 flex-shrink-0"
-                  />
-                  <div className="flex-1">
-                    <label htmlFor="admin-responsibility" className="text-sm font-medium text-amber-900 cursor-pointer block">
-                      {t?.adminResponsibility || 'Responsabilidade do Usuário Administrador'}
-                    </label>
-                    <p className="text-xs text-amber-700 mt-1 leading-relaxed">
-                      {t?.adminResponsibilityDescription || 'Assumo total responsabilidade pelas configurações e dados inseridos no sistema, comprometendo-me a manter a segurança e confidencialidade das informações dos pacientes.'}
-                    </p>
-                    <button
-                      onClick={() => setDocumentModal({ isOpen: true, type: 'admin' })}
-                      className="text-xs text-amber-600 underline mt-2 hover:text-amber-800 transition-colors"
-                    >
-                      {t?.viewResponsibilityDocument || 'Ver termo de responsabilidade →'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
         </Card>
       </div>
 
 
-      {/* Document Modal */}
-      <DocumentModal
-        isOpen={documentModal.isOpen}
-        onClose={() => setDocumentModal({ isOpen: false, type: null })}
-        document={
-          documentModal.type === 'lgpd'
-            ? t?.lgpdTerms || null
-            : documentModal.type === 'admin'
-            ? t?.adminTerms || null
-            : null
-        }
-        onAccept={() => {
-          if (documentModal.type === 'lgpd') {
-            setLgpdAccepted(true);
-          } else if (documentModal.type === 'admin') {
-            setAdminResponsibilityAccepted(true);
-          }
-        }}
-        showAcceptButton={
-          (documentModal.type === 'lgpd' && !lgpdAccepted) ||
-          (documentModal.type === 'admin' && !adminResponsibilityAccepted)
-        }
-      />
     </ConfiguracoesClinicaLayout>
   );
 };

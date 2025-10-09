@@ -7,6 +7,7 @@ import { generateRoutes } from '../utils/routeGenerator';
 // Páginas de autenticação
 const Login = lazy(() => import('../pages/Login'));
 const EsqueceuSenha = lazy(() => import('../pages/EsqueceuSenha'));
+const PrimeiroAcesso = lazy(() => import('../pages/PrimeiroAcesso'));
 
 // Loading component
 const LoadingScreen = () => (
@@ -35,6 +36,11 @@ export function AppRouter() {
         <Route path="/esqueceu-senha" element={
           <AuthLayout>
             <EsqueceuSenha />
+          </AuthLayout>
+        } />
+        <Route path="/primeiro-acesso" element={
+          <AuthLayout>
+            <PrimeiroAcesso />
           </AuthLayout>
         } />
 

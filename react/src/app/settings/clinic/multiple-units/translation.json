@@ -1,7 +1,9 @@
 {
   "PT": {
-    "title": "Múltiplas Unidades",
-    "description": "Habilite para gerenciar unidades adicionais da sua clínica",
+    "title": "Unidade",
+    "description": "Habilite para gerenciar unidades da sua clínica",
+    "pageTitle": "Unidades",
+    "pageDescription": "Uma unidade é o padrão, mas se você tiver mais pode adicionar e gerenciar aqui para organizar as operações da sua clínica",
     "units": "Unidades",
     "newUnit": "Nova Unidade",
     "masterUnit": {
@@ -44,8 +46,10 @@
     }
   },
   "EN": {
-    "title": "Multiple Units",
-    "description": "Enable to manage additional units of your clinic",
+    "title": "Unit",
+    "description": "Enable to manage units of your clinic",
+    "pageTitle": "Units",
+    "pageDescription": "One unit is the default, but if you have more you can add and manage them here to organize your clinic operations",
     "units": "Units",
     "newUnit": "New Unit",
     "masterUnit": {
@@ -88,8 +92,10 @@
     }
   },
   "ES": {
-    "title": "Múltiples Unidades",
-    "description": "Habilite para gestionar unidades adicionales de su clínica",
+    "title": "Unidad",
+    "description": "Habilite para gestionar unidades de su clínica",
+    "pageTitle": "Unidades",
+    "pageDescription": "Una unidad es la predeterminada, pero si tiene más puede agregarlas y gestionarlas aquí para organizar las operaciones de su clínica",
     "units": "Unidades",
     "newUnit": "Nueva Unidad",
     "masterUnit": {

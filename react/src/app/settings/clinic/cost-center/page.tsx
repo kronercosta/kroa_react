@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../../../../components/ui/Button';
 import { Input } from '../../../../components/ui/Input';
 import { Switch } from '../../../../components/ui/Switch';
@@ -11,8 +11,8 @@ import { useTranslation } from '../../../../hooks/useTranslation';
 import translations from './translation.json';
 
 const CentroCustoClinica: React.FC = () => {
-  const { centroCustoEnabled, setCentroCustoEnabled } = useClinic();
   const { t } = useTranslation(translations);
+  const { costCenters: globalCostCenters, setCostCenters: setGlobalCostCenters } = useClinic();
 
   // Centro de Custo states
   const [editingCostCenter, setEditingCostCenter] = useState<number | null>(null);
@@ -26,42 +26,42 @@ const CentroCustoClinica: React.FC = () => {
     }
   ]);
 
+  // Sync local state with global context
+  useEffect(() => {
+    const simplifiedCostCenters = costCenters.map(center => ({
+      id: center.id,
+      name: center.name,
+      isMaster: center.isMaster
+    }));
+    setGlobalCostCenters(simplifiedCostCenters);
+  }, [costCenters, setGlobalCostCenters]);
+
   return (
     <ConfiguracoesClinicaLayout>
       <div className="space-y-6">
-        {/* Toggle Section */}
+        {/* Cost Centers List - sempre aberto */}
         <Card>
-          <div className="flex items-center justify-between">
+          <div className="flex justify-between items-start mb-4">
             <div>
-              <h3 className="text-base font-medium text-gray-900">{t.toggleTitle || 'Centro de Custo'}</h3>
-              <p className="text-sm text-gray-500">{t.toggleDescription || 'Habilite para organizar receitas e despesas por centro'}</p>
-            </div>
-            <Switch
-              checked={centroCustoEnabled}
-              onChange={setCentroCustoEnabled}
-            />
-          </div>
-        </Card>
-
-        {/* Cost Centers List */}
-        {centroCustoEnabled && (
-          <Card>
-            <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-bold text-gray-900">{t.pageTitle || 'Centros de Custo'}</h2>
-              <Button
+              <p className="text-sm text-gray-500 mt-1">{t.toggleDescription || 'Habilite para organizar receitas e despesas por departamento ou separar financeiro por profissional'}</p>
+            </div>
+            <Button
                 onClick={() => setCostCenters([...costCenters, {
                   id: Date.now(),
                   name: t.defaultCenterName || 'Novo Centro',
                   description: t.defaultCenterDescription || 'Descrição do centro'
                 }])}
                 variant="primary"
+                size="sm"
+                className="whitespace-nowrap"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 {t.newCenter || 'Novo Centro'}
               </Button>
-            </div>
+          </div>
 
             <Table
               columns={[
@@ -140,17 +140,17 @@ const CentroCustoClinica: React.FC = () => {
                       </button>
                       <button
                         onClick={() => {
-                          if (costCenters.length > 1) {
-                            console.log('Delete cost center', row.id);
+                          if (!row.isMaster && costCenters.length > 1) {
+                            setCostCenters(costCenters.filter(c => c.id !== row.id));
                           }
                         }}
                         className={`p-1.5 rounded-lg transition-all ${
-                          costCenters.length === 1
+                          row.isMaster || costCenters.length === 1
                             ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
                             : 'bg-red-100 text-red-600 hover:bg-red-200'
                         }`}
-                        title={costCenters.length === 1 ? 'Não é possível excluir o único centro de custo' : 'Excluir'}
-                        disabled={costCenters.length === 1}
+                        title={row.isMaster ? 'Centro principal não pode ser excluído' : costCenters.length === 1 ? 'Não é possível excluir o único centro de custo' : 'Excluir'}
+                        disabled={row.isMaster || costCenters.length === 1}
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -164,8 +164,8 @@ const CentroCustoClinica: React.FC = () => {
               hoverable
               sticky
             />
-          </Card>
-        )}
+        </Card>
+
       </div>
     </ConfiguracoesClinicaLayout>
   );

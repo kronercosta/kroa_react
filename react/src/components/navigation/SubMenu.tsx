@@ -214,11 +214,6 @@ export function SubMenu({
           WebkitOverflowScrolling: 'touch'
         }}
       >
-        <style jsx>{`
-          div::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
         <div className="flex gap-2 min-w-max">
           {items.map((item) => (
             <button

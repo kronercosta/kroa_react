@@ -3,10 +3,19 @@
     "systemAccess": {
       "title": "Acesso ao Sistema",
       "description": "Configure o acesso geral do colaborador",
-      "label": "Acesso ao Sistema Web",
-      "webDescription": "Permite login no sistema através do navegador",
-      "mobileTitle": "Acesso ao Aplicativo Mobile",
-      "mobileDescription": "Permite login através do aplicativo móvel"
+      "label": "Acesso ao Sistema",
+      "systemDescription": "Permite que o colaborador faça login no sistema",
+      "ipRestrictionTitle": "Restringir por IP",
+      "ipRestrictionDescription": "Limita o acesso apenas aos IPs cadastrados da clínica",
+      "allowedIPs": "IPs Permitidos",
+      "ipHelp": "Selecione os IPs de onde este colaborador poderá acessar o sistema",
+      "firstAccessTitle": "Primeiro Acesso",
+      "firstAccessDescription": "Envie um email para que o colaborador defina sua senha e aceite os termos",
+      "emailSentDescription": "Email de primeiro acesso enviado com sucesso",
+      "sendEmail": "Enviar Email",
+      "emailSent": "Email Enviado",
+      "resendEmail": "Reenviar Email",
+      "sendNewEmail": "Enviar Novo Email"
     },
     "modules": {
       "title": "Permissões por Módulo",
@@ -58,10 +67,19 @@
     "systemAccess": {
       "title": "System Access",
       "description": "Configure general employee access",
-      "label": "Web System Access",
-      "webDescription": "Allows login to the system through the browser",
-      "mobileTitle": "Mobile App Access",
-      "mobileDescription": "Allows login through the mobile application"
+      "label": "System Access",
+      "systemDescription": "Allows the employee to login to the system",
+      "ipRestrictionTitle": "IP Restriction",
+      "ipRestrictionDescription": "Limits access only to registered clinic IPs",
+      "allowedIPs": "Allowed IPs",
+      "ipHelp": "Select the IPs from which this employee can access the system",
+      "firstAccessTitle": "First Access",
+      "firstAccessDescription": "Send an email for the employee to set their password and accept terms",
+      "emailSentDescription": "First access email sent successfully",
+      "sendEmail": "Send Email",
+      "emailSent": "Email Sent",
+      "resendEmail": "Resend Email",
+      "sendNewEmail": "Send New Email"
     },
     "modules": {
       "title": "Module Permissions",
@@ -113,10 +131,19 @@
     "systemAccess": {
       "title": "Acceso al Sistema",
       "description": "Configure el acceso general del empleado",
-      "label": "Acceso al Sistema Web",
-      "webDescription": "Permite iniciar sesión en el sistema a través del navegador",
-      "mobileTitle": "Acceso a la Aplicación Móvil",
-      "mobileDescription": "Permite iniciar sesión a través de la aplicación móvil"
+      "label": "Acceso al Sistema",
+      "systemDescription": "Permite que el empleado inicie sesión en el sistema",
+      "ipRestrictionTitle": "Restricción por IP",
+      "ipRestrictionDescription": "Limita el acceso solo a las IPs registradas de la clínica",
+      "allowedIPs": "IPs Permitidas",
+      "ipHelp": "Seleccione las IPs desde donde este empleado puede acceder al sistema",
+      "firstAccessTitle": "Primer Acceso",
+      "firstAccessDescription": "Envíe un email para que el empleado establezca su contraseña y acepte los términos",
+      "emailSentDescription": "Email de primer acceso enviado con éxito",
+      "sendEmail": "Enviar Email",
+      "emailSent": "Email Enviado",
+      "resendEmail": "Reenviar Email",
+      "sendNewEmail": "Enviar Nuevo Email"
     },
     "modules": {
       "title": "Permisos por Módulo",

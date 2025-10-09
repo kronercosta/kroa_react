@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Logo } from '../../components/Logo';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useRegion } from '../../contexts/RegionContext';
 import translations from './translation.json';
 
 interface OnboardingLayoutProps {
@@ -8,15 +9,69 @@ interface OnboardingLayoutProps {
   currentStep: number;
   totalSteps: number;
   showProgress?: boolean;
+  customSlides?: Array<{
+    title: string;
+    subtitle: string;
+    description: string;
+    icon: string;
+  }>;
+  customTrustContent?: React.ReactNode;
 }
 
 export function OnboardingLayout({
   children,
   currentStep,
   totalSteps,
-  showProgress = true
+  showProgress = true,
+  customSlides,
+  customTrustContent
 }: OnboardingLayoutProps) {
   const { t } = useTranslation(translations);
+  const { currentRegion } = useRegion();
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const defaultSlides = [
+    {
+      title: "Transforme sua clínica",
+      subtitle: "Em dias, não meses",
+      description: "A Krooa nasceu dentro das clínicas reais e entende o que custa caro: resposta demorada, retrabalho e uma agenda que parece cheia, mas não fatura.",
+      icon: "⚡"
+    },
+    {
+      title: "Acesso rápido",
+      subtitle: "Zero curva de aprendizado",
+      description: "Entre no sistema em 5 minutos e veja como tudo se conecta sem precisar de treinamento. Interface intuitiva e processo automatizado.",
+      icon: "🚀"
+    },
+    {
+      title: "Resultados nas primeiras semanas",
+      subtitle: "Impacto imediato na operação",
+      description: "Reduza tarefas manuais, evite falhas humanas e veja seus pacientes voltando com consistência. Eficiência que você sente desde o primeiro dia.",
+      icon: "📈"
+    },
+    {
+      title: "IA que trabalha por você",
+      subtitle: "Automação 24/7",
+      description: "Responde no WhatsApp, confirma, remarca e resolve 24h por dia, mantendo o relacionamento ativo mesmo com a clínica fechada.",
+      icon: "🤖"
+    },
+    {
+      title: "Resultados comprovados",
+      subtitle: "Dr. Carlos Mendes - Clínica OdontoCare",
+      description: "Em 3 meses com a Krooa, nossa produtividade cresceu 40% e os custos administrativos caíram pela metade.",
+      icon: "🏆"
+    }
+  ];
+
+  const slides = customSlides || defaultSlides;
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [slides.length]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-krooa-green/5 to-blue-50 flex flex-col">
@@ -51,88 +106,96 @@ export function OnboardingLayout({
         </div>
       </header>
 
-      {/* Progress Bar */}
-      {showProgress && (
-        <div className="w-full bg-gray-200 h-1">
-          <div
-            className="h-1 bg-gradient-to-r from-krooa-green to-krooa-blue transition-all duration-500 ease-out"
-            style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-          />
-        </div>
-      )}
 
       {/* Main Content */}
-      <main className="flex-1 flex">
-        {/* Sidebar motivacional - apenas desktop */}
-        <div className="hidden xl:flex xl:w-1/2 bg-gradient-to-br from-krooa-green to-krooa-blue p-12 justify-center">
-          <div className="max-w-lg text-white sticky top-[10%] h-fit">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold mb-4">
-                {t?.layout?.sidebarTitle || 'Você está a alguns passos de transformar sua clínica'}
-              </h2>
-              <p className="text-xl text-white/90 mb-8">
-                {t?.layout?.sidebarSubtitle || 'Junte-se a mais de 1.000 profissionais que já revolucionaram sua gestão odontológica.'}
-              </p>
+      <main className="flex-1 flex relative">
+        {/* Carousel motivacional - apenas desktop */}
+        <div className="hidden xl:block xl:w-2/5 bg-gradient-to-br from-krooa-blue to-krooa-green relative overflow-hidden">
+          <div className="sticky top-0 h-[100vh] flex items-center justify-center p-8">
+            <div className="w-full max-w-sm">
+            {/* Glassmorphism container */}
+            <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl h-[480px] flex flex-col">
+              {/* Carousel content */}
+              <div className="transition-all duration-700 ease-in-out flex-1 flex flex-col">
+                <div>
+                  <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center mb-6 mx-auto shadow-lg">
+                    <span className="text-4xl">{slides[currentSlide].icon}</span>
+                  </div>
+
+                  {/* Título com altura fixa */}
+                  <div className="h-[60px] flex items-center mb-2">
+                    <h2 className="text-2xl font-semibold text-white leading-tight tracking-tight text-left">
+                      {slides[currentSlide].title}
+                    </h2>
+                  </div>
+
+                  {/* Subtitle e description com fluxo natural */}
+                  <div className="flex-1 flex flex-col justify-start">
+                    <p className="text-xs font-medium text-white/60 uppercase tracking-widest mb-4 text-left">
+                      {slides[currentSlide].subtitle}
+                    </p>
+                    <p className="text-base text-white/90 leading-relaxed font-light text-left">
+                      {slides[currentSlide].description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Fixed bottom section */}
+              <div className="mt-auto">
+                {/* Progress dots */}
+                <div className="flex justify-center gap-2 mb-6">
+                  {slides.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentSlide(index)}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        index === currentSlide
+                          ? 'bg-white shadow-sm scale-125'
+                          : 'bg-white/40 hover:bg-white/60'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* Trust indicators */}
+                {customTrustContent || (
+                  <div className="text-center">
+                    <p className="text-xs text-white/60 mb-3 font-medium">
+                      {currentRegion === 'US'
+                        ? 'More than 1,000 clinics trust KROA'
+                        : 'Mais de 1.000 clínicas já confiam na KROA'
+                      }
+                    </p>
+                    <div className="flex justify-center gap-4 text-xs text-white/50">
+                      <div className="flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="font-medium">
+                          {currentRegion === 'US' ? 'SSL Secure' : 'SSL Seguro'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clipRule="evenodd" />
+                        </svg>
+                        <span className="font-medium">
+                          {currentRegion === 'US' ? 'HIPAA Compliant' : 'LGPD Compliant'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">{t?.layout?.feature1Title || 'Configuração em 5 minutos'}</h3>
-                  <p className="text-white/80">{t?.layout?.feature1Description || 'Configure sua clínica rapidamente com nosso processo guiado'}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">{t?.layout?.feature2Title || 'Resultados imediatos'}</h3>
-                  <p className="text-white/80">{t?.layout?.feature2Description || 'Comece a usar no mesmo dia com todas as funcionalidades'}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 109.75 9.75A9.75 9.75 0 0012 2.25z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">{t?.layout?.feature3Title || 'Suporte especializado'}</h3>
-                  <p className="text-white/80">{t?.layout?.feature3Description || 'Equipe de especialistas em gestão odontológica à sua disposição'}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-12 p-6 bg-white/10 rounded-lg backdrop-blur-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                  <span className="text-lg font-bold">🏆</span>
-                </div>
-                <div>
-                  <div className="font-semibold">{t?.layout?.testimonialAuthor || 'Dr. Carlos Mendes'}</div>
-                  <div className="text-sm text-white/70">{t?.layout?.testimonialClinic || 'Clínica OdontoCare'}</div>
-                </div>
-              </div>
-              <p className="text-white/90 italic">
-                {t?.layout?.testimonialText || '"Em 3 meses com a KROA, nossa produtividade aumentou 40% e reduzimos os custos administrativos pela metade."'}
-              </p>
             </div>
           </div>
         </div>
 
         {/* Formulário - desktop e mobile */}
-        <div className="flex-1 xl:w-1/2 flex items-center justify-center p-4 xl:p-12">
-          <div className="w-full max-w-md xl:max-w-lg">
+        <div className="flex-1 xl:w-3/5 p-4 xl:p-12 xl:min-h-[100vh] flex items-center">
+          <div className="w-full max-w-md xl:max-w-lg mx-auto">
             {children}
           </div>
         </div>

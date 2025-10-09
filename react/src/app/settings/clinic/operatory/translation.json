@@ -92,12 +92,12 @@
     }
   },
   "EN": {
-    "pageTitle": "Chair Configuration",
-    "pageSubtitle": "Configure schedules and professionals for each chair",
+    "pageTitle": "Operatory Configuration",
+    "pageSubtitle": "Configure schedules and professionals for each operatory",
     "statusCard": {
       "title": "Configuration Status",
       "subtitle": "Based on appointments from the last 4 weeks",
-      "chairsAnalyzed": "chairs analyzed",
+      "chairsAnalyzed": "operatories analyzed",
       "status": {
         "good": "Adequate",
         "warning": "Warning",
@@ -113,10 +113,10 @@
       "for": "for",
       "slotsAvailable": "available slots",
       "occupancy": "occupancy",
-      "suggestion": "💡 Suggestion: Consider reducing the available hours for this chair."
+      "suggestion": "💡 Suggestion: Consider reducing the available hours for this operatory."
     },
     "buttons": {
-      "newChair": "New Chair",
+      "newChair": "New Operatory",
       "addSchedule": "Add Schedule",
       "save": "Save",
       "cancel": "Cancel",
@@ -138,11 +138,11 @@
       }
     },
     "aside": {
-      "titleNew": "New Chair",
-      "titleEdit": "Edit Chair",
+      "titleNew": "New Operatory",
+      "titleEdit": "Edit Operatory",
       "configureSchedules": "Configure Schedules",
-      "chairName": "Chair Name",
-      "chairNamePlaceholder": "Chair Name",
+      "chairName": "Operatory Name",
+      "chairNamePlaceholder": "Operatory Name",
       "specificDates": "Specific Dates",
       "specificDatesDescription": "Configure for specific dates instead of weekdays",
       "daysOfWeek": "Days of the Week",
@@ -157,8 +157,8 @@
       "schedulesConfigured": "Configured Schedules",
       "noSchedules": "No schedules configured",
       "noSchedulesDescription": "Configure the fields above and click \"Add Schedule\"",
-      "confirmDelete": "Are you sure you want to delete this chair?",
-      "pleaseEnterName": "Please enter the chair name"
+      "confirmDelete": "Are you sure you want to delete this operatory?",
+      "pleaseEnterName": "Please enter the operatory name"
     },
     "schedulesTable": {
       "dayDate": "Day/Date",

@@ -6,7 +6,7 @@
       "conta": "Configurações Administrativas",
       "cadeiras": "Cadeiras",
       "centroCusto": "Centro de Custo",
-      "multiplasUnidades": "Múltiplas Unidades",
+      "multiplasUnidades": "Unidade",
       "parametros": "Parâmetros"
     }
   },
@@ -15,9 +15,9 @@
     "subtitle": "Manage your clinic information and settings",
     "tabs": {
       "conta": "Administrative Settings",
-      "cadeiras": "Chairs",
-      "centroCusto": "Cost Center",
-      "multiplasUnidades": "Multiple Units",
+      "cadeiras": "Operatories",
+      "centroCusto": "Departments",
+      "multiplasUnidades": "Unit",
       "parametros": "Parameters"
     }
   },
@@ -28,7 +28,7 @@
       "conta": "Configuraciones Administrativas",
       "cadeiras": "Sillas",
       "centroCusto": "Centro de Costo",
-      "multiplasUnidades": "Múltiples Unidades",
+      "multiplasUnidades": "Unidad",
       "parametros": "Parámetros"
     }
   }

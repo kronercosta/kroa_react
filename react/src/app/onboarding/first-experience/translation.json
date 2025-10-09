@@ -1,0 +1,50 @@
+{
+  "PT": {
+    "skipButton": "Explorar o Sistema Sozinho",
+    "greeting": {
+      "title": "Olá Dr. João! Sou a Krooa IA",
+      "subtitle": "Estou aqui para tornar sua Jornada de Sucesso simples e eficiente."
+    },
+    "aiStatus": {
+      "online": "Online",
+      "typing": "Krooa IA está digitando..."
+    },
+    "chat": {
+      "initialQuestion": "Conte-me um pouco sobre seu consultório... Já usa algum sistema de gestão?",
+      "placeholder": "Digite sua resposta aqui...",
+      "aiResponse": "Perfeito! Vou te ajudar com isso. Que tal começarmos configurando sua clínica? 🏥\n\nPrimeiro, me fale um pouco sobre seu consultório:\n\n• Você já usa algum sistema de gestão?\n• Quantos profissionais trabalham na clínica?\n• Qual é a especialidade principal?\n\nCom essas informações, posso personalizar completamente sua experiência! 🎯"
+    }
+  },
+  "EN": {
+    "skipButton": "Explore the System Solo",
+    "greeting": {
+      "title": "Hello Dr. João! I'm Krooa AI",
+      "subtitle": "I'm here to make your Success Journey simple and efficient."
+    },
+    "aiStatus": {
+      "online": "Online",
+      "typing": "Krooa AI is typing..."
+    },
+    "chat": {
+      "initialQuestion": "Tell me a bit about your practice... Do you currently use any management system?",
+      "placeholder": "Type your answer here...",
+      "aiResponse": "Perfect! I'll help you with that. How about we start by setting up your clinic? 🏥\n\nFirst, tell me a bit about your practice:\n\n• Do you currently use any management system?\n• How many professionals work at the clinic?\n• What's your main specialty?\n\nWith this information, I can completely personalize your experience! 🎯"
+    }
+  },
+  "ES": {
+    "skipButton": "Explorar el Sistema Solo",
+    "greeting": {
+      "title": "¡Hola Dr. João! Soy Krooa IA",
+      "subtitle": "Estoy aquí para hacer tu Jornada de Éxito simple y eficiente."
+    },
+    "aiStatus": {
+      "online": "En línea",
+      "typing": "Krooa IA está escribiendo..."
+    },
+    "chat": {
+      "initialQuestion": "Cuéntame un poco sobre tu consultorio... ¿Ya usas algún sistema de gestión?",
+      "placeholder": "Escribe tu respuesta aquí...",
+      "aiResponse": "¡Perfecto! Te ayudaré con eso. ¿Qué tal si comenzamos configurando tu clínica? 🏥\n\nPrimero, cuéntame un poco sobre tu consultorio:\n\n• ¿Ya usas algún sistema de gestión?\n• ¿Cuántos profesionales trabajan en la clínica?\n• ¿Cuál es la especialidad principal?\n\n¡Con esta información, puedo personalizar completamente tu experiencia! 🎯"
+    }
+  }
+}

@@ -399,9 +399,12 @@ export function Select({
         }
       });
     } else {
+      // Para seleção única, permitir desselecionar se clicar na opção já selecionada
+      const newValue = value === option.value ? '' : option.value;
+
       onChange?.({
         target: {
-          value: option.value,
+          value: newValue,
           name
         }
       });
@@ -581,7 +584,7 @@ export function Select({
             }
           }}
         >
-          <div className="flex-1 px-3 py-2 pr-10 overflow-hidden">
+          <div className={`flex-1 px-3 py-2 overflow-hidden ${!multiple && hasValue ? 'pr-16' : 'pr-10'}`}>
             {multiple && selectedValues.length > 0 ? (
               <MultipleChipsDisplay
                 selectedOptions={selectedOptions}
@@ -593,6 +596,26 @@ export function Select({
               </span>
             )}
           </div>
+
+          {/* Botão para limpar seleção única */}
+          {!multiple && hasValue && !disabled && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange?.({
+                  target: {
+                    value: '',
+                    name
+                  }
+                });
+              }}
+              className="absolute right-8 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          )}
+
           <ChevronDown
             className={`
               absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform

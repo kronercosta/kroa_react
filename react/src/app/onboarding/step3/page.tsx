@@ -18,6 +18,21 @@ export default function Step3Page() {
     expiry: '',
     cvv: ''
   });
+  const [boletoData, setBoletoData] = useState({
+    fullName: '',
+    cpf: '',
+    email: '',
+    phone: '',
+    address: {
+      street: '',
+      number: '',
+      complement: '',
+      neighborhood: '',
+      city: '',
+      state: '',
+      zipCode: ''
+    }
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'card' | 'boleto'>('card');
@@ -25,12 +40,78 @@ export default function Step3Page() {
   const getPlanData = () => {
     const onboardingData = JSON.parse(sessionStorage.getItem('onboardingData') || '{}');
     return {
-      selectedPlan: onboardingData.selectedPlan || '',
-      couponCode: onboardingData.couponCode
+      selectedPlan: onboardingData.selectedPlan || 'complete',
+      selectedPeriod: onboardingData.selectedPeriod || 'monthly',
+      couponCode: onboardingData.couponCode,
+      appliedCoupon: onboardingData.appliedCoupon,
+      finalPrice: onboardingData.finalPrice || 0
     };
   };
 
   const planData = getPlanData();
+
+  // Função para formatar preço baseado na região
+  const formatCurrency = (value: number) => {
+    if (currentRegion === 'BR') {
+      return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      }).format(value);
+    } else {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(value);
+    }
+  };
+
+  // Preços baseados na região e período
+  const basePrices = {
+    BR: {
+      monthly: 192.00,
+      quarterly: 576.00,
+      yearly: 1920.00
+    },
+    US: {
+      monthly: 730.00,
+      quarterly: 2190.00,
+      yearly: 7300.00
+    }
+  };
+
+  const getCurrentPrice = () => {
+    const regionKey = currentRegion as keyof typeof basePrices;
+    return basePrices[regionKey][planData.selectedPeriod as keyof typeof basePrices[typeof regionKey]];
+  };
+
+  const calculateFinalPrice = () => {
+    let basePrice = getCurrentPrice();
+
+    // Aplicar desconto se houver cupom
+    if (planData.appliedCoupon) {
+      if (planData.appliedCoupon.type === 'percentage') {
+        basePrice = basePrice * (1 - planData.appliedCoupon.discount / 100);
+      } else {
+        basePrice = Math.max(0, basePrice - planData.appliedCoupon.discount);
+      }
+    }
+
+    return basePrice;
+  };
+
+  const periodNames = {
+    monthly: currentRegion === 'BR' ? 'Mensal' : 'Monthly',
+    quarterly: currentRegion === 'BR' ? 'Trimestral' : 'Quarterly',
+    yearly: currentRegion === 'BR' ? 'Anual' : 'Yearly'
+  };
+
+  const planNames = {
+    complete: currentRegion === 'BR' ? 'Plano Completo' : 'Complete Plan'
+  };
+
+  // Determinar se deve mostrar 7 dias grátis (não para boleto)
+  const showFreeTrial = selectedPaymentMethod === 'card';
+  const finalPrice = calculateFinalPrice();
 
   const validateCard = () => {
     const newErrors: Record<string, string> = {};
@@ -61,6 +142,59 @@ export default function Step3Page() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const validateBoleto = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!boletoData.fullName.trim()) {
+      newErrors.fullName = 'Nome completo é obrigatório';
+    }
+
+    if (!boletoData.cpf.trim()) {
+      newErrors.cpf = 'CPF é obrigatório';
+    } else if (!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(boletoData.cpf)) {
+      newErrors.cpf = 'CPF inválido (formato: 000.000.000-00)';
+    }
+
+    if (!boletoData.email.trim()) {
+      newErrors.email = 'E-mail é obrigatório';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(boletoData.email)) {
+      newErrors.email = 'E-mail inválido';
+    }
+
+    if (!boletoData.phone.trim()) {
+      newErrors.phone = 'Telefone é obrigatório';
+    }
+
+    if (!boletoData.address.street.trim()) {
+      newErrors['address.street'] = 'Endereço é obrigatório';
+    }
+
+    if (!boletoData.address.number.trim()) {
+      newErrors['address.number'] = 'Número é obrigatório';
+    }
+
+    if (!boletoData.address.neighborhood.trim()) {
+      newErrors['address.neighborhood'] = 'Bairro é obrigatório';
+    }
+
+    if (!boletoData.address.city.trim()) {
+      newErrors['address.city'] = 'Cidade é obrigatória';
+    }
+
+    if (!boletoData.address.state.trim()) {
+      newErrors['address.state'] = 'Estado é obrigatório';
+    }
+
+    if (!boletoData.address.zipCode.trim()) {
+      newErrors['address.zipCode'] = 'CEP é obrigatório';
+    } else if (!/^\d{5}-\d{3}$/.test(boletoData.address.zipCode)) {
+      newErrors['address.zipCode'] = 'CEP inválido (formato: 00000-000)';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleNext = (data: {
     cardData: {
       number: string;
@@ -68,7 +202,7 @@ export default function Step3Page() {
       expiry: string;
       cvv: string;
     };
-    paymentMethod: 'card' | 'google_pay' | 'stripe_link' | 'boleto';
+    paymentMethod: 'card' | 'google_pay' | 'apple_pay' | 'stripe_link' | 'boleto';
   }) => {
     // Armazenar dados no sessionStorage
     const onboardingData = JSON.parse(sessionStorage.getItem('onboardingData') || '{}');
@@ -85,15 +219,34 @@ export default function Step3Page() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateCard()) {
-      setIsLoading(true);
-      setTimeout(() => {
-        handleNext({
-          cardData,
-          paymentMethod: 'card'
-        });
-        setIsLoading(false);
-      }, 1500);
+
+    if (selectedPaymentMethod === 'card') {
+      if (validateCard()) {
+        setIsLoading(true);
+        setTimeout(() => {
+          handleNext({
+            cardData,
+            paymentMethod: 'card'
+          });
+          setIsLoading(false);
+        }, 1500);
+      }
+    } else if (selectedPaymentMethod === 'boleto') {
+      if (validateBoleto()) {
+        setIsLoading(true);
+        setTimeout(() => {
+          handleNext({
+            cardData: {
+              number: '**** **** **** BOLETO',
+              name: boletoData.fullName,
+              expiry: '**/**',
+              cvv: '***'
+            },
+            paymentMethod: 'boleto'
+          });
+          setIsLoading(false);
+        }, 1500);
+      }
     }
   };
 
@@ -105,7 +258,26 @@ export default function Step3Page() {
     return numbers;
   };
 
-  const handleAlternativePayment = (method: 'google_pay' | 'stripe_link' | 'boleto') => {
+  const formatCPF = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 11) {
+      return numbers
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    }
+    return value;
+  };
+
+  const formatCEP = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 8) {
+      return numbers.replace(/(\d{5})(\d)/, '$1-$2');
+    }
+    return value;
+  };
+
+  const handleAlternativePayment = (method: 'google_pay' | 'apple_pay' | 'stripe_link' | 'boleto') => {
     setIsLoading(true);
 
     if (method === 'google_pay') {
@@ -123,6 +295,20 @@ export default function Step3Page() {
         });
         setIsLoading(false);
       }, 1000);
+    } else if (method === 'apple_pay') {
+      // Simular autenticação com Apple Pay
+      setTimeout(() => {
+        handleNext({
+          cardData: {
+            number: '**** **** **** 9876',
+            name: 'Apple Pay',
+            expiry: '**/**',
+            cvv: '***'
+          },
+          paymentMethod: 'apple_pay'
+        });
+        setIsLoading(false);
+      }, 1200);
     } else if (method === 'stripe_link') {
       // Simular envio de link de pagamento
       setTimeout(() => {
@@ -164,11 +350,11 @@ export default function Step3Page() {
     >
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-krooa-green to-krooa-blue text-white p-8 text-center">
-          <h1 className="text-2xl font-bold mb-2">
+        <div className="bg-gradient-to-r from-krooa-blue to-krooa-green text-white p-8 text-center">
+          <h1 className="text-2xl font-bold mb-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
             {t?.step2?.title || 'Informações de Pagamento'}
           </h1>
-          <p className="text-krooa-green-100">
+          <p className="text-krooa-green-100" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
             {t?.step2?.securityNote?.replace('🔒 ', '') || 'Dados seguros e criptografados'}
           </p>
         </div>
@@ -177,41 +363,64 @@ export default function Step3Page() {
           {/* Plan Summary */}
           {planData && (
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <h3 className="font-semibold text-gray-900 mb-2">{t?.step2?.orderSummary || 'Resumo do pedido'}</h3>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">{t?.step2?.plan || 'Plano'} {planData.selectedPlan}</span>
-                <span className="font-semibold">{t?.step2?.freeTrial || '7 dias grátis'}</span>
-              </div>
-              {planData.couponCode && (
-                <div className="flex justify-between items-center text-green-600">
-                  <span>Cupom: {planData.couponCode}</span>
-                  <span>-15%</span>
+              <h3 className="font-semibold text-gray-900 mb-3">{t?.step3?.orderSummary || 'Resumo do pedido'}</h3>
+
+              {/* Plan Details */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">
+                    {planNames[planData.selectedPlan as keyof typeof planNames] || 'Plano Completo'} - {periodNames[planData.selectedPeriod as keyof typeof periodNames]}
+                  </span>
+                  <span className="font-semibold">{formatCurrency(getCurrentPrice())}</span>
                 </div>
-              )}
+
+                {/* Cupom aplicado */}
+                {planData.appliedCoupon && (
+                  <div className="flex justify-between items-center text-green-600">
+                    <span>Cupom: {planData.couponCode}</span>
+                    <span>
+                      -{planData.appliedCoupon.type === 'percentage'
+                        ? `${planData.appliedCoupon.discount}%`
+                        : formatCurrency(planData.appliedCoupon.discount)
+                      }
+                    </span>
+                  </div>
+                )}
+
+                {/* 7 dias grátis (só para cartão) */}
+                {showFreeTrial && (
+                  <div className="flex justify-between items-center text-blue-600 bg-blue-50 p-2 rounded">
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      {t?.step3?.freeTrial || '7 dias grátis'}
+                    </span>
+                    <span className="font-semibold">{formatCurrency(0)}</span>
+                  </div>
+                )}
+
+                {/* Total */}
+                <div className="border-t pt-2 mt-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold text-gray-900">
+                      {showFreeTrial ? (t?.step3?.totalAfterTrial || 'Total após trial') : (t?.step3?.total || 'Total')}
+                    </span>
+                    <span className="text-lg font-bold text-krooa-blue">
+                      {showFreeTrial ? formatCurrency(finalPrice) : formatCurrency(finalPrice)}
+                    </span>
+                  </div>
+
+                  {showFreeTrial && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      {t?.step3?.trialInfo || 'Você será cobrado apenas após o período de teste de 7 dias'}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
-          {/* Free Trial Info */}
-          <div className="bg-blue-50 rounded-lg p-4 mb-6">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="text-sm">
-                <p className="font-medium text-blue-900 mb-1">
-                  {t?.step2?.freeTrialPeriod || 'Período de teste gratuito'}
-                </p>
-                <p className="text-blue-700">
-                  {t?.step2?.trialInfo || 'Você terá 7 dias para testar gratuitamente. Após esse período, será cobrado o valor do plano escolhido.'}
-                </p>
-                <p className="text-blue-700 mt-1">
-                  {t?.step2?.cancelInfo || 'Você pode cancelar durante os 7 dias de teste sem cobrança alguma.'}
-                </p>
-              </div>
-            </div>
-          </div>
 
           {/* Payment Method Selection */}
           <div className="mb-6">
@@ -311,6 +520,29 @@ export default function Step3Page() {
                 </div>
               </button>
 
+              {/* Apple Pay */}
+              <button
+                type="button"
+                className="relative border-2 rounded-lg p-4 border-gray-200 hover:border-gray-300 transition-all text-left"
+                onClick={() => handleAlternativePayment('apple_pay')}
+                disabled={isLoading}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
+                    </svg>
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Apple Pay</h4>
+                      <p className="text-sm text-gray-600">Pagamento seguro com Touch ID ou Face ID</p>
+                    </div>
+                  </div>
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </button>
+
               {/* Boleto - Only for BR */}
               {currentRegion === 'BR' && (
                 <div
@@ -338,8 +570,8 @@ export default function Step3Page() {
                             <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
                           </svg>
                           <div>
-                            <h4 className="font-semibold text-gray-900">{t?.step2?.boleto || 'Boleto Bancário'}</h4>
-                            <p className="text-sm text-gray-600">{t?.step2?.boletoDescription || 'Aprovação em ate 48 horas • Não possui teste grátis'}</p>
+                            <h4 className="font-semibold text-gray-900">{t?.step3?.boleto || 'Boleto Bancário'}</h4>
+                            <p className="text-sm text-gray-600">{t?.step3?.boletoDescription || 'Aprovação em até 2 dias úteis • Sem período de teste'}</p>
                           </div>
                         </div>
                       </div>
@@ -433,6 +665,28 @@ export default function Step3Page() {
               <span>{t?.step2?.securityNote || '🔒 Seus dados estão seguros e criptografados'}</span>
             </div>
 
+            {/* Free Trial Info */}
+            <div className="bg-blue-50 rounded-lg p-4 mt-6">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="text-sm">
+                  <p className="font-medium text-blue-900 mb-1">
+                    {t?.step2?.freeTrialPeriod || 'Período de teste gratuito'}
+                  </p>
+                  <p className="text-blue-700">
+                    {t?.step2?.trialInfo || 'Você terá 7 dias para testar gratuitamente. Após esse período, será cobrado o valor do plano escolhido.'}
+                  </p>
+                  <p className="text-blue-700 mt-1">
+                    {t?.step2?.cancelInfo || 'Você pode cancelar durante os 7 dias de teste sem cobrança alguma.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Form Buttons for Card Payment */}
             <div className="flex gap-3 pt-4">
               <Button
@@ -459,6 +713,7 @@ export default function Step3Page() {
                 )}
               </Button>
             </div>
+
           </form>
           )}
 
@@ -488,6 +743,159 @@ export default function Step3Page() {
                 </div>
               </div>
 
+              {/* Boleto Form */}
+              <form id="boleto-form" onSubmit={handleSubmit} className="space-y-4">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="font-medium text-gray-900 mb-4">Dados para emissão do boleto</h3>
+
+                  {/* Personal Data */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <Input
+                      label="Nome completo"
+                      value={boletoData.fullName}
+                      onChange={(value) => setBoletoData(prev => ({ ...prev, fullName: value }))}
+                      error={errors.fullName}
+                      required
+                      fullWidth
+                    />
+
+                    <Input
+                      label="CPF"
+                      value={boletoData.cpf}
+                      onChange={(value) => {
+                        const formatted = formatCPF(value);
+                        setBoletoData(prev => ({ ...prev, cpf: formatted }));
+                      }}
+                      placeholder="000.000.000-00"
+                      error={errors.cpf}
+                      required
+                      fullWidth
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <Input
+                      label="E-mail"
+                      type="email"
+                      value={boletoData.email}
+                      onChange={(value) => setBoletoData(prev => ({ ...prev, email: value }))}
+                      error={errors.email}
+                      required
+                      fullWidth
+                    />
+
+                    <Input
+                      label="Telefone"
+                      value={boletoData.phone}
+                      onChange={(value) => setBoletoData(prev => ({ ...prev, phone: value }))}
+                      error={errors.phone}
+                      required
+                      fullWidth
+                    />
+                  </div>
+
+                  {/* Address */}
+                  <h4 className="font-medium text-gray-900 mb-3">Endereço</h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="md:col-span-2">
+                      <Input
+                        label="Endereço"
+                        value={boletoData.address.street}
+                        onChange={(value) => setBoletoData(prev => ({
+                          ...prev,
+                          address: { ...prev.address, street: value }
+                        }))}
+                        error={errors['address.street']}
+                        required
+                        fullWidth
+                      />
+                    </div>
+
+                    <Input
+                      label="Número"
+                      value={boletoData.address.number}
+                      onChange={(value) => setBoletoData(prev => ({
+                        ...prev,
+                        address: { ...prev.address, number: value }
+                      }))}
+                      error={errors['address.number']}
+                      required
+                      fullWidth
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <Input
+                      label="Complemento (opcional)"
+                      value={boletoData.address.complement}
+                      onChange={(value) => setBoletoData(prev => ({
+                        ...prev,
+                        address: { ...prev.address, complement: value }
+                      }))}
+                      fullWidth
+                    />
+
+                    <Input
+                      label="Bairro"
+                      value={boletoData.address.neighborhood}
+                      onChange={(value) => setBoletoData(prev => ({
+                        ...prev,
+                        address: { ...prev.address, neighborhood: value }
+                      }))}
+                      error={errors['address.neighborhood']}
+                      required
+                      fullWidth
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <Input
+                      label="Cidade"
+                      value={boletoData.address.city}
+                      onChange={(value) => setBoletoData(prev => ({
+                        ...prev,
+                        address: { ...prev.address, city: value }
+                      }))}
+                      error={errors['address.city']}
+                      required
+                      fullWidth
+                    />
+
+                    <Input
+                      label="Estado"
+                      value={boletoData.address.state}
+                      onChange={(value) => setBoletoData(prev => ({
+                        ...prev,
+                        address: { ...prev.address, state: value.toUpperCase() }
+                      }))}
+                      placeholder="SP"
+                      maxLength={2}
+                      error={errors['address.state']}
+                      required
+                      fullWidth
+                    />
+
+                    <Input
+                      label="CEP"
+                      value={boletoData.address.zipCode}
+                      onChange={(value) => {
+                        const formatted = formatCEP(value);
+                        setBoletoData(prev => ({
+                          ...prev,
+                          address: { ...prev.address, zipCode: formatted }
+                        }));
+                      }}
+                      placeholder="00000-000"
+                      error={errors['address.zipCode']}
+                      required
+                      fullWidth
+                    />
+                  </div>
+                </div>
+              </form>
+
+
               <div className="flex gap-3">
                 <Button
                   type="button"
@@ -498,9 +906,9 @@ export default function Step3Page() {
                   Voltar
                 </Button>
                 <Button
-                  type="button"
+                  type="submit"
                   variant="primary"
-                  onClick={() => handleAlternativePayment('boleto')}
+                  form="boleto-form"
                   disabled={isLoading}
                   className="flex-1"
                 >

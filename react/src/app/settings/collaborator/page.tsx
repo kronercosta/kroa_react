@@ -240,6 +240,7 @@ export default function ConfigColaborador() {
             {/* Add New Button */}
             <Button
               variant="primary"
+              size="sm"
               className="flex items-center gap-2"
               onClick={() => navigate('/settings/collaborator/personal-data')}
             >

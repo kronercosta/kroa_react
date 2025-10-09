@@ -2,7 +2,7 @@
   "PT": {
     "pageTitle": "Centros de Custo",
     "toggleTitle": "Centro de Custo",
-    "toggleDescription": "Habilite para organizar receitas e despesas por centro",
+    "toggleDescription": "Um centro de custo é o padrão, mas se você tiver mais pode adicionar e gerenciar aqui para organizar receitas e despesas por departamento ou separar financeiro por profissional",
     "newCenter": "Novo Centro",
     "defaultCenterName": "Novo Centro",
     "defaultCenterDescription": "Descrição do centro",
@@ -26,14 +26,14 @@
     }
   },
   "EN": {
-    "pageTitle": "Cost Centers",
-    "toggleTitle": "Cost Center",
-    "toggleDescription": "Enable to organize revenue and expenses by center",
-    "newCenter": "New Center",
-    "defaultCenterName": "New Center",
-    "defaultCenterDescription": "Center description",
-    "masterCenterName": "Main Cost Center",
-    "masterCenterDescription": "Default system cost center",
+    "pageTitle": "Departments",
+    "toggleTitle": "Departments",
+    "toggleDescription": "Enable to organize revenue and expenses by department or separate finances by professional",
+    "newCenter": "New Department",
+    "defaultCenterName": "New Department",
+    "defaultCenterDescription": "Department description",
+    "masterCenterName": "Main Department",
+    "masterCenterDescription": "Default system department",
     "table": {
       "name": "Name",
       "description": "Description",
@@ -46,15 +46,15 @@
       "cancel": "Cancel"
     },
     "messages": {
-      "confirmDelete": "Are you sure you want to delete this cost center?",
+      "confirmDelete": "Are you sure you want to delete this department?",
       "recordsLinked": "linked records",
-      "masterCannotDelete": "Main cost center cannot be deleted"
+      "masterCannotDelete": "Main department cannot be deleted"
     }
   },
   "ES": {
     "pageTitle": "Centros de Costo",
     "toggleTitle": "Centro de Costo",
-    "toggleDescription": "Habilite para organizar ingresos y gastos por centro",
+    "toggleDescription": "Un centro de costo es el predeterminado, pero si tiene más puede agregarlos y gestionarlos aquí para organizar ingresos y gastos por departamento o separar finanzas por profesional",
     "newCenter": "Nuevo Centro",
     "defaultCenterName": "Nuevo Centro",
     "defaultCenterDescription": "Descripción del centro",

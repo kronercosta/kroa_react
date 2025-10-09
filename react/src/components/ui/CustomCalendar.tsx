@@ -18,6 +18,7 @@ interface CustomCalendarProps {
   floating?: boolean;
   error?: boolean;
   warning?: boolean;
+  excludedDates?: string[]; // Array de datas já selecionadas no formato dd/mm/yyyy
 }
 
 const generateYears = () => {
@@ -67,7 +68,8 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
   required = false,
   floating = true,
   error = false,
-  warning = false
+  warning = false,
+  excludedDates = []
 }) => {
   const uiTranslations = useUITranslation();
 
@@ -181,6 +183,12 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
     );
   };
 
+  const isExcluded = (day: number) => {
+    if (!excludedDates || excludedDates.length === 0) return false;
+    const dateStr = `${day.toString().padStart(2, '0')}/${(currentMonth + 1).toString().padStart(2, '0')}/${currentYear}`;
+    return excludedDates.includes(dateStr);
+  };
+
   const renderCalendarDays = () => {
     const daysInMonth = getDaysInMonth(currentMonth, currentYear);
     const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
@@ -202,11 +210,14 @@ export const CustomCalendar: React.FC<CustomCalendarProps> = ({
             p-2 text-sm rounded-lg transition-all duration-200 font-medium min-h-[36px] flex items-center justify-center
             ${isSelected(day)
               ? 'bg-gradient-to-br from-krooa-green to-krooa-dark text-white shadow-lg scale-110 ring-2 ring-krooa-green/30 font-bold'
-              : isToday(day)
-                ? 'bg-krooa-green/15 text-krooa-dark border-2 border-krooa-green/60 font-semibold'
-                : 'hover:bg-krooa-green/10 text-gray-700 hover:text-krooa-dark hover:scale-105'
+              : isExcluded(day)
+                ? 'bg-gray-100 text-gray-400 border border-gray-300 cursor-not-allowed'
+                : isToday(day)
+                  ? 'bg-krooa-green/15 text-krooa-dark border-2 border-krooa-green/60 font-semibold'
+                  : 'hover:bg-krooa-green/10 text-gray-700 hover:text-krooa-dark hover:scale-105'
             }
           `}
+          disabled={isExcluded(day)}
         >
           {day}
         </button>

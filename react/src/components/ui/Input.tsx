@@ -65,6 +65,9 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   timeIntervals?: number; // Intervalo em minutos (5, 15, 30, etc)
   timeStart?: string; // Hora de início (ex: "08:00")
   timeEnd?: string; // Hora de fim (ex: "18:00")
+
+  // Props para datepicker
+  excludedDates?: string[]; // Datas já selecionadas no formato dd/mm/yyyy
 }
 
 // Detectar bandeira do cartão
@@ -387,6 +390,25 @@ const checkIfIncomplete = (value: string, type: ValidationType): boolean => {
       return cleaned.length > 0 && cleaned.length < 9;
     case 'creditCard':
       return cleaned.length > 0 && cleaned.length < 13;
+    case 'phone':
+      if (cleaned.length === 0) return false;
+
+      // Para telefones brasileiros, considera incompleto se:
+      // - Tem menos que 10 dígitos (mínimo para fixo)
+      // - Tem 10 dígitos mas o 3º é 9 (deveria ser celular com 11)
+      if (cleaned.length < 10) return true;
+
+      if (cleaned.length === 10) {
+        // Se tem 10 dígitos mas o 3º é 9, é um celular incompleto
+        const thirdDigit = cleaned.charAt(2);
+        return thirdDigit === '9';
+      }
+
+      // Se tem mais de 11 dígitos, é inválido (não incompleto)
+      if (cleaned.length > 11) return false;
+
+      // 11 dígitos está completo
+      return false;
     default:
       return false;
   }
@@ -466,6 +488,28 @@ const validateValue = (value: string, validation: ValidationType): boolean => {
     case 'creditCard':
       return cleaned.length >= 13 && cleaned.length <= 19;
 
+    case 'phone':
+      // Validação básica para telefones brasileiros
+      if (cleaned.length === 10 || cleaned.length === 11) {
+        // Verificar DDD válido
+        const ddd = parseInt(cleaned.substring(0, 2));
+        const validDDDs = [11,12,13,14,15,16,17,18,19,21,22,24,27,28,31,32,33,34,35,37,38,41,42,43,44,45,46,47,48,49,51,53,54,55,61,62,63,64,65,66,67,68,69,71,73,74,75,77,79,81,82,83,84,85,86,87,88,89,91,92,93,94,95,96,97,98,99];
+
+        if (!validDDDs.includes(ddd)) {
+          return false;
+        }
+
+        // Para celular (11 dígitos), o terceiro dígito deve ser 9
+        if (cleaned.length === 11) {
+          const thirdDigit = cleaned.charAt(2);
+          return thirdDigit === '9';
+        }
+
+        // Para telefone fixo (10 dígitos), está válido
+        return true;
+      }
+      return false;
+
     default:
       return true;
   }
@@ -495,6 +539,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
   timeIntervals = 15,
   timeStart = '00:00',
   timeEnd = '23:59',
+  // Props do datepicker
+  excludedDates = [],
   ...props
 }, ref) => {
   const uiTranslations = useUITranslation();
@@ -652,6 +698,56 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
         setIsValid(true);
       }
     }
+    // Validação especial para telefone internacional
+    else if (mask === 'internationalPhone' && newValue) {
+      const cleaned = newValue.replace(/\D/g, '');
+
+      if (selectedCountry.code === 'BR') {
+        // Validação para Brasil - telefones fixos (10 dígitos) e celulares (11 dígitos)
+        if (cleaned.length > 0 && cleaned.length < 10) {
+          // Telefone incompleto
+          setIsIncomplete(true);
+          setIsValid(true);
+          currentIsValid = false;
+        } else if (cleaned.length === 10) {
+          // Telefone fixo (10 dígitos) - não deve ter 9 na 3ª posição
+          setIsIncomplete(false);
+          const phoneIsValid = cleaned.charAt(2) !== '9';
+          setIsValid(phoneIsValid);
+          currentIsValid = phoneIsValid;
+        } else if (cleaned.length === 11) {
+          // Telefone celular (11 dígitos) - precisa ter 9 na 3ª posição
+          setIsIncomplete(false);
+          const phoneIsValid = cleaned.charAt(2) === '9';
+          setIsValid(phoneIsValid);
+          currentIsValid = phoneIsValid;
+        } else if (cleaned.length > 11) {
+          // Muito longo
+          setIsIncomplete(false);
+          setIsValid(false);
+          currentIsValid = false;
+        } else {
+          setIsIncomplete(false);
+          setIsValid(true);
+          currentIsValid = true;
+        }
+      } else {
+        // Validação para outros países (mínimo 7 dígitos)
+        if (cleaned.length > 0 && cleaned.length < 7) {
+          setIsIncomplete(true);
+          setIsValid(true);
+          currentIsValid = false;
+        } else if (cleaned.length >= 7) {
+          setIsIncomplete(false);
+          setIsValid(true);
+          currentIsValid = true;
+        } else {
+          setIsIncomplete(false);
+          setIsValid(true);
+          currentIsValid = true;
+        }
+      }
+    }
     // Validação normal para outros tipos
     else if (validation !== 'none') {
       if (newValue) {
@@ -756,6 +852,33 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
     // Verificar se é horário inválido
     if (!isValid && mask === 'time') {
       return uiTranslations?.input?.validation?.invalidTime || 'Horário inválido';
+    }
+
+    // Verificar se é telefone incompleto
+    if (isIncomplete && mask === 'internationalPhone') {
+      if (selectedCountry.code === 'BR') {
+        return uiTranslations?.input?.validation?.incompletePhone || 'Telefone incompleto (fixo: 10 dígitos, celular: 11 dígitos)';
+      } else {
+        return uiTranslations?.input?.validation?.incompletePhone || 'Telefone incompleto (mín. 7 dígitos)';
+      }
+    }
+
+    // Verificar se é telefone inválido
+    if (!isValid && mask === 'internationalPhone') {
+      if (selectedCountry.code === 'BR') {
+        const cleaned = internalValue.replace(/\D/g, '');
+        if (cleaned.length > 11) {
+          return uiTranslations?.input?.validation?.phoneTooLong || 'Telefone com muitos dígitos';
+        } else if (cleaned.length === 11) {
+          return uiTranslations?.input?.validation?.invalidPhone || 'Para celular, digite 9 após o DDD';
+        } else if (cleaned.length === 10) {
+          return uiTranslations?.input?.validation?.invalidPhone || 'Para fixo, não digite 9 após o DDD';
+        } else {
+          return uiTranslations?.input?.validation?.invalidPhone || 'Telefone inválido';
+        }
+      } else {
+        return uiTranslations?.input?.validation?.invalidPhone || 'Telefone inválido';
+      }
     }
 
     if (isIncomplete && validation !== 'none') {
@@ -958,6 +1081,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
           error={!!showError}
           warning={!!showWarning}
           className={className}
+          excludedDates={excludedDates}
         />
 
         {/* Mensagem de erro */}
@@ -1123,7 +1247,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
               setIsFocused(false);
               setTimeout(() => setShowTimeDropdown(false), 150);
             }}
-            placeholder="HH:MM"
             disabled={disabled}
             className={`
               peer w-full h-10 rounded-lg border px-3 py-2 pr-10 text-gray-900

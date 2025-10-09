@@ -53,6 +53,7 @@ export const Aside: React.FC<AsideProps> = ({
               <Button
                 onClick={onSave}
                 variant="primary"
+                size="sm"
               >
                 {buttonText}
               </Button>

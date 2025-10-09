@@ -14,13 +14,20 @@ interface LayoutProps {
 }
 
 export function MainLayout({ children }: LayoutProps) {
-  const { multiplasUnidadesEnabled, centroCustoEnabled } = useClinic();
+  const {
+    multiplasUnidadesEnabled,
+    centroCustoEnabled,
+    units,
+    costCenters,
+    selectedUnitIds,
+    setSelectedUnitIds,
+    selectedCostCenterIds,
+    setSelectedCostCenterIds
+  } = useClinic();
   const { t } = useTranslation(layoutTranslations);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [configMenuOpen, setConfigMenuOpen] = useState(false);
-  const [selectedUnidades, setSelectedUnidades] = useState<string[]>([]);
-  const [selectedCentros, setSelectedCentros] = useState<string[]>([]);
   const location = useLocation();
   const menuRef = useRef<HTMLDivElement>(null);
   const configMenuRef = useRef<HTMLDivElement>(null);
@@ -62,21 +69,21 @@ export function MainLayout({ children }: LayoutProps) {
     window.location.href = '/login';
   };
 
-  const unidadesOptions = [
-    { value: '1', label: 'Unidade Principal' },
-    { value: '2', label: 'Unidade Setor Oeste' },
-    { value: '3', label: 'Unidade Centro' },
-    { value: '4', label: 'Unidade Norte' },
-    { value: '5', label: 'Unidade Sul' }
-  ];
+  // Convert units and cost centers to select options
+  const unidadesOptions = units.map(unit => ({
+    value: unit.id.toString(),
+    label: unit.titulo
+  }));
 
-  const centrosOptions = [
-    { value: '1', label: 'Ortodontia' },
-    { value: '2', label: 'Endodontia' },
-    { value: '3', label: 'Cirurgia' },
-    { value: '4', label: 'Periodontia' },
-    { value: '5', label: 'Implantodontia' }
-  ];
+  const centrosOptions = costCenters.map(center => ({
+    value: center.id.toString(),
+    label: center.name
+  }));
+
+  // Show filters based on quantity, not enabled state
+  const showUnitsFilter = units.length > 1;
+  const showCostCentersFilter = costCenters.length > 1;
+
 
   // Menu de configurações - Array simples com Iconify
   const configItems = [
@@ -220,10 +227,10 @@ export function MainLayout({ children }: LayoutProps) {
         {/* Header */}
         <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 h-16">
           <div className="flex items-center justify-between h-full">
-            {/* Logo Principal */}
+            {/* Seção Esquerda: Apenas Logo */}
             <div className="flex items-center gap-2 sm:gap-4">
-              {/* Menu Hambúrguer Mobile */}
-              <div className="relative md:hidden" ref={menuRef}>
+                {/* Menu Hambúrguer Mobile */}
+                <div className="relative md:hidden" ref={menuRef}>
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                   className="text-gray-500 hover:text-gray-700 transition-colors p-1.5 rounded-lg hover:bg-gray-100"
@@ -235,25 +242,39 @@ export function MainLayout({ children }: LayoutProps) {
                 {mobileMenuOpen && (
                   <div className="absolute left-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-[calc(100vh-100px)] overflow-y-auto">
                     {/* Superfiltros no mobile */}
-                    {(multiplasUnidadesEnabled || centroCustoEnabled) && (
+                    {(showUnitsFilter || showCostCentersFilter) && (
                       <div className="p-4 border-b border-gray-200 space-y-3">
                         <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wider">{t?.actions?.filters || 'Filtros'}</h3>
-                        {multiplasUnidadesEnabled && (
+                        {showUnitsFilter && (
                           <Select
                             placeholder={t?.actions?.allUnits || 'Todas as Unidades'}
                             options={unidadesOptions}
-                            value={selectedUnidades}
-                            onChange={(e) => setSelectedUnidades(Array.isArray(e.target.value) ? e.target.value : [])}
+                            value={selectedUnitIds.map(id => id.toString())}
+                            onChange={(e) => {
+                              const values = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
+                              const ids = values.filter(v => v).map(v => parseInt(v));
+                              setSelectedUnitIds(ids);
+                            }}
                             multiple={true}
+                            showAllOption={true}
+                            allOptionText={t?.actions?.allUnits || 'Todas as Unidades'}
+                            minWidth="min-w-40"
                           />
                         )}
-                        {centroCustoEnabled && (
+                        {showCostCentersFilter && (
                           <Select
                             placeholder={t?.actions?.allCenters || 'Todos os Centros'}
                             options={centrosOptions}
-                            value={selectedCentros}
-                            onChange={(e) => setSelectedCentros(Array.isArray(e.target.value) ? e.target.value : [])}
+                            value={selectedCostCenterIds.map(id => id.toString())}
+                            onChange={(e) => {
+                              const values = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
+                              const ids = values.filter(v => v).map(v => parseInt(v));
+                              setSelectedCostCenterIds(ids);
+                            }}
                             multiple={true}
+                            showAllOption={true}
+                            allOptionText={t?.actions?.allCenters || 'Todos os Centros'}
+                            minWidth="min-w-40"
                           />
                         )}
                       </div>
@@ -309,45 +330,69 @@ export function MainLayout({ children }: LayoutProps) {
                 className="hidden sm:block h-14 object-contain"
               />
 
-              {/* Stage Indicator */}
-              <StageIndicator className="ml-3 sm:ml-6" />
             </div>
 
             {/* Ações do header - Lado direito */}
             <div className="flex items-center gap-2 sm:gap-4">
-              {/* 1. Superfiltros - Ocultos no mobile */}
-              {(multiplasUnidadesEnabled || centroCustoEnabled) && (
-                <div className="hidden md:flex items-center gap-3">
-                  {/* Seletor de Unidades (Múltipla Seleção) */}
-                  {multiplasUnidadesEnabled && (
+              {/* Level Badge */}
+              <StageIndicator />
+
+              {/* IA Assistant */}
+              <button className="flex items-center gap-2 bg-gradient-to-r from-krooa-green/10 to-krooa-blue/10 hover:from-krooa-green/20 hover:to-krooa-blue/20 border border-krooa-green/40 hover:border-krooa-blue/60 text-krooa-blue px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 group">
+                <div className="relative">
+                  <span className="text-base group-hover:scale-110 transition-transform duration-200">🤖</span>
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-krooa-green rounded-full border border-white animate-pulse"></div>
+                </div>
+                <span className="hidden sm:block">Krooa IA</span>
+              </button>
+
+              {/* Superfiltros - Desktop */}
+              {(showUnitsFilter || showCostCentersFilter) && (
+                <div className="hidden md:flex items-center gap-2">
+                  {/* Seletor de Unidades (Multi-Select) */}
+                  {showUnitsFilter && (
                     <Select
                       placeholder={t?.actions?.allUnits || 'Todas as Unidades'}
                       options={unidadesOptions}
-                      value={selectedUnidades}
-                      onChange={(e) => setSelectedUnidades(Array.isArray(e.target.value) ? e.target.value : [])}
+                      value={selectedUnitIds.map(id => id.toString())}
+                      onChange={(e) => {
+                        const values = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
+                        const ids = values.filter(v => v).map(v => parseInt(v));
+                        setSelectedUnitIds(ids);
+                      }}
                       multiple={true}
+                      showAllOption={true}
+                      allOptionText={t?.actions?.allUnits || 'Todas as Unidades'}
+                      minWidth="min-w-40"
                     />
                   )}
 
-                  {/* Seletor de Centro de Custo (Seleção Múltipla) */}
-                  {centroCustoEnabled && (
+                  {/* Seletor de Centro de Custo (Multi-Select) */}
+                  {showCostCentersFilter && (
                     <Select
                       placeholder={t?.actions?.allCenters || 'Todos os Centros'}
                       options={centrosOptions}
-                      value={selectedCentros}
-                      onChange={(e) => setSelectedCentros(Array.isArray(e.target.value) ? e.target.value : [])}
+                      value={selectedCostCenterIds.map(id => id.toString())}
+                      onChange={(e) => {
+                        const values = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
+                        const ids = values.filter(v => v).map(v => parseInt(v));
+                        setSelectedCostCenterIds(ids);
+                      }}
                       multiple={true}
+                      showAllOption={true}
+                      allOptionText={t?.actions?.allCenters || 'Todos os Centros'}
+                      minWidth="min-w-40"
                     />
                   )}
                 </div>
               )}
 
-              {/* Divisor sutil - Oculto no mobile */}
-              {(multiplasUnidadesEnabled || centroCustoEnabled) && (
+              {/* Divisor sutil */}
+              {(showUnitsFilter || showCostCentersFilter) && (
                 <div className="hidden md:block h-6 w-px bg-gray-300"></div>
               )}
 
-              {/* 2. Busca */}
+              {/* Busca */}
               <button className="text-gray-500 hover:text-gray-700 transition-colors p-1">
                 <Icon icon="mdi:magnify" className="w-5 h-5" />
               </button>
