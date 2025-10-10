@@ -41,6 +41,28 @@ interface ResendStep1Response {
   };
 }
 
+interface Step2Request {
+  session_code: string;
+  name: string;
+  phone: string;
+  phone_ddi: string;
+}
+
+interface Step2Response {
+  success: boolean;
+  message: string;
+  data: {
+    prospect_id: number;
+    session_code: string;
+    name: string;
+    phone: string;
+    phone_ddi: string;
+    email: string;
+    current_step: number;
+    next_step: string;
+  };
+}
+
 export const prospectsService = {
   /**
    * Envia email para o step 1 do onboarding
@@ -63,6 +85,14 @@ export const prospectsService = {
    */
   resendStep1: async (data: ResendStep1Request): Promise<ResendStep1Response> => {
     const response = await api.post<ResendStep1Response>('/prospects/resend-step1', data);
+    return response.data;
+  },
+
+  /**
+   * Envia dados pessoais (nome e telefone) para o step 2
+   */
+  step2: async (data: Step2Request): Promise<Step2Response> => {
+    const response = await api.post<Step2Response>('/prospects/step2', data);
     return response.data;
   }
 };

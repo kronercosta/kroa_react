@@ -1,290 +1,344 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { OnboardingLayout } from '../OnboardingLayout';
+import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
 import { useTranslation } from '../../../hooks/useTranslation';
+import { useRegion } from '../../../contexts/RegionContext';
 import translations from '../translation.json';
 
-export default function Step5Page() {
+export default function Step4Page() {
   const navigate = useNavigate();
   const { t } = useTranslation(translations);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { currentRegion } = useRegion();
 
-  const getAccountData = () => {
+  const getUserData = () => {
     const onboardingData = JSON.parse(sessionStorage.getItem('onboardingData') || '{}');
     return {
-      clinicName: onboardingData.clinicName || '',
-      customDomain: onboardingData.customDomain || '',
-      email: onboardingData.email || ''
+      email: onboardingData.email || '',
+      isGoogleAuth: onboardingData.isGoogleAuth || false
     };
   };
 
-  const accountData = getAccountData();
+  const userData = getUserData();
 
-  const steps = t?.step4?.steps || [
-    'Validando informações',
-    'Criando banco de dados',
-    'Configurando domínio personalizado',
-    'Preparando ambiente',
-    'Finalizando configurações'
-  ];
+  const [formData, setFormData] = useState({
+    clinicName: '',
+    customDomain: '',
+    password: '',
+    confirmPassword: '',
+    email: userData.email
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [domainAvailable, setDomainAvailable] = useState<boolean | null>(null);
+  const [isCheckingDomain, setIsCheckingDomain] = useState(false);
 
+
+  // Password strength
+  const [passwordStrength, setPasswordStrength] = useState({
+    hasLength: false,
+    hasUppercase: false,
+    hasNumber: false,
+    hasSpecial: false
+  });
+
+  // Check domain availability
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentStep((prev) => {
-        if (prev < steps.length - 1) {
-          return prev + 1;
-        } else {
-          // Simular possível erro (10% chance)
-          if (Math.random() < 0.1) {
-            setError('Erro ao criar a conta. Tente novamente.');
-            clearInterval(timer);
-            return prev;
-          }
+    if (formData.customDomain && formData.customDomain.length >= 3) {
+      setIsCheckingDomain(true);
+      const timer = setTimeout(() => {
+        // Simular verificação de disponibilidade
+        const isAvailable = !['kroa', 'admin', 'test', 'demo'].includes(formData.customDomain.toLowerCase());
+        setDomainAvailable(isAvailable);
+        setIsCheckingDomain(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setDomainAvailable(null);
+      setIsCheckingDomain(false);
+    }
+  }, [formData.customDomain]);
 
-          setIsComplete(true);
-          clearInterval(timer);
-          return prev;
-        }
-      });
-    }, 1500);
+  // Password strength validation
+  useEffect(() => {
+    const password = formData.password;
+    setPasswordStrength({
+      hasLength: password.length >= 8,
+      hasUppercase: /[A-Z]/.test(password),
+      hasNumber: /\d/.test(password),
+      hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    });
+  }, [formData.password]);
 
-    return () => clearInterval(timer);
-  }, [steps.length]);
 
-  const handleComplete = () => {
-    // Limpar dados do sessionStorage após conclusão
-    sessionStorage.removeItem('onboardingData');
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
 
-    // Redirecionar para dashboard ou página principal
-    navigate('/dashboard');
+    if (!formData.clinicName.trim()) {
+      newErrors.clinicName = t?.step3?.validation?.clinicNameRequired || 'Nome da clínica é obrigatório';
+    }
+
+
+    if (!formData.customDomain.trim()) {
+      newErrors.customDomain = t?.step3?.validation?.domainRequired || 'Endereço de acesso é obrigatório';
+    } else if (!/^[a-zA-Z0-9-]+$/.test(formData.customDomain)) {
+      newErrors.customDomain = t?.step3?.validation?.domainInvalid || 'Endereço inválido';
+    } else if (domainAvailable === false) {
+      newErrors.customDomain = t?.step3?.domainUnavailable || 'Endereço não disponível';
+    }
+
+    if (!formData.password) {
+      newErrors.password = t?.step3?.validation?.passwordRequired || 'Senha é obrigatória';
+    } else if (!Object.values(passwordStrength).every(Boolean)) {
+      newErrors.password = t?.step3?.validation?.passwordWeak || 'Senha não atende aos requisitos';
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = t?.step3?.validation?.passwordMismatch || 'Senhas não coincidem';
+    }
+
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const retryCreation = () => {
-    setError(null);
-    setCurrentStep(0);
-    setIsComplete(false);
+  const handleNext = (data: {
+    clinicName: string;
+    customDomain: string;
+    password: string;
+    email: string;
+  }) => {
+    // Armazenar dados no sessionStorage
+    const onboardingData = JSON.parse(sessionStorage.getItem('onboardingData') || '{}');
+    const updatedData = { ...onboardingData, ...data };
+    sessionStorage.setItem('onboardingData', JSON.stringify(updatedData));
 
-    const timer = setInterval(() => {
-      setCurrentStep((prev) => {
-        if (prev < steps.length - 1) {
-          return prev + 1;
-        } else {
-          setIsComplete(true);
-          clearInterval(timer);
-          return prev;
-        }
-      });
-    }, 1000);
+    // Navegar para próxima etapa (criação da conta)
+    navigate('/onboarding/step5');
   };
 
-  if (error) {
-    return (
-      <OnboardingLayout
-        currentStep={5}
-        totalSteps={5}
-        showProgress={false}
-      >
-        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
+  const handleBack = () => {
+    navigate('/onboarding/step3');
+  };
 
-          <h1 className="text-xl font-bold text-gray-900 mb-2">
-            {t?.step4?.error?.title || 'Ops! Algo deu errado'}
-          </h1>
-          <p className="text-gray-600 mb-6">
-            {error}
-          </p>
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateForm()) {
+      setIsLoading(true);
+      setTimeout(() => {
+        handleNext({
+          clinicName: formData.clinicName,
+          customDomain: formData.customDomain,
+          password: formData.password,
+          email: formData.email
+        });
+        setIsLoading(false);
+      }, 1000);
+    }
+  };
 
-          <div className="space-y-3">
-            <Button
-              variant="primary"
-              onClick={retryCreation}
-              fullWidth
-            >
-              {t?.step4?.error?.retry || 'Tentar novamente'}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => window.location.href = '/support'}
-              fullWidth
-            >
-              {t?.step4?.error?.contact || 'Entrar em contato com o suporte'}
-            </Button>
-          </div>
-        </div>
-      </OnboardingLayout>
-    );
-  }
+  const formatDomain = (value: string) => {
+    return value.toLowerCase().replace(/[^a-zA-Z0-9-]/g, '');
+  };
 
-  if (isComplete) {
-    return (
-      <OnboardingLayout
-        currentStep={5}
-        totalSteps={5}
-        showProgress={false}
-      >
-        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-
-          <h1 className="text-2xl font-bold text-green-600 mb-2">
-            {t?.step4?.success || 'Conta criada com sucesso!'}
-          </h1>
-
-          <p className="text-gray-600 mb-6">
-            {t?.step4?.successMessage || 'Sua clínica está pronta para uso. Você será redirecionado em alguns segundos.'}
-          </p>
-
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <div className="text-sm text-gray-600 space-y-1">
-              <p><strong>{t?.step4?.labels?.clinic || 'Clínica:'}</strong> {accountData.clinicName}</p>
-              <p><strong>{t?.step4?.labels?.access || 'Acesso:'}</strong> https://{accountData.customDomain}.kroa.com.br</p>
-              <p><strong>{t?.step4?.labels?.email || 'E-mail:'}</strong> {accountData.email}</p>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <Button
-              variant="primary"
-              onClick={handleComplete}
-              size="lg"
-              fullWidth
-            >
-              {t?.step4?.accessNow || 'Acessar agora'}
-            </Button>
-
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span>{t?.step4?.redirectingIn5Seconds || 'Redirecionando automaticamente em 5 segundos...'}</span>
-            </div>
-          </div>
-
-          {/* Confetti Animation */}
-          <div className="fixed inset-0 pointer-events-none">
-            {Array.from({ length: 50 }, (_, i) => (
-              <div
-                key={i}
-                className="absolute w-2 h-2 bg-krooa-green rounded-full animate-bounce"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 2}s`,
-                  animationDuration: `${1 + Math.random() * 2}s`
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      </OnboardingLayout>
-    );
-  }
+  const domainSuffix = currentRegion === 'BR' ? '.kroa.com.br' : '.kroa.com';
 
   return (
     <OnboardingLayout
-      currentStep={5}
+      currentStep={4}
       totalSteps={5}
-      showProgress={false} // Não mostrar progresso na última etapa
+      showProgress={true}
     >
-      <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+      <div className="bg-white rounded-xl shadow-lg p-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="w-16 h-16 bg-krooa-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <div className="w-8 h-8 border-4 border-krooa-green border-t-transparent rounded-full animate-spin"></div>
-          </div>
-
+        <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {t?.step4?.title || 'Criando sua conta...'}
+            {t?.step3?.title || 'Configurações avançadas'}
           </h1>
           <p className="text-gray-600">
-            {t?.step4?.subtitle || 'Estamos preparando tudo para você'}
+            {t?.step3?.subtitle || 'Agora vamos personalizar sua clínica no sistema'}
           </p>
         </div>
 
-        {/* Progress Steps */}
-        <div className="space-y-4 mb-8">
-          {steps.map((step: string, index: number) => (
-            <div key={index} className="flex items-center gap-3">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
-                index < currentStep
-                  ? 'bg-green-500 text-white'
-                  : index === currentStep
-                  ? 'bg-krooa-green text-white'
-                  : 'bg-gray-200 text-gray-500'
-              }`}>
-                {index < currentStep ? (
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                ) : index === currentStep ? (
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                ) : (
-                  <span className="text-xs">{index + 1}</span>
-                )}
-              </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Email (readonly) */}
+          <div>
+            <Input
+              label={t?.step1?.email || 'E-mail'}
+              value={formData.email}
+              onChange={() => {}} // Não permite edição
+              placeholder={t?.step1?.emailPlaceholder || 'Digite seu melhor e-mail'}
+              validation="email"
+              disabled
+              fullWidth
+            />
+            <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              E-mail verificado no passo anterior
+            </p>
+          </div>
 
-              <div className={`flex-1 text-left ${
-                index <= currentStep ? 'text-gray-900' : 'text-gray-400'
-              }`}>
-                <p className="text-sm font-medium">{step}</p>
-                {index === currentStep && (
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className="w-2 h-2 bg-krooa-green rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-krooa-green rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-krooa-green rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  </div>
-                )}
+          {/* Clinic Name */}
+          <Input
+            label={t?.step3?.clinicName || 'Nome da clínica'}
+            value={formData.clinicName}
+            onChange={(value) => setFormData(prev => ({ ...prev, clinicName: value }))}
+            placeholder={t?.step3?.clinicNamePlaceholder || 'Digite o nome da sua clínica'}
+            error={errors.clinicName}
+            required
+            fullWidth
+          />
+
+          {/* Custom Domain */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t?.step3?.customDomain || 'Endereço de acesso personalizado'}
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={formData.customDomain}
+                onChange={(e) => {
+                  const formatted = formatDomain(e.target.value);
+                  setFormData(prev => ({ ...prev, customDomain: formatted }));
+                }}
+                placeholder={t?.step3?.customDomainPlaceholder || 'Digite o endereço desejado'}
+                className={`w-full px-3 py-2 pr-32 border rounded-lg focus:outline-none focus:ring-2 focus:ring-krooa-green/20 focus:border-krooa-green ${
+                  errors.customDomain ? 'border-red-300' : 'border-gray-300'
+                }`}
+              />
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
+                {domainSuffix}
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* Progress Bar */}
-        <div className="mb-6">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>{t?.step4?.progressLabel || 'Progresso'}</span>
-            <span>{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
+            {/* Domain Status */}
+            <div className="mt-1">
+              {isCheckingDomain && (
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
+                  Verificando disponibilidade...
+                </div>
+              )}
+              {domainAvailable === true && !isCheckingDomain && (
+                <div className="flex items-center gap-2 text-sm text-green-600">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  {t?.step3?.domainAvailable || 'Endereço disponível!'}
+                </div>
+              )}
+              {domainAvailable === false && !isCheckingDomain && (
+                <div className="flex items-center gap-2 text-sm text-red-600">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  {t?.step3?.domainUnavailable || 'Endereço não disponível'}
+                </div>
+              )}
+              {formData.customDomain && !isCheckingDomain && domainAvailable === null && (
+                <p className="text-xs text-gray-500">
+                  {t?.step3?.domainExample || 'Exemplo: minhaclinica.kroa.com.br'}
+                </p>
+              )}
+            </div>
+            {errors.customDomain && (
+              <p className="text-sm text-red-600 mt-1">{errors.customDomain}</p>
+            )}
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-gradient-to-r from-krooa-blue to-krooa-green h-2 rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-            ></div>
-          </div>
-        </div>
 
-        {/* Current step indicator */}
-        {currentStep === steps.length - 1 && (
-          <div className="bg-blue-50 rounded-lg p-4">
-            <p className="text-sm text-blue-700 font-medium">
-              {t?.step4?.almostDone || 'Quase pronto!'}
-            </p>
-            <p className="text-xs text-blue-600 mt-1">
-              {t?.step4?.finalizingDetails || 'Finalizando os últimos detalhes da sua conta...'}
-            </p>
-          </div>
-        )}
+          {/* Password */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Input
+                label={t?.step3?.password || 'Senha'}
+                mask="password"
+                value={formData.password}
+                onChange={(value) => setFormData(prev => ({ ...prev, password: value }))}
+                placeholder={t?.step3?.passwordPlaceholder || 'Digite uma senha segura'}
+                error={errors.password}
+                required
+                fullWidth
+                showPasswordToggle={true}
+              />
 
-        {/* Account Info Preview */}
-        <div className="bg-gray-50 rounded-lg p-4 text-left">
-          <h3 className="font-medium text-gray-900 mb-2">{t?.step4?.accountInfo || 'Informações da conta:'}</h3>
-          <div className="text-sm text-gray-600 space-y-1">
-            <p><strong>{t?.step4?.labels?.clinic || 'Clínica:'}</strong> {accountData.clinicName}</p>
-            <p><strong>{t?.step4?.labels?.domain || 'Domínio:'}</strong> {accountData.customDomain}.kroa.com.br</p>
-            <p><strong>{t?.step4?.labels?.email || 'E-mail:'}</strong> {accountData.email}</p>
+              {/* Password Requirements */}
+              {formData.password && (
+                <div className="mt-2 space-y-1">
+                  {(t?.step3?.passwordRequirements || [
+                    'Mínimo de 8 caracteres',
+                    'Pelo menos 1 letra maiúscula',
+                    'Pelo menos 1 número',
+                    'Pelo menos 1 caractere especial'
+                  ]).map((requirement: string, index: number) => {
+                    const checks = [
+                      passwordStrength.hasLength,
+                      passwordStrength.hasUppercase,
+                      passwordStrength.hasNumber,
+                      passwordStrength.hasSpecial
+                    ];
+                    const isValid = checks[index];
+
+                    return (
+                      <div key={index} className={`flex items-center gap-2 text-xs ${
+                        isValid ? 'text-green-600' : 'text-gray-400'
+                      }`}>
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        {requirement}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <Input
+              label={t?.step3?.confirmPassword || 'Confirmar senha'}
+              mask="password"
+              value={formData.confirmPassword}
+              onChange={(value) => setFormData(prev => ({ ...prev, confirmPassword: value }))}
+              placeholder={t?.step3?.confirmPasswordPlaceholder || 'Digite a senha novamente'}
+              error={errors.confirmPassword}
+              required
+              fullWidth
+              showPasswordToggle={true}
+            />
           </div>
-        </div>
+
+          {/* Email Verification - Removido pois email já foi verificado no Step 1 */}
+
+          {/* Buttons */}
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleBack}
+              className="flex-1"
+            >
+              {t?.common?.back || 'Voltar'}
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={isLoading || domainAvailable === false}
+              className="flex-1"
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  {t?.common?.loading || 'Carregando...'}
+                </div>
+              ) : (
+                t?.common?.next || 'Continuar'
+              )}
+            </Button>
+          </div>
+        </form>
       </div>
     </OnboardingLayout>
   );

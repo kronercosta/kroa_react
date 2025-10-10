@@ -76,7 +76,9 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({
       attemptsRemaining: 'Tentativas restantes:',
       maxAttemptsReached: 'Número máximo de tentativas atingido. Solicite um novo código.',
       verified: 'E-mail verificado com sucesso!',
-      sendError: 'Erro ao enviar código. Tente novamente.'
+      sendError: 'Erro ao enviar código. Tente novamente.',
+      changeEmail: 'Trocar email',
+      codeSentTo: 'Código enviado para:'
     },
     en: {
       title: 'Security verification',
@@ -89,7 +91,9 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({
       attemptsRemaining: 'Attempts remaining:',
       maxAttemptsReached: 'Maximum attempts reached. Request a new code.',
       verified: 'Email verified successfully!',
-      sendError: 'Error sending code. Please try again.'
+      sendError: 'Error sending code. Please try again.',
+      changeEmail: 'Change email',
+      codeSentTo: 'Code sent to:'
     },
     es: {
       title: 'Verificación de seguridad',
@@ -102,7 +106,9 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({
       attemptsRemaining: 'Intentos restantes:',
       maxAttemptsReached: 'Máximo de intentos alcanzado. Solicite un nuevo código.',
       verified: '¡Correo verificado con éxito!',
-      sendError: 'Error al enviar código. Inténtelo de nuevo.'
+      sendError: 'Error al enviar código. Inténtelo de nuevo.',
+      changeEmail: 'Cambiar correo',
+      codeSentTo: 'Código enviado a:'
     }
   };
 
@@ -471,33 +477,32 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({
   return (
     <div>
       {/* Header com ícone */}
-      <div className="mb-6">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4 mx-auto">
-          <svg className="w-8 h-8 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        </div>
-      </div>
-
-      <h2 className="text-2xl font-bold text-krooa-dark mb-2 text-center">{t.title}</h2>
-      <p className="text-gray-600 mb-8 text-center">
-        {t.description}
-        <br />
-        <span className="font-medium text-krooa-dark">{email}</span>
-      </p>
 
       {/* Informação do email de destino */}
       {state.codeSent && (
-        <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg space-y-3">
           <div className="flex items-center gap-2 justify-center">
             <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
               <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
               <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
             </svg>
             <span className="text-sm text-blue-800">
-              Código enviado para: <span className="font-medium">{email}</span>
+              {t.codeSentTo} <span className="font-medium">{email}</span>
             </span>
           </div>
+
+          {/* Botão Trocar Email */}
+          {onCancel && (
+            <div className="flex justify-center">
+              <button
+                onClick={onCancel}
+                disabled={state.isVerifying || state.isSending}
+                className="text-xs text-blue-700 hover:text-blue-900 font-medium underline transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {t.changeEmail}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
