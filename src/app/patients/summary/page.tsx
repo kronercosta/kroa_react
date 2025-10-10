@@ -22,7 +22,10 @@ import {
   CalendarX,
   ClipboardList,
   CheckCircle2,
-  XCircle
+  XCircle,
+  Brain,
+  Send,
+  RefreshCw
 } from 'lucide-react';
 import { Card } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';
@@ -62,6 +65,24 @@ const PatientSummaryPage: React.FC = () => {
     medications: [
       { name: 'Metformina', dose: '850mg', frequency: '2x ao dia' },
       { name: 'Losartana', dose: '50mg', frequency: '1x ao dia' }
+    ]
+  };
+
+  // Perfil Comportamental TCP (Teoria do Comportamento Planejado)
+  const behavioralProfile = {
+    profileType: 'Motivacional', // 'Consciente', 'Motivacional', 'Desorganizado', 'Resistente'
+    lastAssessment: '15/01/2024',
+    daysSinceAssessment: 15,
+    adherenceScore: 75, // 0-100
+    barriers: {
+      attitude: 'low', // Atitude em relação ao medicamento
+      socialNorm: 'medium', // Norma social/apoio familiar
+      perceivedControl: 'high' // Controle comportamental percebido
+    },
+    recommendations: [
+      'Uso de lembretes no celular',
+      'Organização com caixa de medicamentos',
+      'Apoio familiar para horários'
     ]
   };
 
@@ -456,7 +477,7 @@ const PatientSummaryPage: React.FC = () => {
                 <p className="text-xs text-gray-500 uppercase mb-2">Alergias</p>
                 <div className="flex flex-wrap gap-2">
                   {medicalInfo.allergies.map((allergy, idx) => (
-                    <Badge key={idx} variant="danger" size="sm">
+                    <Badge key={idx} variant="error" size="sm">
                       {allergy}
                     </Badge>
                   ))}
@@ -512,10 +533,111 @@ const PatientSummaryPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Medicações em Uso */}
           <Card>
-            <div className="flex items-center gap-2 mb-4">
-              <FileText className="w-5 h-5 text-blue-500" />
-              <h3 className="font-semibold">Medicações em Uso</h3>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-blue-500" />
+                <h3 className="font-semibold">Medicações em Uso</h3>
+              </div>
             </div>
+
+            {/* Perfil Comportamental TCP */}
+            <div className="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Brain className="w-5 h-5 text-purple-600" />
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900">Perfil de Adesão (TCP)</h4>
+                    <p className="text-xs text-gray-600">
+                      Tipo: <span className="font-medium text-purple-700">{behavioralProfile.profileType}</span>
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {behavioralProfile.daysSinceAssessment > 30 ? (
+                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                      <RefreshCw className="w-3 h-3" />
+                      Reenviar
+                    </Button>
+                  ) : (
+                    <Badge variant="success" size="sm">
+                      Atualizado
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              {/* Score de Adesão */}
+              <div className="mb-3">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-xs text-gray-600">Score de Adesão</span>
+                  <span className="text-xs font-bold text-purple-700">{behavioralProfile.adherenceScore}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all"
+                    style={{ width: `${behavioralProfile.adherenceScore}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Barreiras identificadas */}
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                <div className="text-center">
+                  <p className="text-xs text-gray-500">Atitude</p>
+                  <div className={`text-xs font-medium ${
+                    behavioralProfile.barriers.attitude === 'low' ? 'text-green-600' :
+                    behavioralProfile.barriers.attitude === 'medium' ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
+                    {behavioralProfile.barriers.attitude === 'low' ? 'Baixa' :
+                     behavioralProfile.barriers.attitude === 'medium' ? 'Média' : 'Alta'}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-gray-500">Apoio Social</p>
+                  <div className={`text-xs font-medium ${
+                    behavioralProfile.barriers.socialNorm === 'low' ? 'text-green-600' :
+                    behavioralProfile.barriers.socialNorm === 'medium' ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
+                    {behavioralProfile.barriers.socialNorm === 'low' ? 'Baixa' :
+                     behavioralProfile.barriers.socialNorm === 'medium' ? 'Média' : 'Alta'}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-gray-500">Controle</p>
+                  <div className={`text-xs font-medium ${
+                    behavioralProfile.barriers.perceivedControl === 'low' ? 'text-green-600' :
+                    behavioralProfile.barriers.perceivedControl === 'medium' ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
+                    {behavioralProfile.barriers.perceivedControl === 'low' ? 'Baixa' :
+                     behavioralProfile.barriers.perceivedControl === 'medium' ? 'Média' : 'Alta'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Recomendações */}
+              <div>
+                <p className="text-xs text-gray-600 mb-1">Estratégias Recomendadas:</p>
+                <div className="flex flex-wrap gap-1">
+                  {behavioralProfile.recommendations.map((rec, idx) => (
+                    <span key={idx} className="text-xs bg-white/70 px-2 py-1 rounded-full">
+                      {rec}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center justify-between">
+                <p className="text-xs text-gray-500">
+                  Avaliado em: {behavioralProfile.lastAssessment}
+                </p>
+                <Button variant="primary" size="sm" className="flex items-center gap-1">
+                  <Send className="w-3 h-3" />
+                  Enviar Questionário
+                </Button>
+              </div>
+            </div>
+
+            {/* Lista de Medicações */}
             <div className="space-y-3">
               {medicalInfo.medications.map((med, idx) => (
                 <div key={idx} className="p-3 bg-gray-50 rounded-lg">

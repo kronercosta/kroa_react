@@ -8,7 +8,7 @@ interface PatientLayoutProps {
   children: React.ReactNode;
   patientId: string;
   patientName?: string;
-  activeTab: 'summary' | 'personal-data';
+  activeTab: 'summary' | 'personal-data' | 'evolution';
 }
 
 const PatientLayout: React.FC<PatientLayoutProps> = ({
@@ -19,6 +19,7 @@ const PatientLayout: React.FC<PatientLayoutProps> = ({
 }) => {
   const tabs = [
     { id: 'summary', label: 'Resumo', href: `/patients/summary?id=${patientId}` },
+    { id: 'evolution', label: 'Evolução', href: `/patients/evolution?id=${patientId}` },
     { id: 'personal-data', label: 'Dados Pessoais', href: `/patients/personal-data?id=${patientId}` }
   ];
 
