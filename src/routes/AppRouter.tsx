@@ -9,11 +9,6 @@ const Login = lazy(() => import('../pages/Login'));
 const EsqueceuSenha = lazy(() => import('../pages/EsqueceuSenha'));
 const PrimeiroAcesso = lazy(() => import('../pages/PrimeiroAcesso'));
 
-// Páginas de Pacientes
-const PatientsPage = lazy(() => import('../app/patients/page'));
-const PatientsSummary = lazy(() => import('../app/patients/summary/page'));
-const PatientsPersonalData = lazy(() => import('../app/patients/personal-data/page'));
-
 // Loading component
 const LoadingScreen = () => (
   <div className="flex items-center justify-center min-h-screen">
