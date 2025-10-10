@@ -1,73 +1,86 @@
-# React + TypeScript + Vite
+# Sistema de Rotas Baseado em Arquivos (Automático)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este sistema funciona **EXATAMENTE** como o Next.js, onde cada pasta representa uma rota automaticamente.
 
-Currently, two official plugins are available:
+## 📁 Estrutura
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/app/
+  dashboard/
+    page.tsx        # Rota: /dashboard (automática)
+  pacientes/
+    page.tsx        # Rota: /pacientes (automática)
+  configuracoes/
+    usuario/
+      page.tsx      # Rota: /configuracoes/usuario (automática)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🚀 Como Adicionar uma Nova Rota (SUPER SIMPLES!)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 1. Criar a pasta e o arquivo
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Para criar uma rota `/exemplo`:
+
+```bash
+mkdir src/app/exemplo
 ```
+
+### 2. Criar o arquivo `page.tsx`
+
+Crie o arquivo `src/app/exemplo/page.tsx`:
+
+```tsx
+import React from 'react';
+
+const Exemplo: React.FC = () => {
+  return (
+    <div>
+      <h1>Minha Página de Exemplo</h1>
+      <p>Conteúdo da página</p>
+    </div>
+  );
+};
+
+export default Exemplo;
+```
+
+### 3. PRONTO! ✨
+
+**NÃO PRECISA FAZER MAIS NADA!** A rota `/exemplo` já está disponível automaticamente!
+
+Acesse `http://localhost:5175/exemplo`
+
+**Notas:**
+- ✅ Layout é adicionado automaticamente
+- ✅ Lazy loading automático
+- ✅ Não precisa registrar em lugar nenhum
+
+## 🎨 Layout
+
+Todas as páginas em `src/app/` recebem o Layout automaticamente (com navegação e sidebar).
+
+Se precisar de uma página SEM layout (como login), coloque em `src/pages/` e registre manualmente no `App.tsx`.
+
+## 📝 Rotas Aninhadas
+
+Para criar uma rota como `/configuracoes/usuario`:
+
+```bash
+mkdir -p src/app/configuracoes/usuario
+```
+
+Crie o arquivo `src/app/configuracoes/usuario/page.tsx` e pronto! A rota `/configuracoes/usuario` estará disponível automaticamente.
+
+## ✅ Vantagens
+
+- ✨ Organização clara por pasta
+- 📦 Code splitting automático (lazy loading)
+- 🔄 Fácil manutenção
+- 🚀 Similar ao Next.js
+
+## 🔄 Migração Gradual
+
+As rotas antigas em `src/pages/` continuam funcionando. Estamos migrando gradualmente para o novo sistema.
+
+Rotas já migradas:
+- ✅ `/dashboard` → `src/app/dashboard/page.tsx`

@@ -29,47 +29,54 @@ export function PageHeaderWithAvatar({
   };
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-4">
-        {onBack && (
-          <button
-            onClick={onBack}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-        )}
+    <div className="flex-shrink-0 bg-white border-b border-gray-200">
+      <div className="px-4 sm:px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            {onBack && (
+              <>
+                <button
+                  onClick={onBack}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+                <div className="w-px h-8 bg-gray-300"></div>
+              </>
+            )}
 
-        <div className="flex items-center gap-3">
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={title}
-              className="w-12 h-12 rounded-full object-cover"
-            />
-          ) : (
-            <div
-              className="w-12 h-12 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: avatarColor }}
-            >
-              {title ? (
-                <span className="text-white font-bold">
-                  {getInitials(title)}
-                </span>
+            <div className="flex items-center gap-3">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={title}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
               ) : (
-                <User className="w-6 h-6 text-white" />
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: avatarColor }}
+                >
+                  {title ? (
+                    <span className="text-white font-bold">
+                      {getInitials(title)}
+                    </span>
+                  ) : (
+                    <User className="w-6 h-6 text-white" />
+                  )}
+                </div>
               )}
-            </div>
-          )}
 
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">{title}</h1>
-            {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">{title}</h1>
+                {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
+              </div>
+            </div>
           </div>
+
+          {actions && <div className="flex items-center gap-2">{actions}</div>}
         </div>
       </div>
-
-      {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>
   );
 }

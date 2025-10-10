@@ -14,7 +14,16 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nrefactor: Implementar sistema de layout reutilizável com PageLayout\n\n- Criar PageLayout genérico com suporte a dois tipos de header (default e avatar)\n- Criar PageHeaderWithAvatar para headers com foto e botão voltar\n- Refatorar ColaboradorLayout para usar PageLayout com header avatar\n- Refatorar ConfiguracoesClinicaLayout para usar PageLayout\n- Atualizar todas as páginas de colaborador para usar novo sistema\n- Atualizar todas as páginas de clínica para usar ConfiguracoesClinicaLayout\n- Remover ColaboradorLayout da página de lista (page.tsx)\n- Adicionar botões Salvar/Cancelar em dados-pessoais, permissões e parâmetros\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git push:*)",
       "Bash(timeout 30 npx tsc --noEmit)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npx tsc:*)",
+      "Bash(find:*)",
+      "Bash(for:*)",
+      "Bash(do)",
+      "Bash(done)",
+      "Bash(node -e \"const fs = require(''fs''); const content = fs.readFileSync(''src/app/patients/page.tsx'', ''utf8''); let open = 0, close = 0; for(let c of content) { if(c === ''('') open++; if(c === '')'') close++; } console.log(''Abertos:'', open, ''Fechados:'', close, ''Diferença:'', open - close);\")",
+      "Bash(node:*)",
+      "Bash(curl:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

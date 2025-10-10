@@ -47,18 +47,16 @@ export function PageLayout({
     <div className="bg-gray-50 flex flex-col overflow-hidden">
       {/* Page Header */}
       {headerType === 'avatar' && avatarData ? (
-        <div className="flex-shrink-0 bg-white border-b border-gray-200">
-          <div className="px-4 sm:px-6 py-4">
-            <PageHeaderWithAvatar
-              title={avatarData.title}
-              subtitle={avatarData.subtitle}
-              avatarUrl={avatarData.avatarUrl}
-              avatarColor={avatarData.avatarColor}
-              onBack={avatarData.onBack}
-              actions={headerControls}
-            />
-          </div>
-        </div>
+        <>
+          <PageHeaderWithAvatar
+            title={avatarData.title}
+            subtitle={avatarData.subtitle}
+            avatarUrl={avatarData.avatarUrl}
+            avatarColor={avatarData.avatarColor}
+            onBack={avatarData.onBack}
+            actions={headerControls}
+          />
+        </>
       ) : (
         <PageHeader title={title || ''} subtitle={subtitle}>
           {headerControls}

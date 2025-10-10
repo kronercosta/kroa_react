@@ -1,0 +1,802 @@
+{
+  "patients": {
+    "title": {
+      "pt": "Pacientes",
+      "en": "Patients"
+    },
+    "subtitle": {
+      "pt": "Gerencie os pacientes da clínica",
+      "en": "Manage clinic patients"
+    },
+    "tabs": {
+      "list": {
+        "pt": "Lista",
+        "en": "List"
+      },
+      "register": {
+        "pt": "Cadastrar",
+        "en": "Register"
+      },
+      "appointments": {
+        "pt": "Consultas",
+        "en": "Appointments"
+      },
+      "treatments": {
+        "pt": "Tratamentos",
+        "en": "Treatments"
+      },
+      "financial": {
+        "pt": "Financeiro",
+        "en": "Financial"
+      },
+      "documents": {
+        "pt": "Documentos",
+        "en": "Documents"
+      },
+      "anamnesis": {
+        "pt": "Anamnese",
+        "en": "Anamnesis"
+      },
+      "reports": {
+        "pt": "Relatórios",
+        "en": "Reports"
+      }
+    },
+    "demographics": {
+      "title": {
+        "pt": "Análise Demográfica",
+        "en": "Demographic Analysis"
+      },
+      "subtitle": {
+        "pt": "Visualize dados e tendências dos pacientes",
+        "en": "View patient data and trends"
+      },
+      "tabs": {
+        "geolocation": {
+          "pt": "Geolocalização",
+          "en": "Geolocation"
+        },
+        "gender": {
+          "pt": "Gênero",
+          "en": "Gender"
+        },
+        "age": {
+          "pt": "Idade",
+          "en": "Age"
+        },
+        "newPatients": {
+          "pt": "Novos Pacientes",
+          "en": "New Patients"
+        },
+        "source": {
+          "pt": "Origem",
+          "en": "Source"
+        }
+      },
+      "cards": {
+        "total": {
+          "pt": "Total de Pacientes",
+          "en": "Total Patients"
+        },
+        "new": {
+          "pt": "Novos",
+          "en": "New"
+        },
+        "active": {
+          "pt": "Ativos",
+          "en": "Active"
+        },
+        "retention": {
+          "pt": "Retenção",
+          "en": "Retention"
+        },
+        "thisMonth": {
+          "pt": "este mês",
+          "en": "this month"
+        },
+        "thisWeek": {
+          "pt": "esta semana",
+          "en": "this week"
+        },
+        "withAppointments": {
+          "pt": "Com consultas marcadas",
+          "en": "With scheduled appointments"
+        },
+        "returning": {
+          "pt": "Pacientes recorrentes",
+          "en": "Returning patients"
+        }
+      },
+      "charts": {
+        "gender": {
+          "title": {
+            "pt": "Distribuição por Gênero",
+            "en": "Gender Distribution"
+          },
+          "total": {
+            "pt": "Total",
+            "en": "Total"
+          },
+          "male": {
+            "pt": "Masculino",
+            "en": "Male"
+          },
+          "female": {
+            "pt": "Feminino",
+            "en": "Female"
+          },
+          "other": {
+            "pt": "Outro",
+            "en": "Other"
+          }
+        },
+        "age": {
+          "title": {
+            "pt": "Distribuição por Idade",
+            "en": "Age Distribution"
+          },
+          "averageAge": {
+            "pt": "Idade Média",
+            "en": "Average Age"
+          },
+          "median": {
+            "pt": "Mediana",
+            "en": "Median"
+          },
+          "youngest": {
+            "pt": "Mais Novo",
+            "en": "Youngest"
+          },
+          "oldest": {
+            "pt": "Mais Velho",
+            "en": "Oldest"
+          },
+          "years": {
+            "pt": "anos",
+            "en": "years"
+          },
+          "months": {
+            "pt": "meses",
+            "en": "months"
+          }
+        },
+        "newPatients": {
+          "title": {
+            "pt": "Evolução de Novos Pacientes",
+            "en": "New Patients Evolution"
+          },
+          "trend": {
+            "pt": "Tendência",
+            "en": "Trend"
+          },
+          "growth": {
+            "pt": "crescimento",
+            "en": "growth"
+          },
+          "thisMonth": {
+            "pt": "Este mês",
+            "en": "This month"
+          },
+          "lastMonth": {
+            "pt": "mês anterior",
+            "en": "last month"
+          },
+          "thisYear": {
+            "pt": "Este ano",
+            "en": "This year"
+          },
+          "lastYear": {
+            "pt": "ano anterior",
+            "en": "last year"
+          },
+          "average": {
+            "pt": "Média",
+            "en": "Average"
+          },
+          "bestMonth": {
+            "pt": "Melhor mês",
+            "en": "Best month"
+          }
+        },
+        "geolocation": {
+          "title": {
+            "pt": "Mapa de Distribuição",
+            "en": "Distribution Map"
+          },
+          "patients": {
+            "pt": "pacientes",
+            "en": "patients"
+          },
+          "legend": {
+            "pt": "Legenda",
+            "en": "Legend"
+          },
+          "patientLocation": {
+            "pt": "Localização de Pacientes",
+            "en": "Patient Location"
+          },
+          "topNeighborhoods": {
+            "pt": "Principais Bairros",
+            "en": "Top Neighborhoods"
+          },
+          "averageDistance": {
+            "pt": "Distância Média",
+            "en": "Average Distance"
+          },
+          "coverage": {
+            "pt": "Cobertura",
+            "en": "Coverage"
+          },
+          "neighborhoods": {
+            "pt": "bairros",
+            "en": "neighborhoods"
+          }
+        },
+        "source": {
+          "title": {
+            "pt": "Origem dos Pacientes",
+            "en": "Patient Source"
+          },
+          "sources": {
+            "referral": {
+              "pt": "Indicação",
+              "en": "Referral"
+            },
+            "online": {
+              "pt": "Online",
+              "en": "Online"
+            },
+            "socialMedia": {
+              "pt": "Redes Sociais",
+              "en": "Social Media"
+            },
+            "insurance": {
+              "pt": "Convênio",
+              "en": "Insurance"
+            },
+            "walkin": {
+              "pt": "Espontâneo",
+              "en": "Walk-in"
+            },
+            "advertising": {
+              "pt": "Propaganda",
+              "en": "Advertising"
+            },
+            "other": {
+              "pt": "Outros",
+              "en": "Other"
+            }
+          },
+          "insights": {
+            "title": {
+              "pt": "Insights",
+              "en": "Insights"
+            },
+            "referralGrowth": {
+              "pt": "Indicações cresceram 22% este mês",
+              "en": "Referrals grew 22% this month"
+            },
+            "onlineConversion": {
+              "pt": "Taxa de conversão online: 35%",
+              "en": "Online conversion rate: 35%"
+            },
+            "socialMediaOpportunity": {
+              "pt": "Oportunidade: aumentar presença em redes sociais",
+              "en": "Opportunity: increase social media presence"
+            }
+          }
+        }
+      }
+    },
+    "list": {
+      "title": {
+        "pt": "Lista de Pacientes",
+        "en": "Patient List"
+      },
+      "subtitle": {
+        "pt": "Total de {{count}} pacientes cadastrados",
+        "en": "Total of {{count}} registered patients"
+      },
+      "columns": {
+        "id": {
+          "pt": "ID",
+          "en": "ID"
+        },
+        "name": {
+          "pt": "Nome",
+          "en": "Name"
+        },
+        "family": {
+          "pt": "Família",
+          "en": "Family"
+        },
+        "contact": {
+          "pt": "Contato",
+          "en": "Contact"
+        },
+        "lastVisit": {
+          "pt": "Última Visita",
+          "en": "Last Visit"
+        },
+        "plan": {
+          "pt": "Plano",
+          "en": "Plan"
+        },
+        "status": {
+          "pt": "Status",
+          "en": "Status"
+        },
+        "actions": {
+          "pt": "Ações",
+          "en": "Actions"
+        }
+      },
+      "status": {
+        "active": {
+          "pt": "Ativo",
+          "en": "Active"
+        },
+        "inactive": {
+          "pt": "Inativo",
+          "en": "Inactive"
+        }
+      },
+      "search": {
+        "placeholder": {
+          "pt": "Buscar por nome, CPF ou telefone...",
+          "en": "Search by name, CPF or phone..."
+        }
+      },
+      "filters": {
+        "allStatus": {
+          "pt": "Todos os Status",
+          "en": "All Status"
+        },
+        "active": {
+          "pt": "Ativos",
+          "en": "Active"
+        },
+        "inactive": {
+          "pt": "Inativos",
+          "en": "Inactive"
+        },
+        "allPlans": {
+          "pt": "Todos os Planos",
+          "en": "All Plans"
+        },
+        "plan": {
+          "pt": "Plano",
+          "en": "Plan"
+        },
+        "lastVisit": {
+          "pt": "Última Visita",
+          "en": "Last Visit"
+        }
+      },
+      "actions": {
+        "view": {
+          "pt": "Ver",
+          "en": "View"
+        },
+        "edit": {
+          "pt": "Editar",
+          "en": "Edit"
+        },
+        "newPatient": {
+          "pt": "Novo Paciente",
+          "en": "New Patient"
+        },
+        "export": {
+          "pt": "Exportar",
+          "en": "Export"
+        },
+        "filter": {
+          "pt": "Filtrar",
+          "en": "Filter"
+        }
+      },
+      "pagination": {
+        "showing": {
+          "pt": "Mostrando {{from}} a {{to}} de {{total}} registros",
+          "en": "Showing {{from}} to {{to}} of {{total}} records"
+        },
+        "previous": {
+          "pt": "Anterior",
+          "en": "Previous"
+        },
+        "next": {
+          "pt": "Próximo",
+          "en": "Next"
+        }
+      },
+      "familyMembers": {
+        "title": {
+          "pt": "Membros da Família",
+          "en": "Family Members"
+        },
+        "viewAll": {
+          "pt": "Ver Grupo Familiar",
+          "en": "View Family Group"
+        },
+        "noMembers": {
+          "pt": "Sem familiares vinculados",
+          "en": "No linked family members"
+        }
+      }
+    },
+    "register": {
+      "title": {
+        "pt": "Cadastrar Paciente",
+        "en": "Register Patient"
+      },
+      "subtitle": {
+        "pt": "Preencha os dados do novo paciente",
+        "en": "Fill in the new patient data"
+      },
+      "sections": {
+        "personalData": {
+          "pt": "Dados Pessoais",
+          "en": "Personal Data"
+        },
+        "address": {
+          "pt": "Endereço",
+          "en": "Address"
+        },
+        "emergencyContact": {
+          "pt": "Contato de Emergência",
+          "en": "Emergency Contact"
+        },
+        "insurance": {
+          "pt": "Convênio",
+          "en": "Insurance"
+        },
+        "notes": {
+          "pt": "Observações",
+          "en": "Notes"
+        }
+      },
+      "fields": {
+        "fullName": {
+          "pt": "Nome Completo",
+          "en": "Full Name"
+        },
+        "fullNamePlaceholder": {
+          "pt": "Digite o nome completo",
+          "en": "Enter full name"
+        },
+        "cpf": {
+          "pt": "CPF",
+          "en": "CPF"
+        },
+        "birthDate": {
+          "pt": "Data de Nascimento",
+          "en": "Birth Date"
+        },
+        "gender": {
+          "label": {
+            "pt": "Gênero",
+            "en": "Gender"
+          },
+          "placeholder": {
+            "pt": "Selecione o gênero",
+            "en": "Select gender"
+          },
+          "male": {
+            "pt": "Masculino",
+            "en": "Male"
+          },
+          "female": {
+            "pt": "Feminino",
+            "en": "Female"
+          },
+          "other": {
+            "pt": "Outro",
+            "en": "Other"
+          }
+        },
+        "phone": {
+          "pt": "Telefone",
+          "en": "Phone"
+        },
+        "email": {
+          "pt": "E-mail",
+          "en": "Email"
+        },
+        "maritalStatus": {
+          "label": {
+            "pt": "Estado Civil",
+            "en": "Marital Status"
+          },
+          "placeholder": {
+            "pt": "Selecione o estado civil",
+            "en": "Select marital status"
+          },
+          "single": {
+            "pt": "Solteiro(a)",
+            "en": "Single"
+          },
+          "married": {
+            "pt": "Casado(a)",
+            "en": "Married"
+          },
+          "divorced": {
+            "pt": "Divorciado(a)",
+            "en": "Divorced"
+          },
+          "widowed": {
+            "pt": "Viúvo(a)",
+            "en": "Widowed"
+          }
+        },
+        "occupation": {
+          "pt": "Profissão",
+          "en": "Occupation"
+        },
+        "occupationPlaceholder": {
+          "pt": "Digite a profissão",
+          "en": "Enter occupation"
+        },
+        "zipCode": {
+          "pt": "CEP",
+          "en": "Zip Code"
+        },
+        "street": {
+          "pt": "Rua",
+          "en": "Street"
+        },
+        "streetPlaceholder": {
+          "pt": "Nome da rua",
+          "en": "Street name"
+        },
+        "number": {
+          "pt": "Número",
+          "en": "Number"
+        },
+        "complement": {
+          "pt": "Complemento",
+          "en": "Complement"
+        },
+        "complementPlaceholder": {
+          "pt": "Apto, sala, etc.",
+          "en": "Apt, suite, etc."
+        },
+        "neighborhood": {
+          "pt": "Bairro",
+          "en": "Neighborhood"
+        },
+        "neighborhoodPlaceholder": {
+          "pt": "Nome do bairro",
+          "en": "Neighborhood name"
+        },
+        "city": {
+          "pt": "Cidade",
+          "en": "City"
+        },
+        "cityPlaceholder": {
+          "pt": "Nome da cidade",
+          "en": "City name"
+        },
+        "state": {
+          "pt": "Estado",
+          "en": "State"
+        },
+        "country": {
+          "pt": "País",
+          "en": "Country"
+        },
+        "countryPlaceholder": {
+          "pt": "Nome do país",
+          "en": "Country name"
+        },
+        "emergencyName": {
+          "pt": "Nome do Contato",
+          "en": "Contact Name"
+        },
+        "emergencyNamePlaceholder": {
+          "pt": "Nome completo do contato",
+          "en": "Contact full name"
+        },
+        "emergencyRelation": {
+          "pt": "Parentesco",
+          "en": "Relationship"
+        },
+        "emergencyRelationPlaceholder": {
+          "pt": "Ex: Mãe, Pai, Cônjuge",
+          "en": "Ex: Mother, Father, Spouse"
+        },
+        "emergencyPhone": {
+          "pt": "Telefone de Emergência",
+          "en": "Emergency Phone"
+        },
+        "emergencyEmail": {
+          "pt": "E-mail de Emergência",
+          "en": "Emergency Email"
+        },
+        "hasInsurance": {
+          "pt": "Possui Convênio",
+          "en": "Has Insurance"
+        },
+        "insuranceCompany": {
+          "pt": "Operadora",
+          "en": "Insurance Company"
+        },
+        "insuranceCompanyPlaceholder": {
+          "pt": "Nome da operadora",
+          "en": "Company name"
+        },
+        "insuranceNumber": {
+          "pt": "Número do Cartão",
+          "en": "Card Number"
+        },
+        "insuranceNumberPlaceholder": {
+          "pt": "Digite o número",
+          "en": "Enter number"
+        },
+        "insurancePlan": {
+          "pt": "Plano",
+          "en": "Plan"
+        },
+        "insurancePlanPlaceholder": {
+          "pt": "Nome do plano",
+          "en": "Plan name"
+        },
+        "insuranceValidity": {
+          "pt": "Validade",
+          "en": "Validity"
+        },
+        "observations": {
+          "pt": "Observações",
+          "en": "Observations"
+        },
+        "observationsPlaceholder": {
+          "pt": "Digite observações sobre o paciente...",
+          "en": "Enter observations about the patient..."
+        },
+        "acceptsMarketing": {
+          "pt": "Aceita receber comunicações de marketing",
+          "en": "Accepts marketing communications"
+        }
+      },
+      "actions": {
+        "cancel": {
+          "pt": "Cancelar",
+          "en": "Cancel"
+        },
+        "save": {
+          "pt": "Salvar",
+          "en": "Save"
+        }
+      }
+    },
+    "appointments": {
+      "title": {
+        "pt": "Consultas",
+        "en": "Appointments"
+      },
+      "subtitle": {
+        "pt": "Gerencie as consultas dos pacientes",
+        "en": "Manage patient appointments"
+      },
+      "status": {
+        "scheduled": {
+          "pt": "Agendado",
+          "en": "Scheduled"
+        },
+        "confirmed": {
+          "pt": "Confirmado",
+          "en": "Confirmed"
+        },
+        "in_progress": {
+          "pt": "Em Atendimento",
+          "en": "In Progress"
+        },
+        "completed": {
+          "pt": "Concluído",
+          "en": "Completed"
+        }
+      },
+      "fields": {
+        "date": {
+          "pt": "Data",
+          "en": "Date"
+        },
+        "time": {
+          "pt": "Horário",
+          "en": "Time"
+        },
+        "professional": {
+          "pt": "Profissional",
+          "en": "Professional"
+        },
+        "procedure": {
+          "pt": "Procedimento",
+          "en": "Procedure"
+        }
+      },
+      "actions": {
+        "newAppointment": {
+          "pt": "Nova Consulta",
+          "en": "New Appointment"
+        },
+        "view": {
+          "pt": "Visualizar",
+          "en": "View"
+        },
+        "reschedule": {
+          "pt": "Reagendar",
+          "en": "Reschedule"
+        }
+      }
+    },
+    "treatments": {
+      "title": {
+        "pt": "Tratamentos",
+        "en": "Treatments"
+      },
+      "subtitle": {
+        "pt": "Histórico de tratamentos dos pacientes",
+        "en": "Patient treatment history"
+      },
+      "comingSoon": {
+        "pt": "Em breve: Sistema de gestão de tratamentos",
+        "en": "Coming soon: Treatment management system"
+      }
+    },
+    "financial": {
+      "title": {
+        "pt": "Financeiro",
+        "en": "Financial"
+      },
+      "subtitle": {
+        "pt": "Gestão financeira dos pacientes",
+        "en": "Patient financial management"
+      },
+      "comingSoon": {
+        "pt": "Em breve: Sistema financeiro de pacientes",
+        "en": "Coming soon: Patient financial system"
+      }
+    },
+    "documents": {
+      "title": {
+        "pt": "Documentos",
+        "en": "Documents"
+      },
+      "subtitle": {
+        "pt": "Documentos e arquivos dos pacientes",
+        "en": "Patient documents and files"
+      },
+      "comingSoon": {
+        "pt": "Em breve: Sistema de gestão de documentos",
+        "en": "Coming soon: Document management system"
+      }
+    },
+    "anamnesis": {
+      "title": {
+        "pt": "Anamnese",
+        "en": "Anamnesis"
+      },
+      "subtitle": {
+        "pt": "Histórico médico e anamnese dos pacientes",
+        "en": "Medical history and patient anamnesis"
+      },
+      "comingSoon": {
+        "pt": "Em breve: Sistema de anamnese digital",
+        "en": "Coming soon: Digital anamnesis system"
+      }
+    },
+    "reports": {
+      "title": {
+        "pt": "Relatórios",
+        "en": "Reports"
+      },
+      "subtitle": {
+        "pt": "Relatórios e análises de pacientes",
+        "en": "Patient reports and analytics"
+      },
+      "comingSoon": {
+        "pt": "Em breve: Sistema de relatórios avançados",
+        "en": "Coming soon: Advanced reporting system"
+      }
+    }
+  }
+}
