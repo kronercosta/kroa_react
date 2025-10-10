@@ -1,4 +1,14 @@
 import api from '../../services/api';
+import axios from 'axios';
+
+interface LocationData {
+  country: string;
+  countryCode: string;
+  city: string;
+  region: string;
+  ip: string;
+  timezone: string;
+}
 
 interface Step1Request {
   email: string;
@@ -63,7 +73,50 @@ interface Step2Response {
   };
 }
 
+interface Step3Request {
+  session_code: string;
+  region: string;
+  accept_kroa_terms: boolean;
+  accept_lgpd_terms: boolean;
+  accept_hipaa_terms: boolean;
+}
+
+interface Step3Response {
+  success: boolean;
+  message: string;
+  data: {
+    prospect_id: number;
+    session_code: string;
+    region: string;
+    terms_accepted: string[];
+    current_step: number;
+    next_step: string;
+  };
+}
+
 export const prospectsService = {
+  /**
+   * Obtém localização do usuário por IP
+   */
+  getLocationByIP: async (): Promise<LocationData> => {
+    try {
+      const response = await axios.get('https://ipapi.co/json/');
+      const data = response.data;
+
+      return {
+        country: data.country_name,
+        countryCode: data.country_code, // BR, US, etc
+        city: data.city,
+        region: data.region,
+        ip: data.ip,
+        timezone: data.timezone
+      };
+    } catch (error) {
+      console.error('Erro ao obter localização por IP:', error);
+      throw error;
+    }
+  },
+
   /**
    * Envia email para o step 1 do onboarding
    */
@@ -93,6 +146,14 @@ export const prospectsService = {
    */
   step2: async (data: Step2Request): Promise<Step2Response> => {
     const response = await api.post<Step2Response>('/prospects/step2', data);
+    return response.data;
+  },
+
+  /**
+   * Envia aceitação de termos para o step 3
+   */
+  step3: async (data: Step3Request): Promise<Step3Response> => {
+    const response = await api.post<Step3Response>('/prospects/step3', data);
     return response.data;
   }
 };

@@ -1,755 +1,339 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { OnboardingLayout } from '../OnboardingLayout';
-import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
-import { Modal } from '../../../components/ui/Modal';
 import { DocumentModal } from './DocumentModal';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useRegion } from '../../../contexts/RegionContext';
 import translations from '../translation.json';
+import { prospectsService } from '../prospectsService';
 
-export default function Step2Page() {
+export default function Step3Page() {
   const navigate = useNavigate();
   const { t } = useTranslation(translations);
-  const { currentRegion, formatCurrency } = useRegion();
-  const [selectedPlan, setSelectedPlan] = useState('monthly');
-  const [selectedPeriod, setSelectedPeriod] = useState<'monthly' | 'quarterly' | 'yearly'>('monthly');
-  const [couponCode, setCouponCode] = useState('');
-  const [couponError, setCouponError] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<{discount: number, type: 'percentage' | 'fixed'} | null>(null);
-  const [showCouponField, setShowCouponField] = useState(false);
+  const { currentRegion } = useRegion();
+
+  const getInitialData = () => {
+    const onboardingData = JSON.parse(sessionStorage.getItem('onboardingData') || '{}');
+    return {
+      email: onboardingData.email || '',
+      session_code: onboardingData.session_code || '',
+      prospect_id: onboardingData.prospect_id
+    };
+  };
+
+  const [formData] = useState(getInitialData());
+  const [kroaTermsAccepted, setKroaTermsAccepted] = useState(false);
   const [lgpdAccepted, setLgpdAccepted] = useState(false);
   const [hipaaAccepted, setHipaaAccepted] = useState(false);
-  const [adminAccepted, setAdminAccepted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [documentModal, setDocumentModal] = useState<{
     isOpen: boolean;
-    type: 'lgpd' | 'hipaa' | 'admin' | 'addons' | null;
+    type: 'kroa' | 'lgpd' | 'hipaa' | null;
   }>({ isOpen: false, type: null });
 
   // Aguardar carregamento das traduções
-  if (!t || !t.step2) {
+  if (!t || !t.step3) {
     return (
-      <OnboardingLayout currentStep={2} totalSteps={5} showProgress={true}>
+      <OnboardingLayout currentStep={3} totalSteps={6} showProgress={true}>
         <div className="bg-white rounded-xl shadow-lg p-8 text-center">
           <div className="w-6 h-6 border-2 border-krooa-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p>Carregando...</p>
+          <p>Loading...</p>
         </div>
       </OnboardingLayout>
     );
   }
 
-  // Preços baseados na região e período
-  const basePrices = {
-    BR: {
-      monthly: 192.00,
-      quarterly: 576.00, // 3x mensal
-      yearly: 1920.00    // 10x mensal
-    },
-    US: {
-      monthly: 730.00,
-      quarterly: 2190.00, // 3x mensal
-      yearly: 7300.00    // 10x mensal
-    }
-  };
-
-  const addOnPrices = {
-    BR: { whatsapp: 89.00, ai: 100.00 },
-    US: { whatsapp: 89.00, ai: 100.00 }
-  };
-
-  const getCurrentPrice = () => {
-    const regionKey = currentRegion as keyof typeof basePrices;
-    return basePrices[regionKey][selectedPeriod];
-  };
-
-  const getAddOnPrice = (addon: 'whatsapp' | 'ai') => {
-    const regionKey = currentRegion as keyof typeof addOnPrices;
-    return addOnPrices[regionKey][addon];
-  };
-
-  const calculateTotal = () => {
-    let basePrice = getCurrentPrice();
-
-    // Aplicar desconto se houver cupom
-    if (appliedCoupon) {
-      if (appliedCoupon.type === 'percentage') {
-        basePrice = basePrice * (1 - appliedCoupon.discount / 100);
-      } else {
-        basePrice = Math.max(0, basePrice - appliedCoupon.discount);
-      }
-    }
-
-    return basePrice;
-  };
-
-  const planDetails = {
-    name: t?.step2?.plans?.complete?.name || 'Plano Completo',
-    features: t?.step2?.plans?.complete?.features || [
-      'Usuários ilimitados',
-      'Cadeiras ilimitadas',
-      'Centro de custo',
-      'Unidades ilimitadas',
-      'Módulos de agenda',
-      'Módulo financeiro',
-      '15GB de storage',
-      currentRegion === 'BR' ? 'Assinatura digital (adicional)' : 'Digital signature available'
-    ]
-  };
-
-  const periodOptions = [
-    {
-      key: 'monthly' as const,
-      name: t?.step2?.periods?.monthly || 'Mensal',
-      suffix: t?.step2?.periods?.monthlySuffix || '/mês'
-    },
-    {
-      key: 'quarterly' as const,
-      name: t?.step2?.periods?.quarterly || 'Trimestral',
-      suffix: t?.step2?.periods?.quarterlySuffix || '/trimestre',
-      discount: currentRegion === 'BR' ? '' : ''
-    },
-    {
-      key: 'yearly' as const,
-      name: t?.step2?.periods?.yearly || 'Anual',
-      suffix: t?.step2?.periods?.yearlySuffix || '/ano',
-      discount: t?.step2?.periods?.yearlyDiscount || '2 meses grátis'
-    }
-  ];
-
-  const applyCoupon = () => {
-    setCouponError('');
-    setAppliedCoupon(null);
-
-    // Cupons válidos por período e região
-    const validCoupons = {
-      monthly: currentRegion === 'BR' ? {
-        'MENSAL10': { discount: 10, type: 'percentage' as const },
-        'PRIMEIROMES': { discount: 50, type: 'fixed' as const },
-        'MONTHLY10': { discount: 10, type: 'percentage' as const },
-        'FIRSTMONTH': { discount: 50, type: 'fixed' as const }
-      } : {
-        'MONTHLY10': { discount: 10, type: 'percentage' as const },
-        'FIRSTMONTH': { discount: 50, type: 'fixed' as const },
-        'MENSAL10': { discount: 10, type: 'percentage' as const },
-        'PRIMEIROMES': { discount: 50, type: 'fixed' as const }
-      },
-      quarterly: currentRegion === 'BR' ? {
-        'TRIMESTRE15': { discount: 15, type: 'percentage' as const },
-        'QUARTERLY15': { discount: 15, type: 'percentage' as const },
-        'DESCONTO3M': { discount: 100, type: 'fixed' as const }
-      } : {
-        'QUARTERLY15': { discount: 15, type: 'percentage' as const },
-        'TRIMESTRE15': { discount: 15, type: 'percentage' as const },
-        'DISCOUNT3M': { discount: 100, type: 'fixed' as const }
-      },
-      yearly: currentRegion === 'BR' ? {
-        'ANUAL20': { discount: 20, type: 'percentage' as const },
-        'YEARLY20': { discount: 20, type: 'percentage' as const },
-        'DESCONTO12M': { discount: 500, type: 'fixed' as const },
-        'PLANO1ANO': { discount: 25, type: 'percentage' as const }
-      } : {
-        'YEARLY20': { discount: 20, type: 'percentage' as const },
-        'ANUAL20': { discount: 20, type: 'percentage' as const },
-        'DISCOUNT12M': { discount: 500, type: 'fixed' as const },
-        'PLAN1YEAR': { discount: 25, type: 'percentage' as const }
-      }
-    };
-
-    if (!couponCode.trim()) {
-      setCouponError(t?.step2?.couponInvalid || 'Digite um código de cupom');
-      return;
-    }
-
-    const periodCoupons = validCoupons[selectedPeriod];
-    const coupon = periodCoupons[couponCode.toUpperCase() as keyof typeof periodCoupons];
-
-    if (coupon) {
-      setAppliedCoupon(coupon);
-    } else {
-      setCouponError(t?.step2?.couponInvalidForPeriod || `Cupom inválido para o período ${periodOptions.find(p => p.key === selectedPeriod)?.name.toLowerCase()}`);
-    }
-  };
-
-  const removeCoupon = () => {
-    setAppliedCoupon(null);
-    setCouponCode('');
-    setCouponError('');
-    setShowCouponField(false);
-  };
-
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!adminAccepted) {
-      newErrors.admin = t?.step2?.termsRequired || 'Você deve aceitar os termos de responsabilidade';
+    // Termos Kroa são obrigatórios para todos
+    if (!kroaTermsAccepted) {
+      newErrors.kroa = t?.step3?.termsRequired || 'Você deve aceitar os termos de uso';
     }
 
+    // LGPD obrigatório para BR
     if (currentRegion === 'BR' && !lgpdAccepted) {
-      newErrors.lgpd = t?.step2?.termsRequired || 'Você deve aceitar os termos da LGPD';
+      newErrors.lgpd = t?.step3?.termsRequired || 'Você deve aceitar os termos da LGPD';
     }
 
+    // HIPAA obrigatório para US
     if (currentRegion === 'US' && !hipaaAccepted) {
-      newErrors.hipaa = t?.step2?.termsRequired || 'You must accept the HIPAA terms';
+      newErrors.hipaa = t?.step3?.termsRequired || 'You must accept the HIPAA terms';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNext = (data: {
-    selectedPlan: string;
-    selectedPeriod: 'monthly' | 'quarterly' | 'yearly';
-    appliedCoupon: {discount: number, type: 'percentage' | 'fixed'} | null;
-    finalPrice: number;
-    couponCode?: string;
-    termsAccepted: boolean;
-    lgpdAccepted?: boolean;
-    hipaaAccepted?: boolean;
-    adminAccepted: boolean;
-  }) => {
-    // Armazenar dados no sessionStorage
-    const onboardingData = JSON.parse(sessionStorage.getItem('onboardingData') || '{}');
-    const updatedData = { ...onboardingData, ...data };
-    sessionStorage.setItem('onboardingData', JSON.stringify(updatedData));
-
-    // Navegar para próxima etapa (pagamento)
-    navigate('/onboarding/step3');
-  };
-
-  const handleBack = () => {
-    navigate('/onboarding/step1');
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      setIsLoading(true);
-      setTimeout(() => {
-        handleNext({
-          selectedPlan: 'complete',
-          selectedPeriod,
-          appliedCoupon,
-          finalPrice: calculateTotal(),
-          couponCode: appliedCoupon ? couponCode : undefined,
-          termsAccepted: true,
-          lgpdAccepted: currentRegion === 'BR' ? lgpdAccepted : undefined,
-          hipaaAccepted: currentRegion === 'US' ? hipaaAccepted : undefined,
-          adminAccepted
-        });
-        setIsLoading(false);
-      }, 1000);
+
+    if (!validateForm()) {
+      return;
+    }
+
+    // Verificar se session_code existe
+    if (!formData.session_code) {
+      console.error('Session code não encontrado');
+      setErrors({ kroa: 'Erro ao salvar dados. Tente novamente.' });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      console.log('Enviando dados step3:', {
+        session_code: formData.session_code,
+        region: currentRegion,
+        accept_kroa_terms: kroaTermsAccepted,
+        accept_lgpd_terms: currentRegion === 'BR' ? lgpdAccepted : false,
+        accept_hipaa_terms: currentRegion === 'US' ? hipaaAccepted : false
+      });
+
+      const response = await prospectsService.step3({
+        session_code: formData.session_code,
+        region: currentRegion,
+        accept_kroa_terms: kroaTermsAccepted,
+        accept_lgpd_terms: currentRegion === 'BR' ? lgpdAccepted : false,
+        accept_hipaa_terms: currentRegion === 'US' ? hipaaAccepted : false
+      });
+
+      console.log('Response step3:', response);
+
+      if (response.success) {
+        // Salvar todos os dados no sessionStorage
+        const onboardingData = JSON.parse(sessionStorage.getItem('onboardingData') || '{}');
+        const updatedData = {
+          ...onboardingData,
+          region: response.data.region,
+          terms_accepted: response.data.terms_accepted,
+          prospect_id: response.data.prospect_id,
+          session_code: response.data.session_code,
+          current_step: response.data.current_step
+        };
+        sessionStorage.setItem('onboardingData', JSON.stringify(updatedData));
+
+        // Navegar para step4
+        navigate('/onboarding/step4');
+      } else {
+        setErrors({ kroa: response.message || 'Erro ao salvar dados.' });
+      }
+    } catch (error: any) {
+      console.error('Erro ao enviar step3:', error);
+      const errorMessage = error.response?.data?.message || 'Erro ao salvar dados. Tente novamente.';
+      setErrors({ kroa: errorMessage });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <OnboardingLayout
-      currentStep={2}
-      totalSteps={5}
+      currentStep={3}
+      totalSteps={6}
       showProgress={true}
     >
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg p-8">
         {/* Header */}
-        <div className="bg-gradient-to-r from-krooa-blue to-krooa-green text-white p-8 text-center">
-          <h1 className="text-2xl font-bold mb-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            {t?.step2?.title || 'Escolha seu plano'}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            {t?.step3?.title || 'Termos e Condições'}
           </h1>
-          <p className="text-krooa-green-100" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
-            {t?.step2?.subtitle || 'Escolha o melhor período para sua clínica'}
+          <p className="text-gray-600">
+            {t?.step3?.subtitle || 'Leia e aceite os termos para continuar'}
           </p>
         </div>
 
-        <div className="p-8">
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Plan Details with Period Selection */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-              {/* Plan Header */}
-              <div className="mb-6">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-xl font-bold text-gray-900">{planDetails.name}</h3>
-                  <div className="text-right ml-4 flex-shrink-0">
-                    <div className="text-2xl font-bold text-krooa-blue whitespace-nowrap">
-                      {formatCurrency(calculateTotal())}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {periodOptions.find(p => p.key === selectedPeriod)?.suffix}
-                    </div>
-                    {appliedCoupon && (
-                      <div className="text-xs text-emerald-600 font-medium mt-1">
-                        {appliedCoupon.type === 'percentage'
-                          ? `${appliedCoupon.discount}% off`
-                          : `${formatCurrency(appliedCoupon.discount)} off`
-                        }
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 w-full">
-                  {t?.step2?.planDescription || 'Tudo que você precisa para gerenciar sua clínica'}
+        {/* Email verificado e dados confirmados */}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-green-800">
+                {t?.step3?.dataConfirmed || 'Dados confirmados'}
+              </p>
+              <p className="text-sm text-green-700">{formData.email}</p>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Termos Kroa - Obrigatório para todos */}
+          <div className="bg-krooa-green/5 border border-krooa-green/20 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="kroa-terms"
+                checked={kroaTermsAccepted}
+                onChange={(e) => setKroaTermsAccepted(e.target.checked)}
+                className="mt-1 w-4 h-4 text-krooa-green bg-gray-100 border-gray-300 rounded focus:ring-krooa-green flex-shrink-0"
+              />
+              <div className="flex-1">
+                <label htmlFor="kroa-terms" className="text-sm font-medium text-gray-900 cursor-pointer block">
+                  {t?.step3?.kroaTermsTitle || 'Termos de Uso da Kroa'}
+                </label>
+                <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                  {t?.step3?.kroaTermsDescription || 'Declaro que li e concordo com os Termos de Uso e Política de Privacidade da Kroa.'}
                 </p>
-              </div>
-
-              {/* Period Selection Tabs */}
-              <div className="mb-6">
-                <h4 className="font-semibold text-gray-900 mb-3">{t?.step2?.choosePeriod || 'Escolha o período:'}</h4>
-                <div className="flex rounded-lg bg-gray-100 p-1">
-                  {periodOptions.map((period) => (
-                    <button
-                      key={period.key}
-                      onClick={() => {
-                        setSelectedPeriod(period.key);
-                        // Reset cupom quando mudar período
-                        setAppliedCoupon(null);
-                        setCouponCode('');
-                        setCouponError('');
-                        setShowCouponField(false);
-                      }}
-                      className={`relative flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all ${
-                        selectedPeriod === period.key
-                          ? 'bg-white text-krooa-blue shadow-sm'
-                          : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                    >
-                      {period.name}
-                      {period.key === 'yearly' && (
-                        <div className="absolute -top-4 -right-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10 whitespace-nowrap">
-                          {t?.step2?.economicalBadge || '+ Econômico'}
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-                {/* Period Benefits */}
-                <div className="mt-3 text-center">
-                  {selectedPeriod === 'yearly' && (
-                    <div className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-sm font-medium px-3 py-1 rounded-full">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      {t?.step2?.yearlyDiscount || 'Economize 2 meses'}
-                    </div>
-                  )}
-                  {selectedPeriod === 'quarterly' && (
-                    <div className="text-sm text-gray-600">
-                      {t?.step2?.quarterlyBenefit || 'Pagamento a cada 3 meses'}
-                    </div>
-                  )}
-                  {selectedPeriod === 'monthly' && (
-                    <div className="text-sm text-gray-600">
-                      {t?.step2?.monthlyBenefit || 'Flexibilidade mensal'}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Coupon Section - Discreto */}
-              <div className="mb-6">
-                {!appliedCoupon ? (
-                  <div>
-                    {/* Botão discreto para mostrar campo de cupom */}
-                    {!showCouponField && (
-                      <button
-                        type="button"
-                        onClick={() => setShowCouponField(true)}
-                        className="text-sm text-gray-600 hover:text-krooa-blue flex items-center gap-1 transition-colors"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                        </svg>
-                        <span>{t?.step2?.haveCoupon || 'Tenho um cupom de desconto'}</span>
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                    )}
-
-                    {/* Campo de cupom expansível */}
-                    {showCouponField && (
-                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 mt-3 animate-in slide-in-from-top-2 duration-200">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-sm font-medium text-gray-700">{t?.step2?.coupon || 'Cupom de desconto'}</h4>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setShowCouponField(false);
-                              setCouponCode('');
-                              setCouponError('');
-                            }}
-                            className="text-gray-400 hover:text-gray-600"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-
-                        <div className="flex gap-3">
-                          <div className="flex-1">
-                            <Input
-                              value={couponCode}
-                              onChange={(value) => setCouponCode(value.toUpperCase())}
-                              placeholder={t?.step2?.couponPlaceholder || 'Digite seu código'}
-                              error={couponError}
-                            />
-                          </div>
-                          <div className="flex-1 max-w-[120px]">
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={applyCoupon}
-                              disabled={!couponCode.trim()}
-                              className="w-full h-10"
-                            >
-                              {t?.step2?.applyCoupon || 'Aplicar'}
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="mt-2 text-xs text-gray-500">
-                          {t?.step2?.couponExamples || 'Exemplos:'} {' '}
-                          {selectedPeriod === 'monthly' && (currentRegion === 'BR' ? 'MENSAL10, PRIMEIROMES' : 'MONTHLY10, FIRSTMONTH')}
-                          {selectedPeriod === 'quarterly' && (currentRegion === 'BR' ? 'TRIMESTRE15, DESCONTO3M' : 'QUARTERLY15, DISCOUNT3M')}
-                          {selectedPeriod === 'yearly' && (currentRegion === 'BR' ? 'ANUAL20, PLANO1ANO' : 'YEARLY20, PLAN1YEAR')}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                    <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <div>
-                        <div className="font-medium text-emerald-800">
-                          {couponCode} - {appliedCoupon.type === 'percentage'
-                            ? `${appliedCoupon.discount}% off`
-                            : `${formatCurrency(appliedCoupon.discount)} off`
-                          }
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={removeCoupon}
-                      className="text-red-600 hover:text-red-800 text-sm font-medium"
-                    >
-                      {t?.step2?.removeCoupon || 'Remover'}
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Learn More Link */}
-              <div className="text-center pt-4 border-t border-gray-100">
                 <button
                   type="button"
-                  onClick={() => setDocumentModal({ isOpen: true, type: 'addons' })}
-                  className="text-krooa-blue hover:text-krooa-blue/80 text-sm font-medium underline"
+                  onClick={() => setDocumentModal({ isOpen: true, type: 'kroa' })}
+                  className="text-xs text-krooa-blue underline mt-2 hover:text-krooa-blue/80 transition-colors"
                 >
-                  {t?.step2?.learnMore || 'Saiba mais'} →
+                  {t?.step3?.viewDocument || 'Ver documento completo →'}
                 </button>
-              </div>
-            </div>
-
-
-
-            {/* Terms and Conditions */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-gray-900">{t?.step2?.termsSection || 'Termos e Condições'}</h3>
-
-              {/* Data Protection Terms - LGPD (BR) or HIPAA (US) */}
-              {currentRegion === 'BR' && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
-                  <div className="flex items-start gap-3">
-                    <input
-                      type="checkbox"
-                      id="lgpd-terms"
-                      checked={lgpdAccepted}
-                      onChange={(e) => setLgpdAccepted(e.target.checked)}
-                      className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
-                    />
-                    <div className="flex-1">
-                      <label htmlFor="lgpd-terms" className="text-sm font-medium text-blue-900 cursor-pointer block">
-                        {t?.step2?.lgpdConsent || 'Aceite dos Termos LGPD'}
-                      </label>
-                      <p className="text-xs text-blue-700 mt-1 leading-relaxed">
-                        {t?.step2?.lgpdDescription || 'Declaro estar ciente e concordo com os termos da Lei Geral de Proteção de Dados (LGPD) e autorizo o tratamento dos dados pessoais conforme descrito na política de privacidade.'}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setDocumentModal({ isOpen: true, type: 'lgpd' })}
-                        className="text-xs text-blue-600 underline mt-2 hover:text-blue-800 transition-colors"
-                      >
-                        {t?.step2?.viewLgpdDocument || 'Ver documento completo →'}
-                      </button>
-                      {errors.lgpd && (
-                        <p className="text-sm text-red-600 mt-1">{errors.lgpd}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* HIPAA Terms for US */}
-              {currentRegion === 'US' && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
-                  <div className="flex items-start gap-3">
-                    <input
-                      type="checkbox"
-                      id="hipaa-terms"
-                      checked={hipaaAccepted}
-                      onChange={(e) => setHipaaAccepted(e.target.checked)}
-                      className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
-                    />
-                    <div className="flex-1">
-                      <label htmlFor="hipaa-terms" className="text-sm font-medium text-blue-900 cursor-pointer block">
-                        {t?.step2?.hipaaConsent || 'HIPAA Terms Acceptance'}
-                      </label>
-                      <p className="text-xs text-blue-700 mt-1 leading-relaxed">
-                        {t?.step2?.hipaaDescription || 'I acknowledge and agree to comply with the Health Insurance Portability and Accountability Act (HIPAA) requirements for protecting patient health information.'}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setDocumentModal({ isOpen: true, type: 'hipaa' })}
-                        className="text-xs text-blue-600 underline mt-2 hover:text-blue-800 transition-colors"
-                      >
-                        {t?.step2?.viewHipaaDocument || 'View complete document →'}
-                      </button>
-                      {errors.hipaa && (
-                        <p className="text-sm text-red-600 mt-1">{errors.hipaa}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Admin Responsibility Terms */}
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4">
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    id="admin-terms"
-                    checked={adminAccepted}
-                    onChange={(e) => setAdminAccepted(e.target.checked)}
-                    className="mt-1 w-4 h-4 text-amber-600 bg-gray-100 border-gray-300 rounded focus:ring-amber-500 flex-shrink-0"
-                  />
-                  <div className="flex-1">
-                    <label htmlFor="admin-terms" className="text-sm font-medium text-amber-900 cursor-pointer block">
-                      {t?.step2?.adminResponsibility || 'Responsabilidade do Administrador'}
-                    </label>
-                    <p className="text-xs text-amber-700 mt-1 leading-relaxed">
-                      {t?.step2?.adminResponsibilityDescription || 'Assumo total responsabilidade pelas configurações e dados inseridos no sistema, comprometendo-me a manter a segurança e confidencialidade das informações dos pacientes.'}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setDocumentModal({ isOpen: true, type: 'admin' })}
-                      className="text-xs text-amber-600 underline mt-2 hover:text-amber-800 transition-colors"
-                    >
-                      {t?.step2?.viewResponsibilityDocument || 'Ver termo de responsabilidade →'}
-                    </button>
-                    {errors.admin && (
-                      <p className="text-sm text-red-600 mt-1">{errors.admin}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Buttons */}
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleBack}
-                className="flex-1"
-              >
-                {t?.common?.back || 'Voltar'}
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                disabled={isLoading}
-                className="flex-1"
-              >
-                {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    {t?.common?.loading || 'Carregando...'}
-                  </div>
-                ) : (
-                  t?.common?.next || 'Continuar'
+                {errors.kroa && (
+                  <p className="text-sm text-red-600 mt-1">{errors.kroa}</p>
                 )}
-              </Button>
+              </div>
             </div>
-          </form>
+          </div>
+
+          {/* LGPD Terms for BR */}
+          {currentRegion === 'BR' && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="lgpd-terms"
+                  checked={lgpdAccepted}
+                  onChange={(e) => setLgpdAccepted(e.target.checked)}
+                  className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
+                />
+                <div className="flex-1">
+                  <label htmlFor="lgpd-terms" className="text-sm font-medium text-blue-900 cursor-pointer block">
+                    {t?.step3?.lgpdConsent || 'Aceite dos Termos LGPD'}
+                  </label>
+                  <p className="text-xs text-blue-700 mt-1 leading-relaxed">
+                    {t?.step3?.lgpdDescription || 'Declaro estar ciente e concordo com os termos da Lei Geral de Proteção de Dados (LGPD) e autorizo o tratamento dos dados pessoais conforme descrito na política de privacidade.'}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setDocumentModal({ isOpen: true, type: 'lgpd' })}
+                    className="text-xs text-blue-600 underline mt-2 hover:text-blue-800 transition-colors"
+                  >
+                    {t?.step3?.viewLgpdDocument || 'Ver documento completo →'}
+                  </button>
+                  {errors.lgpd && (
+                    <p className="text-sm text-red-600 mt-1">{errors.lgpd}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* HIPAA Terms for US */}
+          {currentRegion === 'US' && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="hipaa-terms"
+                  checked={hipaaAccepted}
+                  onChange={(e) => setHipaaAccepted(e.target.checked)}
+                  className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
+                />
+                <div className="flex-1">
+                  <label htmlFor="hipaa-terms" className="text-sm font-medium text-blue-900 cursor-pointer block">
+                    {t?.step3?.hipaaConsent || 'HIPAA Terms Acceptance'}
+                  </label>
+                  <p className="text-xs text-blue-700 mt-1 leading-relaxed">
+                    {t?.step3?.hipaaDescription || 'I acknowledge and agree to comply with the Health Insurance Portability and Accountability Act (HIPAA) requirements for protecting patient health information.'}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setDocumentModal({ isOpen: true, type: 'hipaa' })}
+                    className="text-xs text-blue-600 underline mt-2 hover:text-blue-800 transition-colors"
+                  >
+                    {t?.step3?.viewHipaaDocument || 'View complete document →'}
+                  </button>
+                  {errors.hipaa && (
+                    <p className="text-sm text-red-600 mt-1">{errors.hipaa}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            fullWidth
+            disabled={isLoading}
+            className="mt-6"
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                {t?.common?.loading || 'Carregando...'}
+              </div>
+            ) : (
+              t?.common?.next || 'Continuar'
+            )}
+          </Button>
+        </form>
+
+        {/* Trust indicators */}
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-center gap-6 text-xs text-gray-500">
+            <div className="flex items-center gap-1">
+              <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span>{t?.step3?.security?.sslSecure || 'SSL Seguro'}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+              </svg>
+              <span>{t?.step3?.security?.dataProtected || 'Dados Protegidos'}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span>
+                {currentRegion === 'BR'
+                  ? (t?.step3?.security?.lgpdCompliant || 'LGPD Compliant')
+                  : (t?.step3?.security?.hipaaCompliant || 'HIPAA Compliant')
+                }
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Document Modal for Terms */}
         <DocumentModal
-          isOpen={documentModal.isOpen && (documentModal.type === 'lgpd' || documentModal.type === 'hipaa' || documentModal.type === 'admin')}
+          isOpen={documentModal.isOpen}
           onClose={() => setDocumentModal({ isOpen: false, type: null })}
           document={
-            documentModal.type === 'lgpd'
+            documentModal.type === 'kroa'
+              ? t?.kroaTerms || null
+              : documentModal.type === 'lgpd'
               ? t?.lgpdTerms || null
               : documentModal.type === 'hipaa'
               ? t?.hipaaTerms || null
-              : documentModal.type === 'admin'
-              ? t?.adminTerms || null
               : null
           }
           onAccept={() => {
-            if (documentModal.type === 'lgpd') {
+            if (documentModal.type === 'kroa') {
+              setKroaTermsAccepted(true);
+            } else if (documentModal.type === 'lgpd') {
               setLgpdAccepted(true);
             } else if (documentModal.type === 'hipaa') {
               setHipaaAccepted(true);
-            } else if (documentModal.type === 'admin') {
-              setAdminAccepted(true);
             }
+            setDocumentModal({ isOpen: false, type: null });
           }}
           showAcceptButton={true}
         />
-
-        {/* Addons Modal */}
-        <Modal
-          isOpen={documentModal.isOpen && documentModal.type === 'addons'}
-          onClose={() => setDocumentModal({ isOpen: false, type: null })}
-          size="lg"
-        >
-          <div className="max-h-[80vh] overflow-y-auto">
-            {documentModal.type === 'addons' && (
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
-                  {t?.step2?.planDetails || 'Detalhes do plano'}
-                </h2>
-
-                {/* Included Features */}
-                <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">{t?.step2?.includedFeatures || 'Incluído no seu plano:'}</h3>
-                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    {planDetails.features.map((feature: string, index: number) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <svg className="w-2 h-2 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                        <span className="text-sm text-gray-700">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <h3 className="font-semibold text-gray-900 mb-3">
-                  {t?.step2?.additionalResources || 'Recursos adicionais disponíveis'}
-                </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  {t?.step2?.additionalResourcesDescription || 'Após contratar o plano, você pode adicionar recursos extras conforme sua necessidade:'}
-                </p>
-
-                {/* Additional Resources */}
-                <div>
-
-                  <div className="space-y-3">
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 bg-green-100 rounded flex items-center justify-center">
-                            <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.787"/>
-                            </svg>
-                          </div>
-                          <h4 className="font-medium text-gray-900">
-                            {t?.step2?.whatsappAddon || 'WhatsApp adicional'}
-                          </h4>
-                        </div>
-                        <span className="font-semibold text-gray-900">
-                          {formatCurrency(getAddOnPrice('whatsapp'))}{periodOptions.find(p => p.key === selectedPeriod)?.suffix}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {t?.step2?.whatsappDescription || 'Conecte mais números do WhatsApp para atendimento'}
-                      </p>
-                    </div>
-
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 bg-purple-100 rounded flex items-center justify-center">
-                            <svg className="w-3 h-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                          <h4 className="font-medium text-gray-900">
-                            {t?.step2?.aiAddon || 'IA adicional'}
-                          </h4>
-                        </div>
-                        <span className="font-semibold text-gray-900">
-                          {formatCurrency(getAddOnPrice('ai'))}{periodOptions.find(p => p.key === selectedPeriod)?.suffix}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {t?.step2?.aiDescription || 'Mais recursos de inteligência artificial'}
-                      </p>
-                    </div>
-
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-6 h-6 bg-orange-100 rounded flex items-center justify-center">
-                          <svg className="w-3 h-3 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                        <h4 className="font-medium text-gray-900">
-                          {t?.step2?.storageAddon || 'Storage adicional'}
-                        </h4>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {t?.step2?.storageDescription || 'Mais espaço além dos 15GB inclusos'}
-                      </p>
-                    </div>
-
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-6 h-6 bg-indigo-100 rounded flex items-center justify-center">
-                          <svg className="w-3 h-3 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                        <h4 className="font-medium text-gray-900">
-                          {currentRegion === 'BR' ? 'Assinatura digital' : 'Digital signature'}
-                        </h4>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {currentRegion === 'BR'
-                          ? 'Documentos com validade jurídica (exclusivo Brasil)'
-                          : 'Legally valid documents'
-                        }
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-800">
-                      💡 {t?.step2?.additionalNote || 'Você pode contratar esses recursos a qualquer momento após iniciar seu plano.'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="mt-6 flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => setDocumentModal({ isOpen: false, type: null })}
-              className="flex-1"
-            >
-              {t?.common?.cancel || 'Fechar'}
-            </Button>
-          </div>
-        </Modal>
       </div>
     </OnboardingLayout>
   );

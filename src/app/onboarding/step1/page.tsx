@@ -241,6 +241,12 @@ export default function Step1Page() {
                     setErrors(prev => ({ ...prev, email: '' }));
                   }
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && formData.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) && !isLoading) {
+                    e.preventDefault();
+                    handleSendCode();
+                  }
+                }}
                 error={errors.email}
                 required
                 fullWidth
