@@ -7,6 +7,7 @@ import { EmailVerification } from '../../../components/ui/EmailVerification';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useRegion } from '../../../contexts/RegionContext';
 import translations from '../translation.json';
+import { prospectsService } from '../prospectsService';
 
 export default function Step1Page() {
   const navigate = useNavigate();
@@ -28,6 +29,10 @@ export default function Step1Page() {
   const [phoneValid, setPhoneValid] = useState<boolean | null>(null);
   const [authStep, setAuthStep] = useState<'auth' | 'verify-email' | 'complete-data'>('auth');
   const [authMethod, setAuthMethod] = useState<'email' | 'google' | null>(null);
+  const [prospectData, setProspectData] = useState<{
+    prospect_id?: number;
+    session_code?: string;
+  }>({});
 
   // Aguardar carregamento das traduções
   if (!t || !t.step1) {
@@ -87,15 +92,104 @@ export default function Step1Page() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSendCode = () => {
+  const handleSendCode = async () => {
     if (validateEmailForm()) {
-      setAuthStep('verify-email');
+      setIsLoading(true);
+      try {
+        const response = await prospectsService.step1({ email: formData.email });
+
+        console.log('Response da API step1:', response);
+
+        // Armazenar dados do prospect
+        setProspectData({
+          prospect_id: response.data.prospect_id,
+          session_code: response.data.session_code
+        });
+
+        console.log('Prospect data salvo:', {
+          prospect_id: response.data.prospect_id,
+          session_code: response.data.session_code
+        });
+
+        // Ir para etapa de verificação
+        setAuthStep('verify-email');
+      } catch (error: any) {
+        // Tratar erro
+        console.error('Erro ao enviar código:', error);
+        const errorMessage = error.response?.data?.message || 'Erro ao enviar código. Tente novamente.';
+        setErrors({ email: errorMessage });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleVerifyCode = async (code: string) => {
+    console.log('handleVerifyCode chamado:', { code, prospectData });
+
+    // Verificar se session_code existe
+    if (!prospectData.session_code) {
+      console.error('Session code não encontrado:', prospectData);
+      return { success: false, error: 'Erro ao verificar código. Tente reenviar.' };
+    }
+
+    try {
+      console.log('Enviando verificação:', {
+        session_code: prospectData.session_code,
+        code
+      });
+
+      const response = await prospectsService.verifyStep1({
+        session_code: prospectData.session_code,
+        code
+      });
+
+      console.log('Response da verificação:', response);
+
+      if (response.success) {
+        return { success: true };
+      } else {
+        return { success: false, error: response.message };
+      }
+    } catch (error: any) {
+      console.error('Erro na verificação:', error);
+      const errorMessage = error.response?.data?.message || 'Código inválido. Tente novamente.';
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  const handleResendCode = async () => {
+    try {
+      const response = await prospectsService.resendStep1({
+        email: formData.email,
+        session_code: prospectData.session_code || ''
+      });
+
+      if (response.success) {
+        return { success: true };
+      } else {
+        return { success: false, error: response.message };
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Erro ao reenviar código. Tente novamente.';
+      return { success: false, error: errorMessage };
     }
   };
 
   const handleEmailVerified = () => {
-    setAuthMethod('email');
-    setAuthStep('complete-data');
+    // Email verificado com sucesso, salvar dados e ir para step2
+    const onboardingData = JSON.parse(sessionStorage.getItem('onboardingData') || '{}');
+    const updatedData = {
+      ...onboardingData,
+      email: formData.email,
+      prospect_id: prospectData.prospect_id,
+      session_code: prospectData.session_code,
+      isEmailVerified: true
+    };
+    sessionStorage.setItem('onboardingData', JSON.stringify(updatedData));
+
+    // Navegar para step2
+    navigate('/onboarding/step2');
   };
 
   const handleCompleteDataSubmit = (e: React.FormEvent) => {
@@ -214,10 +308,17 @@ export default function Step1Page() {
                 type="button"
                 variant="outline"
                 onClick={handleSendCode}
-                disabled={!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)}
+                disabled={!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) || isLoading}
                 className="w-full"
               >
-                {t?.step1?.sendCode || 'Enviar código'}
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin" />
+                    {t?.common?.loading || 'Enviando...'}
+                  </div>
+                ) : (
+                  t?.step1?.sendCode || 'Enviar código'
+                )}
               </Button>
             </div>
           </div>
@@ -232,6 +333,10 @@ export default function Step1Page() {
               onCancel={() => setAuthStep('auth')}
               language={currentRegion === 'BR' ? 'pt' : currentRegion === 'US' ? 'en' : 'es'}
               templateType="email-verification"
+              autoSendCode={false}
+              autoVerify={false}
+              onVerifyCode={handleVerifyCode}
+              onResendCode={handleResendCode}
             />
           </div>
         )}

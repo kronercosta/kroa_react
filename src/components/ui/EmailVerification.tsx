@@ -10,6 +10,8 @@ interface EmailVerificationProps {
   cooldownSeconds?: number;
   autoVerify?: boolean;
   autoSendCode?: boolean; // Se true, envia código automaticamente ao montar. Se false, assume que código já foi enviado externamente
+  onVerifyCode?: (code: string) => Promise<{ success: boolean; error?: string }>; // Função customizada de verificação
+  onResendCode?: () => Promise<{ success: boolean; error?: string }>; // Função customizada de reenvio
 }
 
 interface VerificationState {
@@ -31,7 +33,9 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({
   maxAttempts = 3,
   cooldownSeconds = 60,
   autoVerify = true,
-  autoSendCode = true
+  autoSendCode = true,
+  onVerifyCode,
+  onResendCode
 }) => {
   const [state, setState] = useState<VerificationState>({
     isVerified: false,
@@ -180,49 +184,69 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({
 
     setState(prev => ({ ...prev, isVerifying: true, error: '' }));
 
-    // Simular delay de verificação
-    await new Promise(resolve => setTimeout(resolve, 800));
+    try {
+      let isValid = false;
+      let errorMessage = '';
 
-    // Verificar código
-    const storedCode = sessionStorage.getItem(`verificationCode_${email}`);
-    const storedEmail = sessionStorage.getItem(`verificationEmail`);
-    const expiry = parseInt(sessionStorage.getItem(`verificationCodeExpiry`) || '0');
+      // Se há função customizada de verificação, usar ela
+      if (onVerifyCode) {
+        const result = await onVerifyCode(fullCode);
+        isValid = result.success;
+        errorMessage = result.error || t.codeInvalid;
+      } else {
+        // Fallback: verificação local com sessionStorage
+        await new Promise(resolve => setTimeout(resolve, 800));
 
-    const isExpired = Date.now() > expiry;
-    const isValid = fullCode === storedCode && email === storedEmail && !isExpired;
+        const storedCode = sessionStorage.getItem(`verificationCode_${email}`);
+        const storedEmail = sessionStorage.getItem(`verificationEmail`);
+        const expiry = parseInt(sessionStorage.getItem(`verificationCodeExpiry`) || '0');
 
-    if (isValid) {
+        const isExpired = Date.now() > expiry;
+        isValid = fullCode === storedCode && email === storedEmail && !isExpired;
+        errorMessage = isExpired ? 'Código expirado' : t.codeInvalid;
+      }
+
+      if (isValid) {
+        setState(prev => ({
+          ...prev,
+          isVerified: true,
+          isVerifying: false,
+          error: ''
+        }));
+
+        // Limpar dados locais se usou sessionStorage
+        if (!onVerifyCode) {
+          sessionStorage.removeItem(`verificationCode_${email}`);
+          sessionStorage.removeItem(`verificationEmail`);
+          sessionStorage.removeItem(`verificationCodeExpiry`);
+        }
+
+        // Chamar callback após animação
+        setTimeout(() => {
+          onVerified();
+        }, 1000);
+      } else {
+        const newAttempts = state.attempts + 1;
+
+        setState(prev => ({
+          ...prev,
+          attempts: newAttempts,
+          isVerifying: false,
+          code: ['', '', '', '', '', ''],
+          error: errorMessage
+        }));
+
+        // Focar no primeiro input
+        setTimeout(() => {
+          codeInputsRef.current[0]?.focus();
+        }, 100);
+      }
+    } catch (error: any) {
       setState(prev => ({
         ...prev,
-        isVerified: true,
         isVerifying: false,
-        error: ''
+        error: error.message || t.codeInvalid
       }));
-
-      // Limpar dados
-      sessionStorage.removeItem(`verificationCode_${email}`);
-      sessionStorage.removeItem(`verificationEmail`);
-      sessionStorage.removeItem(`verificationCodeExpiry`);
-
-      // Chamar callback após animação
-      setTimeout(() => {
-        onVerified();
-      }, 1000);
-    } else {
-      const newAttempts = state.attempts + 1;
-
-      setState(prev => ({
-        ...prev,
-        attempts: newAttempts,
-        isVerifying: false,
-        code: ['', '', '', '', '', ''],
-        error: isExpired ? 'Código expirado' : t.codeInvalid
-      }));
-
-      // Focar no primeiro input
-      setTimeout(() => {
-        codeInputsRef.current[0]?.focus();
-      }, 100);
     }
   };
 
@@ -242,10 +266,88 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({
 
     // Auto-verificar quando todos os campos estiverem preenchidos
     if (autoVerify && index === 5 && value) {
-      const fullCode = [...newCode.slice(0, 5), value].join('');
+      const fullCode = newCode.join('');
       if (fullCode.length === 6) {
-        setTimeout(() => verifyCode(), 300);
+        // Aguardar state atualizar e então verificar
+        setTimeout(async () => {
+          await verifyCodeWithFullCode(fullCode);
+        }, 300);
       }
+    }
+  };
+
+  // Função auxiliar para verificar código completo
+  const verifyCodeWithFullCode = async (fullCode: string) => {
+    if (fullCode.length !== 6) {
+      setState(prev => ({ ...prev, error: t.codeInvalid }));
+      return;
+    }
+
+    setState(prev => ({ ...prev, isVerifying: true, error: '' }));
+
+    try {
+      let isValid = false;
+      let errorMessage = '';
+
+      // Se há função customizada de verificação, usar ela
+      if (onVerifyCode) {
+        const result = await onVerifyCode(fullCode);
+        isValid = result.success;
+        errorMessage = result.error || t.codeInvalid;
+      } else {
+        // Fallback: verificação local com sessionStorage
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        const storedCode = sessionStorage.getItem(`verificationCode_${email}`);
+        const storedEmail = sessionStorage.getItem(`verificationEmail`);
+        const expiry = parseInt(sessionStorage.getItem(`verificationCodeExpiry`) || '0');
+
+        const isExpired = Date.now() > expiry;
+        isValid = fullCode === storedCode && email === storedEmail && !isExpired;
+        errorMessage = isExpired ? 'Código expirado' : t.codeInvalid;
+      }
+
+      if (isValid) {
+        setState(prev => ({
+          ...prev,
+          isVerified: true,
+          isVerifying: false,
+          error: ''
+        }));
+
+        // Limpar dados locais se usou sessionStorage
+        if (!onVerifyCode) {
+          sessionStorage.removeItem(`verificationCode_${email}`);
+          sessionStorage.removeItem(`verificationEmail`);
+          sessionStorage.removeItem(`verificationCodeExpiry`);
+        }
+
+        // Chamar callback após animação
+        setTimeout(() => {
+          onVerified();
+        }, 1000);
+      } else {
+        const newAttempts = state.attempts + 1;
+
+        setState(prev => ({
+          ...prev,
+          attempts: newAttempts,
+          isVerifying: false,
+          code: ['', '', '', '', '', ''],
+          error: errorMessage
+        }));
+
+        // Focar no primeiro input
+        setTimeout(() => {
+          codeInputsRef.current[0]?.focus();
+        }, 100);
+      }
+    } catch (error: any) {
+      setState(prev => ({
+        ...prev,
+        isVerifying: false,
+        error: error.message || t.codeInvalid
+      }));
     }
   };
 
@@ -296,10 +398,46 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({
       ...prev,
       code: ['', '', '', '', '', ''],
       attempts: 0,
-      error: ''
+      error: '',
+      isSending: true
     }));
 
-    await sendVerificationCode();
+    setResendCooldown(cooldownSeconds);
+
+    try {
+      // Se há função customizada de reenvio, usar ela
+      if (onResendCode) {
+        const result = await onResendCode();
+
+        if (result.success) {
+          setState(prev => ({
+            ...prev,
+            isSending: false,
+            error: ''
+          }));
+
+          // Focar no primeiro input
+          setTimeout(() => {
+            codeInputsRef.current[0]?.focus();
+          }, 100);
+        } else {
+          setState(prev => ({
+            ...prev,
+            isSending: false,
+            error: result.error || t.sendError
+          }));
+        }
+      } else {
+        // Fallback: usar função original de envio
+        await sendVerificationCode();
+      }
+    } catch (error: any) {
+      setState(prev => ({
+        ...prev,
+        isSending: false,
+        error: error.message || t.sendError
+      }));
+    }
   };
 
   // Enviar código automaticamente ao montar (apenas se autoSendCode=true)
