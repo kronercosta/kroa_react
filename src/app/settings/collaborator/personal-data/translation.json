@@ -31,6 +31,74 @@
     "buttons": {
       "save": "Salvar",
       "cancel": "Cancelar"
+    },
+    "lgpdTerms": {
+      "title": "Termo de Consentimento LGPD",
+      "lastUpdated": "Última atualização: Janeiro de 2025",
+      "sections": [
+        {
+          "title": "1. Coleta e Uso de Dados Pessoais",
+          "content": "De acordo com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), informamos que seus dados pessoais serão coletados e tratados para:\n\n• Gestão de recursos humanos e controle de acesso ao sistema;\n• Execução de suas atividades profissionais dentro da clínica;\n• Cumprimento de obrigações legais e regulatórias;\n• Comunicação interna e externa relacionada às suas funções."
+        },
+        {
+          "title": "2. Dados Coletados",
+          "content": "Serão coletados e armazenados os seguintes dados:\n\n• Dados de identificação (nome, CPF, RG, foto);\n• Dados de contato (e-mail, telefone, WhatsApp);\n• Dados profissionais (cargo, especialidade, registro em conselho de classe);\n• Dados de acesso ao sistema (logs de login, IP, atividades realizadas);\n• Dados relacionados ao desempenho profissional."
+        },
+        {
+          "title": "3. Compartilhamento de Dados",
+          "content": "Seus dados pessoais poderão ser compartilhados com:\n\n• Outros colaboradores da clínica, quando necessário para execução das atividades;\n• Órgãos reguladores e fiscalizadores, quando exigido por lei;\n• Prestadores de serviço que atuam em nosso nome (ex: sistemas de TI, contabilidade);\n• Autoridades governamentais, mediante ordem judicial."
+        },
+        {
+          "title": "4. Segurança da Informação",
+          "content": "A clínica adota medidas técnicas e organizacionais adequadas para proteger seus dados pessoais contra acessos não autorizados, destruição, perda, alteração ou divulgação indevida, incluindo:\n\n• Criptografia de dados sensíveis;\n• Controle de acesso baseado em perfis;\n• Backups regulares;\n• Treinamento da equipe sobre proteção de dados."
+        },
+        {
+          "title": "5. Seus Direitos",
+          "content": "Você possui os seguintes direitos em relação aos seus dados pessoais:\n\n• Confirmação da existência de tratamento;\n• Acesso aos dados;\n• Correção de dados incompletos, inexatos ou desatualizados;\n• Anonimização, bloqueio ou eliminação de dados desnecessários;\n• Portabilidade dos dados;\n• Informação sobre compartilhamento;\n• Revogação do consentimento."
+        },
+        {
+          "title": "6. Retenção de Dados",
+          "content": "Seus dados serão mantidos durante todo o período de vínculo profissional com a clínica e, após o término, pelo prazo exigido pela legislação trabalhista e fiscal aplicável."
+        },
+        {
+          "title": "7. Contato",
+          "content": "Para exercer seus direitos ou esclarecer dúvidas sobre o tratamento de seus dados pessoais, entre em contato com nosso Encarregado de Proteção de Dados (DPO) através dos canais oficiais da clínica."
+        }
+      ]
+    },
+    "adminTerms": {
+      "title": "Termo de Responsabilidade do Colaborador",
+      "lastUpdated": "Última atualização: Janeiro de 2025",
+      "sections": [
+        {
+          "title": "1. Responsabilidade sobre o Acesso",
+          "content": "Ao aceitar este termo, declaro que:\n\n• Sou o único responsável pelo uso da minha conta de acesso ao sistema;\n• Manterei sigilo absoluto sobre minha senha de acesso;\n• Notificarei imediatamente a administração em caso de suspeita de uso indevido da minha conta;\n• Não compartilharei minhas credenciais com terceiros sob nenhuma circunstância."
+        },
+        {
+          "title": "2. Uso Profissional do Sistema",
+          "content": "Comprometo-me a utilizar o sistema exclusivamente para:\n\n• Atividades relacionadas às minhas funções profissionais;\n• Agendamentos, consultas e procedimentos autorizados;\n• Acesso a informações de pacientes apenas quando necessário para meu trabalho;\n• Registro fidedigno de informações e procedimentos realizados."
+        },
+        {
+          "title": "3. Sigilo Profissional",
+          "content": "Declaro estar ciente e comprometido com:\n\n• O sigilo profissional estabelecido pelo meu código de ética;\n• A Lei Geral de Proteção de Dados (LGPD);\n• O sigilo médico-odontológico e confidencialidade das informações de pacientes;\n• A não divulgação de informações confidenciais da clínica a terceiros."
+        },
+        {
+          "title": "4. Precisão das Informações",
+          "content": "Assumo responsabilidade por:\n\n• Garantir a veracidade e exatidão dos dados que registro no sistema;\n• Atualizar prontamente qualquer informação incorreta;\n• Revisar cuidadosamente os dados antes de salvá-los;\n• Documentar adequadamente todos os procedimentos realizados."
+        },
+        {
+          "title": "5. Consequências do Uso Indevido",
+          "content": "Estou ciente de que o uso indevido do sistema, incluindo:\n\n• Acesso não autorizado a informações;\n• Alteração fraudulenta de dados;\n• Compartilhamento de informações confidenciais;\n• Uso para fins não profissionais;\n\nPoderá resultar em medidas disciplinares, rescisão do contrato de trabalho e/ou ações legais cabíveis."
+        },
+        {
+          "title": "6. Auditoria e Monitoramento",
+          "content": "Declaro estar ciente de que:\n\n• Todas as atividades realizadas no sistema são registradas (logs);\n• A clínica poderá realizar auditorias periódicas de acesso;\n• Posso ser chamado a justificar acessos ou alterações realizadas;\n• Os registros de auditoria podem ser utilizados em processos administrativos ou judiciais."
+        },
+        {
+          "title": "7. Desligamento",
+          "content": "Comprometo-me a:\n\n• Devolver imediatamente todas as credenciais de acesso em caso de desligamento;\n• Não utilizar o sistema após o término do vínculo profissional;\n• Manter o sigilo das informações acessadas mesmo após o desligamento;\n• Não copiar, transferir ou reter informações do sistema para uso pessoal."
+        }
+      ]
     }
   },
   "EN": {
@@ -65,6 +133,74 @@
     "buttons": {
       "save": "Save",
       "cancel": "Cancel"
+    },
+    "lgpdTerms": {
+      "title": "GDPR Consent Terms",
+      "lastUpdated": "Last updated: January 2025",
+      "sections": [
+        {
+          "title": "1. Collection and Use of Personal Data",
+          "content": "In accordance with the General Data Protection Regulation (GDPR), we inform you that your personal data will be collected and processed for:\n\n• Human resources management and system access control;\n• Execution of your professional activities within the clinic;\n• Compliance with legal and regulatory obligations;\n• Internal and external communication related to your functions."
+        },
+        {
+          "title": "2. Data Collected",
+          "content": "The following data will be collected and stored:\n\n• Identification data (name, ID, photo);\n• Contact data (email, phone, WhatsApp);\n• Professional data (position, specialty, professional council registration);\n• System access data (login logs, IP, activities performed);\n• Professional performance related data."
+        },
+        {
+          "title": "3. Data Sharing",
+          "content": "Your personal data may be shared with:\n\n• Other clinic collaborators, when necessary for activity execution;\n• Regulatory and supervisory bodies, when required by law;\n• Service providers acting on our behalf (e.g., IT systems, accounting);\n• Government authorities, by court order."
+        },
+        {
+          "title": "4. Information Security",
+          "content": "The clinic adopts appropriate technical and organizational measures to protect your personal data against unauthorized access, destruction, loss, alteration or improper disclosure, including:\n\n• Encryption of sensitive data;\n• Profile-based access control;\n• Regular backups;\n• Staff training on data protection."
+        },
+        {
+          "title": "5. Your Rights",
+          "content": "You have the following rights regarding your personal data:\n\n• Confirmation of processing existence;\n• Access to data;\n• Correction of incomplete, inaccurate or outdated data;\n• Anonymization, blocking or deletion of unnecessary data;\n• Data portability;\n• Information about sharing;\n• Consent revocation."
+        },
+        {
+          "title": "6. Data Retention",
+          "content": "Your data will be kept throughout the entire period of professional relationship with the clinic and, after termination, for the period required by applicable labor and tax legislation."
+        },
+        {
+          "title": "7. Contact",
+          "content": "To exercise your rights or clarify doubts about the processing of your personal data, contact our Data Protection Officer (DPO) through the clinic's official channels."
+        }
+      ]
+    },
+    "adminTerms": {
+      "title": "Collaborator Responsibility Terms",
+      "lastUpdated": "Last updated: January 2025",
+      "sections": [
+        {
+          "title": "1. Access Responsibility",
+          "content": "By accepting these terms, I declare that:\n\n• I am solely responsible for using my system access account;\n• I will maintain absolute confidentiality of my access password;\n• I will immediately notify administration in case of suspected improper use of my account;\n• I will not share my credentials with third parties under any circumstances."
+        },
+        {
+          "title": "2. Professional Use of the System",
+          "content": "I commit to using the system exclusively for:\n\n• Activities related to my professional functions;\n• Authorized appointments, consultations and procedures;\n• Access to patient information only when necessary for my work;\n• Accurate recording of information and procedures performed."
+        },
+        {
+          "title": "3. Professional Confidentiality",
+          "content": "I declare to be aware and committed to:\n\n• Professional confidentiality established by my code of ethics;\n• The General Data Protection Regulation (GDPR);\n• Medical-dental confidentiality and patient information confidentiality;\n• Non-disclosure of clinic confidential information to third parties."
+        },
+        {
+          "title": "4. Information Accuracy",
+          "content": "I assume responsibility for:\n\n• Ensuring truthfulness and accuracy of data I record in the system;\n• Promptly updating any incorrect information;\n• Carefully reviewing data before saving it;\n• Properly documenting all procedures performed."
+        },
+        {
+          "title": "5. Consequences of Improper Use",
+          "content": "I am aware that improper use of the system, including:\n\n• Unauthorized access to information;\n• Fraudulent data alteration;\n• Sharing of confidential information;\n• Use for non-professional purposes;\n\nMay result in disciplinary measures, employment contract termination and/or applicable legal actions."
+        },
+        {
+          "title": "6. Audit and Monitoring",
+          "content": "I declare to be aware that:\n\n• All activities performed in the system are logged;\n• The clinic may conduct periodic access audits;\n• I may be called to justify accesses or changes made;\n• Audit logs may be used in administrative or legal proceedings."
+        },
+        {
+          "title": "7. Termination",
+          "content": "I commit to:\n\n• Immediately return all access credentials in case of termination;\n• Not use the system after the end of professional relationship;\n• Maintain confidentiality of accessed information even after termination;\n• Not copy, transfer or retain system information for personal use."
+        }
+      ]
     }
   },
   "ES": {
@@ -99,6 +235,74 @@
     "buttons": {
       "save": "Guardar",
       "cancel": "Cancelar"
+    },
+    "lgpdTerms": {
+      "title": "Términos de Consentimiento RGPD",
+      "lastUpdated": "Última actualización: Enero de 2025",
+      "sections": [
+        {
+          "title": "1. Recolección y Uso de Datos Personales",
+          "content": "De acuerdo con el Reglamento General de Protección de Datos (RGPD), le informamos que sus datos personales serán recolectados y tratados para:\n\n• Gestión de recursos humanos y control de acceso al sistema;\n• Ejecución de sus actividades profesionales dentro de la clínica;\n• Cumplimiento de obligaciones legales y regulatorias;\n• Comunicación interna y externa relacionada con sus funciones."
+        },
+        {
+          "title": "2. Datos Recolectados",
+          "content": "Se recolectarán y almacenarán los siguientes datos:\n\n• Datos de identificación (nombre, ID, foto);\n• Datos de contacto (correo electrónico, teléfono, WhatsApp);\n• Datos profesionales (cargo, especialidad, registro en consejo profesional);\n• Datos de acceso al sistema (registros de inicio de sesión, IP, actividades realizadas);\n• Datos relacionados con el desempeño profesional."
+        },
+        {
+          "title": "3. Compartición de Datos",
+          "content": "Sus datos personales podrán ser compartidos con:\n\n• Otros colaboradores de la clínica, cuando sea necesario para la ejecución de actividades;\n• Órganos reguladores y fiscalizadores, cuando sea requerido por ley;\n• Proveedores de servicios que actúan en nuestro nombre (ej: sistemas de TI, contabilidad);\n• Autoridades gubernamentales, mediante orden judicial."
+        },
+        {
+          "title": "4. Seguridad de la Información",
+          "content": "La clínica adopta medidas técnicas y organizativas adecuadas para proteger sus datos personales contra accesos no autorizados, destrucción, pérdida, alteración o divulgación indebida, incluyendo:\n\n• Encriptación de datos sensibles;\n• Control de acceso basado en perfiles;\n• Copias de seguridad regulares;\n• Capacitación del personal sobre protección de datos."
+        },
+        {
+          "title": "5. Sus Derechos",
+          "content": "Usted posee los siguientes derechos con relación a sus datos personales:\n\n• Confirmación de la existencia de tratamiento;\n• Acceso a los datos;\n• Corrección de datos incompletos, inexactos o desactualizados;\n• Anonimización, bloqueo o eliminación de datos innecesarios;\n• Portabilidad de los datos;\n• Información sobre compartición;\n• Revocación del consentimiento."
+        },
+        {
+          "title": "6. Retención de Datos",
+          "content": "Sus datos serán mantenidos durante todo el período de vínculo profesional con la clínica y, después del término, por el plazo exigido por la legislación laboral y fiscal aplicable."
+        },
+        {
+          "title": "7. Contacto",
+          "content": "Para ejercer sus derechos o aclarar dudas sobre el tratamiento de sus datos personales, entre en contacto con nuestro Oficial de Protección de Datos (DPO) a través de los canales oficiales de la clínica."
+        }
+      ]
+    },
+    "adminTerms": {
+      "title": "Términos de Responsabilidad del Colaborador",
+      "lastUpdated": "Última actualización: Enero de 2025",
+      "sections": [
+        {
+          "title": "1. Responsabilidad sobre el Acceso",
+          "content": "Al aceptar estos términos, declaro que:\n\n• Soy el único responsable por el uso de mi cuenta de acceso al sistema;\n• Mantendré sigilo absoluto sobre mi contraseña de acceso;\n• Notificaré inmediatamente a la administración en caso de sospecha de uso indebido de mi cuenta;\n• No compartiré mis credenciales con terceros bajo ninguna circunstancia."
+        },
+        {
+          "title": "2. Uso Profesional del Sistema",
+          "content": "Me comprometo a utilizar el sistema exclusivamente para:\n\n• Actividades relacionadas con mis funciones profesionales;\n• Citas, consultas y procedimientos autorizados;\n• Acceso a información de pacientes solo cuando sea necesario para mi trabajo;\n• Registro fidedigno de información y procedimientos realizados."
+        },
+        {
+          "title": "3. Sigilo Profesional",
+          "content": "Declaro estar consciente y comprometido con:\n\n• El sigilo profesional establecido por mi código de ética;\n• El Reglamento General de Protección de Datos (RGPD);\n• El sigilo médico-odontológico y confidencialidad de las informaciones de pacientes;\n• La no divulgación de informaciones confidenciales de la clínica a terceros."
+        },
+        {
+          "title": "4. Precisión de las Informaciones",
+          "content": "Asumo responsabilidad por:\n\n• Garantizar la veracidad y exactitud de los datos que registro en el sistema;\n• Actualizar prontamente cualquier información incorrecta;\n• Revisar cuidadosamente los datos antes de guardarlos;\n• Documentar adecuadamente todos los procedimientos realizados."
+        },
+        {
+          "title": "5. Consecuencias del Uso Indebido",
+          "content": "Estoy consciente de que el uso indebido del sistema, incluyendo:\n\n• Acceso no autorizado a informaciones;\n• Alteración fraudulenta de datos;\n• Compartición de informaciones confidenciales;\n• Uso para fines no profesionales;\n\nPodrá resultar en medidas disciplinarias, rescisión del contrato de trabajo y/o acciones legales aplicables."
+        },
+        {
+          "title": "6. Auditoría y Monitoreo",
+          "content": "Declaro estar consciente de que:\n\n• Todas las actividades realizadas en el sistema son registradas (logs);\n• La clínica podrá realizar auditorías periódicas de acceso;\n• Puedo ser llamado a justificar accesos o alteraciones realizadas;\n• Los registros de auditoría pueden ser utilizados en procesos administrativos o judiciales."
+        },
+        {
+          "title": "7. Desvinculación",
+          "content": "Me comprometo a:\n\n• Devolver inmediatamente todas las credenciales de acceso en caso de desvinculación;\n• No utilizar el sistema después del término del vínculo profesional;\n• Mantener el sigilo de las informaciones accedidas incluso después de la desvinculación;\n• No copiar, transferir o retener informaciones del sistema para uso personal."
+        }
+      ]
     }
   }
 }

@@ -2029,6 +2029,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
             </div>
           )}
 
+          {/* Toggle de senha */}
+          {mask === 'password' && showPasswordToggle && (
+            <IconButton
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              disabled={disabled}
+              variant="ghost"
+              size="sm"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </IconButton>
+          )}
 
           {/* Checkbox "Sem número" */}
           {mask === 'addressNumber' && allowNoNumber && (

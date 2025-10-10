@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { OnboardingLayout } from '../OnboardingLayout';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
+import { EmailVerification } from '../../../components/ui/EmailVerification';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useRegion } from '../../../contexts/RegionContext';
 import translations from '../translation.json';
@@ -25,30 +26,8 @@ export default function Step1Page() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [phoneValid, setPhoneValid] = useState<boolean | null>(null);
-  const [authStep, setAuthStep] = useState<'auth' | 'complete-data'>('auth');
+  const [authStep, setAuthStep] = useState<'auth' | 'verify-email' | 'complete-data'>('auth');
   const [authMethod, setAuthMethod] = useState<'email' | 'google' | null>(null);
-  const [emailVerification, setEmailVerification] = useState({
-    isVerified: false,
-    codeSent: false,
-    code: '',
-    isVerifying: false,
-    attempts: 0,
-    maxAttempts: 3
-  });
-  const [resendCooldown, setResendCooldown] = useState(0);
-
-  // Cooldown timer para reenvio de código
-  useEffect(() => {
-    let timer: number | null = null;
-    if (resendCooldown > 0) {
-      timer = setInterval(() => {
-        setResendCooldown(prev => prev - 1);
-      }, 1000);
-    }
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [resendCooldown]);
 
   // Aguardar carregamento das traduções
   if (!t || !t.step1) {
@@ -85,8 +64,6 @@ export default function Step1Page() {
       newErrors.email = t?.step1?.validation?.emailRequired || 'E-mail é obrigatório';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = t?.step1?.validation?.emailInvalid || 'E-mail inválido';
-    } else if (!emailVerification.isVerified) {
-      newErrors.email = t?.step1?.validation?.emailNotVerified || 'E-mail não verificado';
     }
 
     setErrors(newErrors);
@@ -110,87 +87,15 @@ export default function Step1Page() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const sendVerificationCode = async () => {
-    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setErrors(prev => ({ ...prev, email: t?.step1?.validation?.emailInvalid || 'E-mail inválido' }));
-      return;
-    }
-
-    setEmailVerification(prev => ({ ...prev, isVerifying: true }));
-    setResendCooldown(60); // Iniciar cooldown de 1 minuto
-
-    // Simular envio do código
-    setTimeout(() => {
-      setEmailVerification(prev => ({
-        ...prev,
-        codeSent: true,
-        isVerifying: false
-      }));
-      setErrors(prev => ({ ...prev, email: '' }));
-    }, 1500);
-  };
-
-  const verifyEmailCode = async () => {
-    if (!emailVerification.code || emailVerification.code.length !== 6) {
-      setErrors(prev => ({ ...prev, verificationCode: t?.step1?.validation?.codeInvalid || 'Código deve ter 6 dígitos' }));
-      return;
-    }
-
-    setEmailVerification(prev => ({ ...prev, isVerifying: true }));
-
-    // Simular verificação do código
-    setTimeout(() => {
-      // Para teste, aceitar qualquer código de 6 dígitos
-      const isValid = emailVerification.code.length === 6;
-
-      if (isValid) {
-        setEmailVerification(prev => ({
-          ...prev,
-          isVerified: true,
-          isVerifying: false
-        }));
-        setErrors(prev => ({ ...prev, verificationCode: '' }));
-
-        // Para login por email, ir para seção de completar dados
-        setTimeout(() => {
-          handleEmailVerificationComplete();
-        }, 1000);
-      } else {
-        setEmailVerification(prev => ({
-          ...prev,
-          attempts: prev.attempts + 1,
-          isVerifying: false,
-          code: ''
-        }));
-        setErrors(prev => ({ ...prev, verificationCode: t?.step1?.validation?.codeInvalid || 'Código inválido' }));
-      }
-    }, 1500);
-  };
-
-  const resendVerificationCode = async () => {
-    if (resendCooldown > 0) return; // Prevenir cliques durante cooldown
-
-    setEmailVerification(prev => ({
-      ...prev,
-      code: '',
-      attempts: 0,
-      isVerifying: true
-    }));
-    setResendCooldown(60); // Reiniciar cooldown de 1 minuto
-
-    setTimeout(() => {
-      setEmailVerification(prev => ({
-        ...prev,
-        isVerifying: false
-      }));
-    }, 1500);
-  };
-
-  const handleEmailSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendCode = () => {
     if (validateEmailForm()) {
-      handleEmailVerificationComplete();
+      setAuthStep('verify-email');
     }
+  };
+
+  const handleEmailVerified = () => {
+    setAuthMethod('email');
+    setAuthStep('complete-data');
   };
 
   const handleCompleteDataSubmit = (e: React.FormEvent) => {
@@ -219,15 +124,8 @@ export default function Step1Page() {
     }, 1500);
   };
 
-
-  const handleEmailVerificationComplete = () => {
-    // Para login por email, mostrar seção para completar dados
-    setAuthMethod('email');
-    setAuthStep('complete-data');
-  };
-
   const handleCompleteData = () => {
-    // Para login social, completar dados e ir para step 2
+    // Completar dados e ir para step 2
     handleNext({
       ...formData,
       isGoogleAuth: authMethod !== 'email'
@@ -293,7 +191,7 @@ export default function Step1Page() {
 
         {/* Email Authentication Form */}
         {authStep === 'auth' && (
-          <form onSubmit={handleEmailSubmit} className="space-y-4">
+          <div className="space-y-4">
             <div className="space-y-3">
               <Input
                 label={t?.step1?.email || 'E-mail'}
@@ -302,17 +200,6 @@ export default function Step1Page() {
                 value={formData.email}
                 onChange={(value, isValid) => {
                   setFormData(prev => ({ ...prev, email: value }));
-                  // Reset verification quando email mudar
-                  if (emailVerification.codeSent || emailVerification.isVerified) {
-                    setEmailVerification({
-                      isVerified: false,
-                      codeSent: false,
-                      code: '',
-                      isVerifying: false,
-                      attempts: 0,
-                      maxAttempts: 3
-                    });
-                  }
                   // Limpar erro quando email for válido
                   if (isValid && errors.email) {
                     setErrors(prev => ({ ...prev, email: '' }));
@@ -321,111 +208,32 @@ export default function Step1Page() {
                 error={errors.email}
                 required
                 fullWidth
-                disabled={emailVerification.isVerified}
               />
 
-              {!emailVerification.isVerified && !emailVerification.codeSent && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={sendVerificationCode}
-                  disabled={!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) || emailVerification.isVerifying}
-                  className="w-full"
-                >
-                  {emailVerification.isVerifying ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      {t?.step1?.sending || 'Enviando...'}
-                    </div>
-                  ) : (
-                    t?.step1?.sendCode || 'Enviar código'
-                  )}
-                </Button>
-              )}
-
-              {/* Email verification section */}
-              {emailVerification.codeSent && !emailVerification.isVerified && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start gap-2 mb-3">
-                    <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                    </svg>
-                    <div>
-                      <h4 className="font-medium text-blue-900 mb-1">
-                        {t?.step1?.verification?.title || 'Verificação de e-mail'}
-                      </h4>
-                      <p className="text-sm text-blue-700">
-                        {t?.step1?.verification?.description || 'Enviamos um código de verificação para seu e-mail:'}
-                      </p>
-                      <p className="text-sm font-medium text-blue-800 mt-1">{formData.email}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder={t?.step1?.verification?.codePlaceholder || 'Digite o código de 6 dígitos'}
-                      value={emailVerification.code}
-                      onChange={(value) => {
-                        const numericValue = value.replace(/\D/g, '').slice(0, 6);
-                        setEmailVerification(prev => ({ ...prev, code: numericValue }));
-                        if (errors.verificationCode) {
-                          setErrors(prev => ({ ...prev, verificationCode: '' }));
-                        }
-                      }}
-                      error={errors.verificationCode}
-                      maxLength={6}
-                      className="text-center tracking-widest"
-                    />
-                    <Button
-                      type="button"
-                      variant="primary"
-                      onClick={verifyEmailCode}
-                      disabled={emailVerification.code.length !== 6 || emailVerification.isVerifying}
-                      className="whitespace-nowrap"
-                    >
-                      {emailVerification.isVerifying ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          {t?.step1?.verifying || 'Verificando...'}
-                        </div>
-                      ) : (
-                        t?.step1?.verify || 'Verificar'
-                      )}
-                    </Button>
-                  </div>
-
-                  <div className="mt-3 text-center">
-                    <button
-                      type="button"
-                      onClick={resendVerificationCode}
-                      disabled={emailVerification.isVerifying || resendCooldown > 0}
-                      className="text-sm text-blue-600 hover:text-blue-800 underline disabled:opacity-50"
-                    >
-                      {resendCooldown > 0
-                        ? `Aguarde ${resendCooldown}s`
-                        : (t?.step1?.verification?.resendCode || 'Reenviar código')
-                      }
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Email verified confirmation */}
-              {emailVerification.isVerified && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 justify-center">
-                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-sm font-medium text-green-800">
-                      {t?.step1?.verification?.verified || 'E-mail verificado! Redirecionando...'}
-                    </span>
-                  </div>
-                </div>
-              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleSendCode}
+                disabled={!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)}
+                className="w-full"
+              >
+                {t?.step1?.sendCode || 'Enviar código'}
+              </Button>
             </div>
-          </form>
+          </div>
+        )}
+
+        {/* Email Verification */}
+        {authStep === 'verify-email' && (
+          <div>
+            <EmailVerification
+              email={formData.email}
+              onVerified={handleEmailVerified}
+              onCancel={() => setAuthStep('auth')}
+              language={currentRegion === 'BR' ? 'pt' : currentRegion === 'US' ? 'en' : 'es'}
+              templateType="email-verification"
+            />
+          </div>
         )}
 
         {/* Complete Data Form - for social auth */}

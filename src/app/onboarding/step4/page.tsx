@@ -255,13 +255,14 @@ export default function Step4Page() {
             <div>
               <Input
                 label={t?.step3?.password || 'Senha'}
-                type="password"
+                mask="password"
                 value={formData.password}
                 onChange={(value) => setFormData(prev => ({ ...prev, password: value }))}
                 placeholder={t?.step3?.passwordPlaceholder || 'Digite uma senha segura'}
                 error={errors.password}
                 required
                 fullWidth
+                showPasswordToggle={true}
               />
 
               {/* Password Requirements */}
@@ -298,13 +299,14 @@ export default function Step4Page() {
 
             <Input
               label={t?.step3?.confirmPassword || 'Confirmar senha'}
-              type="password"
+              mask="password"
               value={formData.confirmPassword}
               onChange={(value) => setFormData(prev => ({ ...prev, confirmPassword: value }))}
               placeholder={t?.step3?.confirmPasswordPlaceholder || 'Digite a senha novamente'}
               error={errors.confirmPassword}
               required
               fullWidth
+              showPasswordToggle={true}
             />
           </div>
 

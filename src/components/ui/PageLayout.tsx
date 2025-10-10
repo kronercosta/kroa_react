@@ -44,7 +44,7 @@ export function PageLayout({
   children
 }: PageLayoutProps) {
   return (
-    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
+    <div className="bg-gray-50 flex flex-col overflow-hidden">
       {/* Page Header */}
       {headerType === 'avatar' && avatarData ? (
         <div className="flex-shrink-0 bg-white border-b border-gray-200">

@@ -8,22 +8,11 @@ import { ColaboradorLayout } from '../ColaboradorLayout';
 import { Camera, CheckCircle, Palette } from 'lucide-react';
 import { useTranslation } from '../../../../hooks/useTranslation';
 import { useRegion } from '../../../../contexts/RegionContext';
-import { DocumentModal } from './DocumentModal';
 import translations from './translation.json';
 
 export default function DadosPessoaisColaborador() {
   const { t } = useTranslation(translations);
   const { currentRegion } = useRegion();
-
-  // Document modal states
-  const [documentModal, setDocumentModal] = useState<{
-    isOpen: boolean;
-    type: 'lgpd' | 'admin' | null;
-  }>({ isOpen: false, type: null });
-
-  // Terms acceptance states
-  const [lgpdAccepted, setLgpdAccepted] = useState(false);
-  const [adminResponsibilityAccepted, setAdminResponsibilityAccepted] = useState(false);
 
   // Carregar dados salvos do localStorage (simulação)
   const carregarDadosSalvos = () => {
@@ -357,116 +346,6 @@ export default function DadosPessoaisColaborador() {
           </div>
         </Card>
 
-        <Card>
-          <h2 className="text-lg font-bold text-gray-900 mb-4">
-            Aceite de Termos
-          </h2>
-          <p className="text-sm text-gray-600 mb-6">
-            {currentRegion === 'BR'
-              ? 'Aceite necessário para primeiro acesso ao sistema (pode ser feito apenas pelo próprio usuário)'
-              : 'Terms acceptance required for first system access (can only be done by the user themselves)'
-            }
-          </p>
-
-          <div className="space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="lgpd-consent"
-                  checked={lgpdAccepted}
-                  onChange={(e) => setLgpdAccepted(e.target.checked)}
-                  className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
-                  disabled={true} // Apenas o próprio usuário pode aceitar
-                />
-                <div className="flex-1">
-                  <label htmlFor="lgpd-consent" className="text-sm font-medium text-blue-900 cursor-pointer block">
-                    {currentRegion === 'BR'
-                      ? 'Aceite dos Termos LGPD'
-                      : 'GDPR Terms Acceptance'
-                    }
-                  </label>
-                  <p className="text-xs text-blue-700 mt-1 leading-relaxed">
-                    {currentRegion === 'BR'
-                      ? 'Declaro estar ciente e concordo com os termos da Lei Geral de Proteção de Dados (LGPD) e autorizo o tratamento dos dados pessoais conforme descrito na política de privacidade.'
-                      : 'I declare that I am aware and agree with the terms of the General Data Protection Regulation (GDPR) and authorize the processing of personal data as described in the privacy policy.'
-                    }
-                  </p>
-                  <button
-                    onClick={() => setDocumentModal({ isOpen: true, type: 'lgpd' })}
-                    className="text-xs text-blue-600 underline mt-2 hover:text-blue-800 transition-colors"
-                  >
-                    {currentRegion === 'BR'
-                      ? 'Ver documento completo →'
-                      : 'View complete document →'
-                    }
-                  </button>
-                  <p className="text-xs text-gray-500 mt-2 italic">
-                    {currentRegion === 'BR'
-                      ? '* Este aceite só pode ser dado pelo próprio colaborador ao fazer login'
-                      : '* This acceptance can only be given by the collaborator themselves when logging in'
-                    }
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4">
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="admin-responsibility"
-                  checked={adminResponsibilityAccepted}
-                  onChange={(e) => setAdminResponsibilityAccepted(e.target.checked)}
-                  className="mt-1 w-4 h-4 text-amber-600 bg-gray-100 border-gray-300 rounded focus:ring-amber-500 flex-shrink-0"
-                  disabled={true} // Apenas o próprio usuário pode aceitar
-                />
-                <div className="flex-1">
-                  <label htmlFor="admin-responsibility" className="text-sm font-medium text-amber-900 cursor-pointer block">
-                    {currentRegion === 'BR'
-                      ? 'Responsabilidade do Colaborador'
-                      : 'Collaborator Responsibility'
-                    }
-                  </label>
-                  <p className="text-xs text-amber-700 mt-1 leading-relaxed">
-                    {currentRegion === 'BR'
-                      ? 'Assumo total responsabilidade pelas ações realizadas com meu usuário no sistema, incluindo agendamentos, alterações de dados de pacientes e acesso a informações confidenciais, comprometendo-me a manter sigilo conforme código de ética profissional.'
-                      : 'I assume full responsibility for actions performed with my user account in the system, including appointments, patient data changes and access to confidential information, committing to maintain confidentiality according to professional code of ethics.'
-                    }
-                  </p>
-                  <button
-                    onClick={() => setDocumentModal({ isOpen: true, type: 'admin' })}
-                    className="text-xs text-amber-600 underline mt-2 hover:text-amber-800 transition-colors"
-                  >
-                    {currentRegion === 'BR'
-                      ? 'Ver termo de responsabilidade →'
-                      : 'View responsibility terms →'
-                    }
-                  </button>
-                  <p className="text-xs text-gray-500 mt-2 italic">
-                    {currentRegion === 'BR'
-                      ? '* Este aceite só pode ser dado pelo próprio colaborador ao fazer login'
-                      : '* This acceptance can only be given by the collaborator themselves when logging in'
-                    }
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Document Modal */}
-        <DocumentModal
-          isOpen={documentModal.isOpen}
-          onClose={() => setDocumentModal({ isOpen: false, type: null })}
-          document={
-            documentModal.type === 'lgpd'
-              ? t?.lgpdTerms || null
-              : documentModal.type === 'admin'
-              ? t?.adminTerms || null
-              : null
-          }
-        />
       </div>
     </ColaboradorLayout>
   );

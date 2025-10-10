@@ -3,20 +3,20 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Switch } from '../components/ui/Switch';
-import { ArrowLeft, Mail, Shield, Lock, CheckCircle, User } from 'lucide-react';
+import { EmailVerification } from '../components/ui/EmailVerification';
+import { useRegion } from '../contexts/RegionContext';
+import { ArrowLeft, Lock, CheckCircle, User } from 'lucide-react';
 import { DocumentModal } from '../app/settings/collaborator/personal-data/DocumentModal';
 
 const PrimeiroAcesso: React.FC = () => {
   const navigate = useNavigate();
+  const { currentRegion } = useRegion();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const email = searchParams.get('email') || '';
 
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1); // 1: Verificação, 2: Senha, 3: Termos, 4: Sucesso
-  const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
-  const [verificationError, setVerificationError] = useState('');
-  const [resendCooldown, setResendCooldown] = useState(0);
   const [passwordData, setPasswordData] = useState({
     password: '',
     confirmPassword: ''
@@ -35,7 +35,14 @@ const PrimeiroAcesso: React.FC = () => {
     type: null
   });
 
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  // Password strength
+  const [passwordStrength, setPasswordStrength] = useState({
+    hasLength: false,
+    hasUppercase: false,
+    hasNumber: false,
+    hasSpecial: false
+  });
+
   const cooldownInterval = useRef<number | null>(null);
 
   // Limpar interval ao desmontar componente
@@ -87,87 +94,28 @@ const PrimeiroAcesso: React.FC = () => {
     }
   };
 
-  const handleVerificationChange = (index: number, value: string) => {
-    if (value.length <= 1 && /^\d*$/.test(value)) {
-      const newCode = [...verificationCode];
-      newCode[index] = value;
-      setVerificationCode(newCode);
-      setVerificationError('');
-
-      // Auto avançar para o próximo campo
-      if (value && index < 5) {
-        inputRefs.current[index + 1]?.focus();
-      }
-
-      // Verificar se todos os campos estão preenchidos
-      if (newCode.every(digit => digit !== '')) {
-        handleVerifyCode(newCode.join(''));
-      }
-    }
+  const handleEmailVerified = () => {
+    setCurrentStep(2);
   };
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && !verificationCode[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').slice(0, 6);
-    if (/^\d+$/.test(pastedData)) {
-      const newCode = pastedData.split('').concat(Array(6).fill('')).slice(0, 6);
-      setVerificationCode(newCode);
-      if (pastedData.length === 6) {
-        handleVerifyCode(pastedData);
-      }
-    }
-  };
-
-  const handleVerifyCode = (code: string) => {
-    setLoading(true);
-    // Simular verificação do código
-    setTimeout(() => {
-      if (code === '123456') { // Código de exemplo
-        setCurrentStep(2);
-      } else {
-        setVerificationError('Código inválido. Por favor, tente novamente.');
-        setVerificationCode(['', '', '', '', '', '']);
-        inputRefs.current[0]?.focus();
-      }
-      setLoading(false);
-    }, 1000);
-  };
-
-  const handleResendCode = () => {
-    setVerificationCode(['', '', '', '', '', '']);
-    setVerificationError('');
-    setResendCooldown(60); // 60 segundos de cooldown
-
-    // Simular reenvio do código
-    console.log('Reenviando código para:', email);
-
-    // Iniciar countdown
-    cooldownInterval.current = setInterval(() => {
-      setResendCooldown(prev => {
-        if (prev <= 1) {
-          if (cooldownInterval.current) {
-            clearInterval(cooldownInterval.current);
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
+  // Password strength validation
+  useEffect(() => {
+    const password = passwordData.password;
+    setPasswordStrength({
+      hasLength: password.length >= 8,
+      hasUppercase: /[A-Z]/.test(password),
+      hasNumber: /\d/.test(password),
+      hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    });
+  }, [passwordData.password]);
 
   const handleSetPassword = () => {
     if (passwordData.password !== passwordData.confirmPassword) {
       alert('As senhas não coincidem');
       return;
     }
-    if (passwordData.password.length < 8) {
-      alert('A senha deve ter pelo menos 8 caracteres');
+    if (!Object.values(passwordStrength).every(Boolean)) {
+      alert('A senha não atende a todos os requisitos');
       return;
     }
     setCurrentStep(3);
@@ -209,92 +157,13 @@ const PrimeiroAcesso: React.FC = () => {
     switch (currentStep) {
       case 1:
         return (
-          <div>
-            <div className="mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4 mx-auto">
-                <Shield className="w-8 h-8 text-blue-500" />
-              </div>
-            </div>
-
-            <h2 className="text-2xl font-bold text-krooa-dark mb-2 text-center">Verificação de segurança</h2>
-            <p className="text-gray-600 mb-8 text-center">
-              Digite o código de 6 dígitos enviado para
-              <br />
-              <span className="font-medium text-krooa-dark">{email}</span>
-            </p>
-
-            {/* Informação do email de destino */}
-            <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center gap-2 justify-center">
-                <Mail className="w-4 h-4 text-blue-600" />
-                <span className="text-sm text-blue-800">
-                  Código enviado para: <span className="font-medium">{email}</span>
-                </span>
-              </div>
-            </div>
-
-            {/* Campos de código */}
-            <div className="flex justify-center gap-2 mb-6">
-              {verificationCode.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => { inputRefs.current[index] = el; }}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleVerificationChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  onPaste={index === 0 ? handlePaste : undefined}
-                  className={`
-                    w-12 h-14 text-center text-xl font-semibold
-                    border-2 rounded-lg transition-all
-                    ${verificationError
-                      ? 'border-red-500 bg-red-50'
-                      : digit
-                        ? 'border-krooa-green bg-green-50'
-                        : 'border-gray-300 hover:border-krooa-blue focus:border-krooa-blue'
-                    }
-                    focus:outline-none focus:ring-2 focus:ring-krooa-blue/20
-                  `}
-                  disabled={loading}
-                />
-              ))}
-            </div>
-
-            {/* Mensagem de erro */}
-            {verificationError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600 text-center">{verificationError}</p>
-              </div>
-            )}
-
-            <div className="space-y-3">
-              <Button
-                variant="primary"
-                fullWidth
-                onClick={() => handleVerifyCode(verificationCode.join(''))}
-                disabled={verificationCode.some(digit => !digit) || loading}
-                loading={loading}
-              >
-                {loading ? 'Verificando...' : 'Verificar código'}
-              </Button>
-
-              {/* Botão de reenviar código */}
-              <Button
-                onClick={handleResendCode}
-                variant="ghost"
-                fullWidth
-                disabled={loading || resendCooldown > 0}
-                className="text-krooa-blue"
-              >
-                {resendCooldown > 0
-                  ? `Reenviar código em ${resendCooldown}s`
-                  : 'Reenviar código'
-                }
-              </Button>
-            </div>
-          </div>
+          <EmailVerification
+            email={email}
+            onVerified={handleEmailVerified}
+            language={currentRegion === 'BR' ? 'pt' : currentRegion === 'US' ? 'en' : 'es'}
+            templateType="email-verification"
+            autoSendCode={false}
+          />
         );
 
       case 2:
@@ -314,31 +183,51 @@ const PrimeiroAcesso: React.FC = () => {
             <div className="space-y-6">
               <Input
                 label="Nova senha"
-                type="password"
+                mask="password"
                 value={passwordData.password}
                 onChange={(value) => setPasswordData(prev => ({ ...prev, password: value }))}
                 required
                 fullWidth
-                icon={<Lock className="w-4 h-4" />}
+                showPasswordToggle={true}
               />
 
               <Input
                 label="Confirmar senha"
-                type="password"
+                mask="password"
                 value={passwordData.confirmPassword}
                 onChange={(value) => setPasswordData(prev => ({ ...prev, confirmPassword: value }))}
                 required
                 fullWidth
-                icon={<Lock className="w-4 h-4" />}
+                showPasswordToggle={true}
               />
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-800 font-medium mb-2">Requisitos da senha:</p>
-                <ul className="text-xs text-blue-700 space-y-1">
-                  <li>• Mínimo de 8 caracteres</li>
-                  <li>• Ao menos uma letra maiúscula</li>
-                  <li>• Ao menos um número</li>
-                  <li>• Ao menos um caractere especial</li>
+                <ul className="text-xs space-y-1">
+                  <li className={`flex items-center gap-2 ${passwordStrength.hasLength ? 'text-green-600' : 'text-gray-400'}`}>
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    • Mínimo de 8 caracteres
+                  </li>
+                  <li className={`flex items-center gap-2 ${passwordStrength.hasUppercase ? 'text-green-600' : 'text-gray-400'}`}>
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    • Ao menos uma letra maiúscula
+                  </li>
+                  <li className={`flex items-center gap-2 ${passwordStrength.hasNumber ? 'text-green-600' : 'text-gray-400'}`}>
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    • Ao menos um número
+                  </li>
+                  <li className={`flex items-center gap-2 ${passwordStrength.hasSpecial ? 'text-green-600' : 'text-gray-400'}`}>
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    • Ao menos um caractere especial
+                  </li>
                 </ul>
               </div>
 

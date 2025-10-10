@@ -4,6 +4,7 @@ import { OnboardingLayout } from '../OnboardingLayout';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
 import { Modal } from '../../../components/ui/Modal';
+import { DocumentModal } from './DocumentModal';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { useRegion } from '../../../contexts/RegionContext';
 import translations from '../translation.json';
@@ -461,7 +462,7 @@ export default function Step2Page() {
 
               {/* Data Protection Terms - LGPD (BR) or HIPAA (US) */}
               {currentRegion === 'BR' && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
                   <div className="flex items-start gap-3">
                     <input
                       type="checkbox"
@@ -472,17 +473,17 @@ export default function Step2Page() {
                     />
                     <div className="flex-1">
                       <label htmlFor="lgpd-terms" className="text-sm font-medium text-blue-900 cursor-pointer block">
-                        {t?.step2?.lgpdConsent || 'Aceito os termos da LGPD'}
+                        {t?.step2?.lgpdConsent || 'Aceite dos Termos LGPD'}
                       </label>
                       <p className="text-xs text-blue-700 mt-1 leading-relaxed">
                         {t?.step2?.lgpdDescription || 'Declaro estar ciente e concordo com os termos da Lei Geral de Proteção de Dados (LGPD) e autorizo o tratamento dos dados pessoais conforme descrito na política de privacidade.'}
                       </p>
                       <button
                         type="button"
-                        className="text-xs text-blue-600 underline mt-2 hover:text-blue-800 transition-colors"
                         onClick={() => setDocumentModal({ isOpen: true, type: 'lgpd' })}
+                        className="text-xs text-blue-600 underline mt-2 hover:text-blue-800 transition-colors"
                       >
-                        {t?.step2?.viewLgpdDocument || 'Ver documento completo'} →
+                        {t?.step2?.viewLgpdDocument || 'Ver documento completo →'}
                       </button>
                       {errors.lgpd && (
                         <p className="text-sm text-red-600 mt-1">{errors.lgpd}</p>
@@ -494,7 +495,7 @@ export default function Step2Page() {
 
               {/* HIPAA Terms for US */}
               {currentRegion === 'US' && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
                   <div className="flex items-start gap-3">
                     <input
                       type="checkbox"
@@ -505,17 +506,17 @@ export default function Step2Page() {
                     />
                     <div className="flex-1">
                       <label htmlFor="hipaa-terms" className="text-sm font-medium text-blue-900 cursor-pointer block">
-                        {t?.step2?.hipaaConsent || 'I accept the HIPAA terms'}
+                        {t?.step2?.hipaaConsent || 'HIPAA Terms Acceptance'}
                       </label>
                       <p className="text-xs text-blue-700 mt-1 leading-relaxed">
                         {t?.step2?.hipaaDescription || 'I acknowledge and agree to comply with the Health Insurance Portability and Accountability Act (HIPAA) requirements for protecting patient health information.'}
                       </p>
                       <button
                         type="button"
-                        className="text-xs text-blue-600 underline mt-2 hover:text-blue-800 transition-colors"
                         onClick={() => setDocumentModal({ isOpen: true, type: 'hipaa' })}
+                        className="text-xs text-blue-600 underline mt-2 hover:text-blue-800 transition-colors"
                       >
-                        {t?.step2?.viewHipaaDocument || 'View full document'} →
+                        {t?.step2?.viewHipaaDocument || 'View complete document →'}
                       </button>
                       {errors.hipaa && (
                         <p className="text-sm text-red-600 mt-1">{errors.hipaa}</p>
@@ -526,7 +527,7 @@ export default function Step2Page() {
               )}
 
               {/* Admin Responsibility Terms */}
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4">
                 <div className="flex items-start gap-3">
                   <input
                     type="checkbox"
@@ -537,17 +538,17 @@ export default function Step2Page() {
                   />
                   <div className="flex-1">
                     <label htmlFor="admin-terms" className="text-sm font-medium text-amber-900 cursor-pointer block">
-                      {t?.step2?.adminResponsibility || 'Aceito as responsabilidades de usuário administrador'}
+                      {t?.step2?.adminResponsibility || 'Responsabilidade do Administrador'}
                     </label>
                     <p className="text-xs text-amber-700 mt-1 leading-relaxed">
                       {t?.step2?.adminResponsibilityDescription || 'Assumo total responsabilidade pelas configurações e dados inseridos no sistema, comprometendo-me a manter a segurança e confidencialidade das informações dos pacientes.'}
                     </p>
                     <button
                       type="button"
-                      className="text-xs text-amber-600 underline mt-2 hover:text-amber-800 transition-colors"
                       onClick={() => setDocumentModal({ isOpen: true, type: 'admin' })}
+                      className="text-xs text-amber-600 underline mt-2 hover:text-amber-800 transition-colors"
                     >
-                      {t?.step2?.viewResponsibilityDocument || 'Ver termo de responsabilidade'} →
+                      {t?.step2?.viewResponsibilityDocument || 'Ver termo de responsabilidade →'}
                     </button>
                     {errors.admin && (
                       <p className="text-sm text-red-600 mt-1">{errors.admin}</p>
@@ -586,55 +587,38 @@ export default function Step2Page() {
           </form>
         </div>
 
-        {/* Document Modal */}
+        {/* Document Modal for Terms */}
+        <DocumentModal
+          isOpen={documentModal.isOpen && (documentModal.type === 'lgpd' || documentModal.type === 'hipaa' || documentModal.type === 'admin')}
+          onClose={() => setDocumentModal({ isOpen: false, type: null })}
+          document={
+            documentModal.type === 'lgpd'
+              ? t?.lgpdTerms || null
+              : documentModal.type === 'hipaa'
+              ? t?.hipaaTerms || null
+              : documentModal.type === 'admin'
+              ? t?.adminTerms || null
+              : null
+          }
+          onAccept={() => {
+            if (documentModal.type === 'lgpd') {
+              setLgpdAccepted(true);
+            } else if (documentModal.type === 'hipaa') {
+              setHipaaAccepted(true);
+            } else if (documentModal.type === 'admin') {
+              setAdminAccepted(true);
+            }
+          }}
+          showAcceptButton={true}
+        />
+
+        {/* Addons Modal */}
         <Modal
-          isOpen={documentModal.isOpen}
+          isOpen={documentModal.isOpen && documentModal.type === 'addons'}
           onClose={() => setDocumentModal({ isOpen: false, type: null })}
           size="lg"
         >
           <div className="max-h-[80vh] overflow-y-auto">
-            {documentModal.type === 'lgpd' && t?.lgpdTerms && (
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">{t.lgpdTerms.title}</h2>
-                <p className="text-sm text-gray-500 mb-6">{t.lgpdTerms.lastUpdated}</p>
-                <div className="space-y-6">
-                  {t.lgpdTerms.sections?.map((section: any, index: number) => (
-                    <div key={index}>
-                      <h3 className="font-semibold text-gray-900 mb-2">{section.title}</h3>
-                      <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{section.content}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {documentModal.type === 'hipaa' && t?.hipaaTerms && (
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">{t.hipaaTerms.title}</h2>
-                <p className="text-sm text-gray-500 mb-6">{t.hipaaTerms.lastUpdated}</p>
-                <div className="space-y-6">
-                  {t.hipaaTerms.sections?.map((section: any, index: number) => (
-                    <div key={index}>
-                      <h3 className="font-semibold text-gray-900 mb-2">{section.title}</h3>
-                      <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{section.content}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {documentModal.type === 'admin' && t?.adminTerms && (
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">{t.adminTerms.title}</h2>
-                <p className="text-sm text-gray-500 mb-6">{t.adminTerms.lastUpdated}</p>
-                <div className="space-y-6">
-                  {t.adminTerms.sections?.map((section: any, index: number) => (
-                    <div key={index}>
-                      <h3 className="font-semibold text-gray-900 mb-2">{section.title}</h3>
-                      <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{section.content}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
             {documentModal.type === 'addons' && (
               <div>
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
@@ -763,22 +747,6 @@ export default function Step2Page() {
               className="flex-1"
             >
               {t?.common?.cancel || 'Fechar'}
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => {
-                if (documentModal.type === 'lgpd') {
-                  setLgpdAccepted(true);
-                } else if (documentModal.type === 'hipaa') {
-                  setHipaaAccepted(true);
-                } else if (documentModal.type === 'admin') {
-                  setAdminAccepted(true);
-                }
-                setDocumentModal({ isOpen: false, type: null });
-              }}
-              className="flex-1"
-            >
-              {t?.step2?.acceptTerms || 'Aceitar Termos'}
             </Button>
           </div>
         </Modal>
