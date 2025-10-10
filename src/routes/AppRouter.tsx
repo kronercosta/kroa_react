@@ -56,11 +56,6 @@ export function AppRouter() {
 
         {/* Rotas Privadas (com MainLayout) */}
         <Route element={<PrivateRoutes />}>
-          {/* Rotas de Pacientes */}
-          <Route path="/patients" element={<PatientsPage />} />
-          <Route path="/patients/summary" element={<PatientsSummary />} />
-          <Route path="/patients/personal-data" element={<PatientsPersonalData />} />
-
           {/* Outras rotas privadas */}
           {privateRoutes.map((route, index) => (
             <Route key={`private-${index}`} path={route.path} element={route.element} />
