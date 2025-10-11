@@ -10,6 +10,7 @@ import {
   TestTube,
   Calendar,
   Filter,
+  Funnel,
   ChevronDown,
   Clock,
   AlertCircle,
@@ -23,7 +24,12 @@ import {
   Eye,
   Download,
   MoreVertical,
-  Activity
+  Activity,
+  Bot,
+  MessageCircle,
+  Plus,
+  ChevronRight,
+  ArrowLeft
 } from 'lucide-react';
 import { Card } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';
@@ -31,6 +37,7 @@ import { Button } from '../../../components/ui/Button';
 import PatientLayout from '../components/PatientLayout';
 import Odontogram from '../components/Odontogram';
 import ProcedureModal from '../components/ProcedureModal';
+import ChatIA from '../../../components/ChatIA';
 
 type EventType = 'all' | 'procedure' | 'prescription' | 'exam' | 'anamnesis' | 'certificate' | 'document';
 type SignatureStatus = 'pending' | 'signed_patient' | 'signed_professional' | 'signed_both' | 'no_signature' | 'rejected';
@@ -51,6 +58,7 @@ interface TimelineEvent {
   details?: any;
 }
 
+
 const PatientEvolutionPage: React.FC = () => {
   const searchParams = new URLSearchParams(window.location.search);
   const patientId = searchParams.get('id') || '1';
@@ -60,6 +68,25 @@ const PatientEvolutionPage: React.FC = () => {
   const [isOdontogramExpanded, setIsOdontogramExpanded] = useState(false);
   const [selectedTooth, setSelectedTooth] = useState<number | null>(null);
   const [showProcedureModal, setShowProcedureModal] = useState(false);
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
+  // Fechar dropdown ao clicar fora
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showFilterDropdown) {
+        const target = event.target as Element;
+        if (!target.closest('.relative')) {
+          setShowFilterDropdown(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showFilterDropdown]);
+
+  // Chat IA - função para gerar respostas
 
   // Dados mockados da timeline
   const timelineEvents: TimelineEvent[] = [
@@ -303,6 +330,48 @@ const PatientEvolutionPage: React.FC = () => {
   // Contar procedimentos pendentes
   const pendingProcedures = timelineEvents.filter(e => e.status === 'pending' && e.type === 'procedure').length;
 
+  // IA do Chat - Respostas inteligentes
+  const generateAIResponse = (userMessage: string): string => {
+    const message = userMessage.toLowerCase();
+
+    if (message.includes('histórico') || message.includes('resumo')) {
+      return `📋 **Resumo do Histórico - Kroner Costa**\n\n• **Última consulta:** 20/01/2024 (Limpeza pendente)\n• **Medicação atual:** Amoxicilina 500mg prescrita em 18/01\n• **Exames solicitados:** Raio-X panorâmico (15/01)\n• **Procedimentos concluídos:** 3 nos últimos 30 dias\n• **Status geral:** Paciente em tratamento ativo`;
+    }
+
+    if (message.includes('dente') || message.includes('dental')) {
+      return `🦷 **Informações Dentárias**\n\n• **Dentes em tratamento:** 21, 22, 23 (limpeza agendada)\n• **Histórico recente:** Procedimento de profilaxia programado\n• **Observações:** Paciente relata sensibilidade\n• **Recomendação:** Acompanhamento pós-limpeza em 15 dias`;
+    }
+
+    if (message.includes('medicação') || message.includes('remédio')) {
+      return `💊 **Medicações Prescritas**\n\n• **Atual:** Amoxicilina 500mg\n• **Posologia:** 8/8h por 7 dias\n• **Prescritor:** Dr. Maria Santos\n• **Data:** 18/01/2024\n• **Status:** Assinado por ambos (paciente e profissional)`;
+    }
+
+    if (message.includes('exame') || message.includes('raio')) {
+      return `🔬 **Exames Solicitados**\n\n• **Raio-X Panorâmico** (15/01/2024)\n• **Solicitado por:** Dr. Carlos Mendes\n• **Motivo:** Avaliação pré-cirúrgica\n• **Status:** Aguardando agendamento\n• **Prioridade:** Média`;
+    }
+
+    if (message.includes('pendente') || message.includes('agendado')) {
+      return `⏰ **Procedimentos Pendentes**\n\n• **Limpeza e Profilaxia** - 20/01/2024 às 14:30\n• **Profissional:** Dr. João Silva\n• **Duração estimada:** 45 minutos\n• **Preparação:** Paciente orientado sobre sensibilidade\n• **Status assinatura:** Aguardando ambas as partes`;
+    }
+
+    if (message.includes('assinatura') || message.includes('documento')) {
+      return `📝 **Status de Assinaturas**\n\n• **Pendentes:** 1 procedimento aguardando assinatura\n• **Concluídas:** Prescrição de antibiótico (ambas as partes)\n• **Tipo:** Termo de consentimento para limpeza\n• **Ação necessária:** Solicitar assinatura do paciente`;
+    }
+
+    if (message.includes('quando') || message.includes('próxima')) {
+      return `📅 **Próximos Compromissos**\n\n• **20/01/2024 - 14:30:** Limpeza e Profilaxia\n• **Após exame:** Avaliação dos resultados do raio-X\n• **Retorno:** 7 dias após antibiótico (25/01)\n• **Controle:** Acompanhar sensibilidade pós-limpeza`;
+    }
+
+    if (message.includes('urgente') || message.includes('prioridade')) {
+      return `🚨 **Casos Urgentes**\n\n• **Limpeza agendada:** Prioridade ALTA\n• **Motivo:** Procedimento com prazo específico\n• **Observação:** Paciente com sensibilidade requer atenção\n• **Preparação especial:** Material para casos sensíveis`;
+    }
+
+    // Resposta padrão inteligente
+    return `🤖 **Análise Inteligente**\n\nAnalisei sua pergunta sobre "${userMessage}". Com base no histórico do paciente Kroner Costa:\n\n• **Status atual:** Em tratamento ativo\n• **Última atualização:** 20/01/2024\n• **Itens pendentes:** 1 procedimento e 1 assinatura\n• **Próxima ação:** Limpeza agendada para hoje\n\nPrecisa de informações específicas sobre algum aspecto do tratamento?`;
+  };
+
+  // Função para enviar mensagem no chat
+
   // Handlers para odontograma
   const handleToothClick = (toothId: number) => {
     setSelectedTooth(toothId);
@@ -314,13 +383,6 @@ const PatientEvolutionPage: React.FC = () => {
     setSelectedTooth(null);
   };
 
-  // Verificar se um evento está relacionado a um dente específico
-  const isEventRelatedToTooth = (event: TimelineEvent, toothId: number) => {
-    if (event.type === 'procedure' && event.details?.teeth) {
-      return event.details.teeth.includes(toothId);
-    }
-    return false;
-  };
 
   return (
     <PatientLayout
@@ -333,7 +395,7 @@ const PatientEvolutionPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Evolução do Paciente</h2>
-            <p className="text-sm text-gray-500 mt-1">Timeline completa de procedimentos e documentos</p>
+            <p className="text-sm text-gray-500 mt-1">Timeline completa de procedimentos e assistente IA</p>
           </div>
           <div className="flex items-center gap-3">
             {pendingProcedures > 0 && (
@@ -345,50 +407,63 @@ const PatientEvolutionPage: React.FC = () => {
             )}
             <Button
               variant={isOdontogramExpanded ? "primary" : "outline"}
+              size="sm"
               onClick={() => setIsOdontogramExpanded(!isOdontogramExpanded)}
-              className="flex items-center gap-2"
             >
-              <Activity className="w-4 h-4" />
-              Odontograma
+              Exame Clínico Interativo
+            </Button>
+            <Button variant="primary" size="sm">
+              <Plus className="w-4 h-4" />
+              Nova Evolução
             </Button>
           </div>
         </div>
 
-        {/* Filtros */}
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-gray-500" />
-              <h3 className="font-semibold">Filtrar por tipo</h3>
+        {/* Timeline */}
+        <div className="space-y-6">
+            {/* Filtros */}
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-gray-900">Filtrar por tipo</h3>
+              <div className="relative">
+                <button
+                  onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-gray-600"
+                  title="Filtros"
+                >
+                  <Funnel className="w-4 h-4" />
+                </button>
+
+                {showFilterDropdown && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-50">
+                    <div className="p-2">
+                      {filters.map((filter) => (
+                        <button
+                          key={filter.id}
+                          onClick={() => {
+                            setSelectedFilter(filter.id as EventType);
+                            setShowFilterDropdown(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between ${
+                            selectedFilter === filter.id
+                              ? 'bg-krooa-green text-krooa-dark'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          <span>{filter.label}</span>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            selectedFilter === filter.id
+                              ? 'bg-krooa-dark/20'
+                              : 'bg-gray-200'
+                          }`}>
+                            {filter.count}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {filters.map((filter) => (
-              <button
-                key={filter.id}
-                onClick={() => setSelectedFilter(filter.id as EventType)}
-                className={`
-                  px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2
-                  ${selectedFilter === filter.id
-                    ? 'bg-krooa-green text-krooa-dark shadow-sm'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }
-                `}
-              >
-                <span>{filter.label}</span>
-                <span className={`
-                  px-2 py-0.5 rounded-full text-xs
-                  ${selectedFilter === filter.id
-                    ? 'bg-krooa-dark/20'
-                    : 'bg-gray-200'
-                  }
-                `}>
-                  {filter.count}
-                </span>
-              </button>
-            ))}
-          </div>
-        </Card>
 
         {/* Timeline */}
         <div className="space-y-6">
@@ -543,20 +618,21 @@ const PatientEvolutionPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Mensagem quando não há eventos */}
-        {filteredEvents.length === 0 && (
-          <Card>
-            <div className="text-center py-12">
-              <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Nenhum evento encontrado</h3>
-              <p className="text-sm text-gray-500">
-                {selectedFilter === 'all'
-                  ? 'Não há eventos registrados para este paciente.'
-                  : `Não há ${filters.find(f => f.id === selectedFilter)?.label.toLowerCase()} registrados.`}
-              </p>
-            </div>
-          </Card>
-        )}
+            {/* Mensagem quando não há eventos */}
+            {filteredEvents.length === 0 && (
+              <Card>
+                <div className="text-center py-12">
+                  <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Nenhum evento encontrado</h3>
+                  <p className="text-sm text-gray-500">
+                    {selectedFilter === 'all'
+                      ? 'Não há eventos registrados para este paciente.'
+                      : `Não há ${filters.find(f => f.id === selectedFilter)?.label.toLowerCase()} registrados.`}
+                  </p>
+                </div>
+              </Card>
+            )}
+        </div>
       </div>
 
       {/* Odontograma */}
@@ -573,6 +649,25 @@ const PatientEvolutionPage: React.FC = () => {
         onClose={handleCloseModal}
         toothId={selectedTooth}
         procedures={timelineEvents}
+      />
+
+      {/* Botão flutuante do Chat IA */}
+      <div className="fixed bottom-6 right-6 z-[9999] pointer-events-auto">
+        <button
+          onClick={() => setIsChatOpen(true)}
+          className="relative p-4 bg-gradient-to-r from-krooa-green to-krooa-blue text-krooa-dark rounded-full shadow-lg hover:shadow-xl transition-all duration-200 pointer-events-auto cursor-pointer z-[10000]"
+          title="Chat com IA"
+        >
+          <Bot className="w-6 h-6" />
+          <div className="absolute -inset-1 rounded-full border-2 border-krooa-green/60 animate-ping pointer-events-none" style={{animationDelay: '0.5s', animationDuration: '2s'}}></div>
+        </button>
+      </div>
+
+      {/* Chat IA Component */}
+      <ChatIA
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        generateResponse={generateAIResponse}
       />
     </PatientLayout>
   );

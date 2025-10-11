@@ -45,6 +45,62 @@ const Odontogram: React.FC<OdontogramProps> = ({
   onToothClick,
   selectedTooth
 }) => {
+  const [selectedView, setSelectedView] = React.useState<'odontograma' | 'faceograma' | 'corpograma'>('odontograma');
+
+  // Estilos CSS personalizados para os dentes
+  React.useEffect(() => {
+    const styleId = 'odontogram-styles';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        .tooth-svg {
+          filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+        }
+
+        .tooth-svg .coroa {
+          fill: #f8f9fa !important;
+          stroke: #495057 !important;
+          stroke-width: 1.5px !important;
+        }
+
+        .tooth-svg .raiz {
+          fill: #e9ecef !important;
+          stroke: #495057 !important;
+          stroke-width: 1.5px !important;
+        }
+
+        .tooth-svg:hover .coroa {
+          fill: #ffffff !important;
+        }
+
+        .tooth-svg:hover .raiz {
+          fill: #f1f3f4 !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    return () => {
+      const existingStyle = document.getElementById(styleId);
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+    };
+  }, []);
+
+  // Sistema de cores profissional para status dos dentes
+  const getToothNumberColor = (tooth: ToothStatus) => {
+    // Prioridade: Urgente > Em tratamento > Planejado > Concluído > Externo > Normal
+    if (tooth.status === 'needs_treatment') return '#dc2626'; // Vermelho - Urgente
+    if (tooth.status === 'pending') return '#f59e0b'; // Laranja - Em tratamento
+    if (tooth.pendingProcedures.length > 0) return '#2563eb'; // Azul - Planejado
+    if (tooth.status === 'treated') return '#7c3aed'; // Roxo - Concluído aqui
+    if (tooth.status === 'crown' || tooth.status === 'implant') return '#059669'; // Verde - Reabilitado
+    if (tooth.status === 'missing') return '#6b7280'; // Cinza - Ausente
+    return '#374151'; // Cinza escuro - Normal/Saudável
+  };
+
   // Cores padronizadas por tipo de procedimento
   const procedureColors: { [key: string]: ProcedureColor } = {
     'Obturação': { name: 'Obturação', color: '#059669', bgColor: '#d1fae5' },
@@ -57,6 +113,91 @@ const Odontogram: React.FC<OdontogramProps> = ({
     'Ortodontia': { name: 'Ortodontia', color: '#ec4899', bgColor: '#fce7f3' },
     'Prótese': { name: 'Prótese', color: '#6366f1', bgColor: '#e0e7ff' },
     'Cirurgia': { name: 'Cirurgia', color: '#dc2626', bgColor: '#fecaca' }
+  };
+
+  // Função para obter tamanhos proporcionais por tipo de dente
+  const getToothSize = (toothId: number, isDeciduous = false) => {
+    if (isDeciduous) {
+      // Tamanhos específicos para dentes decíduos conforme exemplo
+      switch (toothId) {
+        // Superiores direitos (55-51)
+        case 55: return { width: 28, height: 30 }; // Molar decíduo
+        case 54: return { width: 28, height: 30 }; // Conforme exemplo
+        case 53: return { width: 20, height: 30 }; // Conforme exemplo
+        case 52: return { width: 20, height: 30 }; // Conforme exemplo
+        case 51: return { width: 20, height: 30 }; // Conforme exemplo
+
+        // Superiores esquerdos (61-65) - mesma lógica espelhada
+        case 61: return { width: 20, height: 30 }; // Igual ao 51
+        case 62: return { width: 20, height: 30 }; // Igual ao 52
+        case 63: return { width: 20, height: 30 }; // Igual ao 53
+        case 64: return { width: 28, height: 30 }; // Igual ao 54
+        case 65: return { width: 28, height: 30 }; // Igual ao 55
+
+        // Inferiores esquerdos (85-81)
+        case 85: return { width: 28, height: 30 }; // Molar decíduo
+        case 84: return { width: 28, height: 30 }; // Molar decíduo
+        case 83: return { width: 20, height: 30 }; // Canino decíduo
+        case 82: return { width: 20, height: 30 }; // Incisivo decíduo
+        case 81: return { width: 20, height: 30 }; // Incisivo decíduo
+
+        // Inferiores direitos (71-75) - mesma lógica espelhada
+        case 71: return { width: 20, height: 30 }; // Igual ao 81
+        case 72: return { width: 20, height: 30 }; // Igual ao 82
+        case 73: return { width: 20, height: 30 }; // Igual ao 83
+        case 74: return { width: 28, height: 30 }; // Igual ao 84
+        case 75: return { width: 28, height: 30 }; // Igual ao 85
+
+        default: return { width: 24, height: 30 };
+      }
+    }
+
+    // Ajustes específicos por dente conforme especificação (-1 width em todos os permanentes)
+    switch (toothId) {
+      // Quadrante superior direito (18-11)
+      case 18: return { width: 29, height: 40 }; // Molar
+      case 17: return { width: 29, height: 40 }; // Molar
+      case 16: return { width: 29, height: 40 }; // Molar
+      case 15: return { width: 19, height: 30 }; // Conforme exemplo
+      case 14: return { width: 21, height: 36 }; // Conforme exemplo
+      case 13: return { width: 21, height: 38 }; // Conforme exemplo
+      case 12: return { width: 22, height: 38 }; // Conforme exemplo
+      case 11: return { width: 27, height: 38 }; // Incisivo central
+
+      // Quadrante superior esquerdo (21-28) - mesma lógica espelhada
+      case 21: return { width: 27, height: 38 }; // Incisivo central
+      case 22: return { width: 22, height: 38 }; // Igual ao 12
+      case 23: return { width: 21, height: 38 }; // Igual ao 13
+      case 24: return { width: 21, height: 36 }; // Igual ao 14
+      case 25: return { width: 19, height: 30 }; // Igual ao 15
+      case 26: return { width: 29, height: 40 }; // Molar
+      case 27: return { width: 29, height: 40 }; // Molar
+      case 28: return { width: 29, height: 40 }; // Molar
+
+      // Quadrante inferior esquerdo - tamanhos específicos conforme padrão
+      case 38: return { width: 29, height: 34 }; // Molar conforme exemplo
+      case 37: return { width: 29, height: 34 }; // Molar conforme exemplo
+      case 36: return { width: 29, height: 34 }; // Molar conforme exemplo
+      case 35: return { width: 21, height: 30 }; // Pré-molar
+      case 34: return { width: 21, height: 30 }; // Pré-molar
+      case 33: return { width: 21, height: 28 }; // Canino conforme exemplo
+      case 32: return { width: 19, height: 32 }; // Incisivo conforme exemplo
+      case 31: return { width: 18, height: 32 }; // Incisivo conforme exemplo
+
+      // Quadrante inferior direito - espelhando o padrão esquerdo
+      case 41: return { width: 18, height: 32 }; // Igual ao 31
+      case 42: return { width: 19, height: 32 }; // Igual ao 32
+      case 43: return { width: 21, height: 28 }; // Igual ao 33
+      case 44: return { width: 21, height: 30 }; // Igual ao 34
+      case 45: return { width: 21, height: 30 }; // Igual ao 35
+      case 46: return { width: 29, height: 34 }; // Igual ao 36
+      case 47: return { width: 29, height: 34 }; // Igual ao 37
+      case 48: return { width: 29, height: 34 }; // Igual ao 38
+
+      // Default para dentes não mapeados (não deveria acontecer)
+      default:
+        return { width: 28, height: 38 };
+    }
   };
 
   // Dados mockados dos dentes - incluindo decíduos
@@ -176,25 +317,16 @@ const Odontogram: React.FC<OdontogramProps> = ({
   ];
 
   if (!isExpanded) {
-    return (
-      <div className="fixed right-4 top-1/2 transform -translate-y-1/2 z-40">
-        <button
-          onClick={onToggle}
-          className="bg-white shadow-lg rounded-l-lg p-3 hover:bg-gray-50 transition-colors border border-r-0"
-        >
-          <ChevronLeft className="w-5 h-5 text-gray-600" />
-        </button>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="fixed right-0 top-0 h-full w-[36rem] bg-white shadow-xl border-l z-40 overflow-y-auto">
+    <div className="fixed right-0 top-0 h-full w-[36rem] md:w-[42rem] lg:w-[48rem] xl:w-[52rem] bg-white shadow-xl border-l z-40 overflow-y-auto">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b bg-gray-50">
         <div className="flex items-center gap-2">
           <Info className="w-5 h-5 text-blue-600" />
-          <h3 className="font-semibold text-gray-900">Odontograma Interativo</h3>
+          <h3 className="font-semibold text-gray-900">Exame Clínico Interativo</h3>
         </div>
         <button
           onClick={onToggle}
@@ -204,81 +336,45 @@ const Odontogram: React.FC<OdontogramProps> = ({
         </button>
       </div>
 
-      {/* Legenda */}
-      <div className="p-4 border-b bg-gray-50">
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Legenda de Status</h4>
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-white border-2 border-gray-400 rounded"></div>
-            <span className="text-gray-600">Saudável</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-100 border-2 border-green-500 rounded"></div>
-            <span className="text-gray-600">Tratado</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-yellow-100 border-2 border-yellow-500 rounded"></div>
-            <span className="text-gray-600">Pendente</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-100 border-2 border-red-500 rounded"></div>
-            <span className="text-gray-600">Necessita Tratamento</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-blue-100 border-2 border-blue-500 rounded"></div>
-            <span className="text-gray-600">Coroa</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-gray-200 border-2 border-gray-400 rounded opacity-50"></div>
-            <span className="text-gray-600">Ausente</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Boxes de Procedimentos por Quadrante */}
-      <div className="p-4 border-b bg-gray-50">
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Procedimentos por Quadrante</h4>
-        <div className="grid grid-cols-2 gap-2 text-xs">
+      {/* Seletor de Visualização */}
+      <div className="p-4 border-b bg-white">
+        <div className="flex gap-2">
           {[
-            { name: 'Superior Direito', procedures: ['Obturação (17)', 'Limpeza (13)'], color: 'bg-blue-50 border-blue-200' },
-            { name: 'Superior Esquerdo', procedures: ['Coroa (26)', 'Obturação (24)'], color: 'bg-green-50 border-green-200' },
-            { name: 'Inferior Esquerdo', procedures: ['Obturação (36)', 'Extração (38)'], color: 'bg-yellow-50 border-yellow-200' },
-            { name: 'Inferior Direito', procedures: ['Canal (46)', 'Obturação (45)'], color: 'bg-purple-50 border-purple-200' }
-          ].map((quadrant, index) => (
-            <div key={index} className={`p-3 rounded-lg border ${quadrant.color}`}>
-              <div className="font-medium text-gray-800 mb-2">{quadrant.name}</div>
-              <div className="space-y-1">
-                {quadrant.procedures.map((proc, idx) => {
-                  const procType = proc.split(' (')[0];
-                  const color = procedureColors[procType];
-                  return (
-                    <div key={idx} className="flex items-center gap-2">
-                      {color && (
-                        <div
-                          className="w-3 h-3 rounded-full border border-white shadow-sm"
-                          style={{ backgroundColor: color.color }}
-                        />
-                      )}
-                      <span className="text-gray-700">{proc}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            { id: 'odontograma', label: 'Odontograma', icon: '🦷' },
+            { id: 'faceograma', label: 'Faceograma', icon: '👤' },
+            { id: 'corpograma', label: 'Corpograma', icon: '🧍' }
+          ].map(view => (
+            <button
+              key={view.id}
+              onClick={() => setSelectedView(view.id as any)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                selectedView === view.id
+                  ? 'bg-blue-100 text-blue-700 border-2 border-blue-300'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border-2 border-transparent'
+              }`}
+            >
+              <span className="text-base">{view.icon}</span>
+              {view.label}
+            </button>
           ))}
         </div>
+        {selectedView !== 'odontograma' && (
+          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm text-yellow-700">
+              📋 {selectedView === 'faceograma' ? 'Faceograma' : 'Corpograma'} em desenvolvimento
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Odontograma com Dentes */}
+      {/* Conteúdo do Odontograma */}
+      {selectedView === 'odontograma' && (
       <div className="p-4">
         <div className="space-y-6">
           {/* Dentes Permanentes Superiores */}
           <div>
-            <div className="flex items-center justify-center mb-4">
-              <h4 className="text-sm font-medium text-gray-700 px-3 py-1 bg-blue-50 rounded-full">PERMANENTES - ARCADA SUPERIOR</h4>
-            </div>
-            <div className="overflow-x-auto">
-              <div className="flex gap-1 justify-center min-w-max px-4">
+            <div className="overflow-x-auto lg:overflow-x-visible">
+              <div className="flex gap-1 lg:gap-2 xl:gap-3 justify-center min-w-max lg:min-w-0 px-4">
                 {teethData
                   .filter(t => t.id >= 11 && t.id <= 28 && !t.isDeciduous)
                   .sort((a, b) => {
@@ -287,20 +383,24 @@ const Odontogram: React.FC<OdontogramProps> = ({
                     if (a.id >= 11 && a.id <= 18 && b.id >= 21 && b.id <= 28) return -1;
                     return 1;
                   })
-                  .map(tooth => (
+                  .map(tooth => {
+                    const size = getToothSize(tooth.id, tooth.isDeciduous);
+                    return (
                     <div key={tooth.id} className="relative group flex flex-col items-center cursor-pointer" onClick={() => onToothClick(tooth.id)}>
-                      <div className="text-xs font-medium text-gray-600 mb-1">{tooth.id}</div>
+                      <div
+                        className="text-xs font-bold mb-1 px-2 py-1 rounded-full bg-white/90 shadow-sm border"
+                        style={{ color: getToothNumberColor(tooth) }}
+                      >
+                        {tooth.id}
+                      </div>
                       <img
                         src={`/tooth/${tooth.id}${tooth.status !== 'healthy' ? 'c' : ''}.svg`}
                         alt={`Dente ${tooth.id}`}
-                        width="42"
-                        height="56"
-                        className={`transition-all duration-200 ${selectedTooth === tooth.id ? 'scale-110 drop-shadow-lg ring-2 ring-blue-400 rounded-lg p-1' : ''}`}
+                        width={size.width}
+                        height={size.height}
+                        className={`tooth-svg transition-all duration-200 lg:scale-110 xl:scale-125 ${selectedTooth === tooth.id ? 'scale-110 lg:scale-125 xl:scale-150 drop-shadow-lg ring-2 ring-blue-400 rounded-lg p-1' : ''}`}
                         style={{
-                          filter: tooth.status === 'treated' ? 'hue-rotate(120deg) saturate(1.2)' :
-                                  tooth.status === 'needs_treatment' ? 'hue-rotate(0deg) saturate(1.5)' :
-                                  tooth.status === 'pending' ? 'hue-rotate(45deg) saturate(1.3)' :
-                                  tooth.status === 'missing' ? 'grayscale(100%) opacity(30%)' : 'none'
+                          opacity: tooth.status === 'missing' ? 0.3 : 1
                         }}
                       />
                       <div className="flex gap-1 mt-1 justify-center">
@@ -317,7 +417,7 @@ const Odontogram: React.FC<OdontogramProps> = ({
                         })}
                       </div>
                     </div>
-                  ))}
+                  )})}
               </div>
             </div>
           </div>
@@ -325,9 +425,6 @@ const Odontogram: React.FC<OdontogramProps> = ({
           {/* Dentes Decíduos Superiores */}
           {teethData.filter(t => (t.id >= 51 && t.id <= 65) && t.isDeciduous).length > 0 && (
             <div>
-              <div className="flex items-center justify-center mb-3">
-                <h4 className="text-xs font-medium text-blue-600 px-3 py-1 bg-blue-100 rounded-full">DECÍDUOS - ARCADA SUPERIOR</h4>
-              </div>
               <div className="overflow-x-auto">
                 <div className="flex gap-1 justify-center min-w-max px-4">
                   {teethData
@@ -338,14 +435,21 @@ const Odontogram: React.FC<OdontogramProps> = ({
                       if (a.id >= 51 && a.id <= 55 && b.id >= 61 && b.id <= 65) return -1;
                       return 1;
                     })
-                    .map(tooth => (
+                    .map(tooth => {
+                      const size = getToothSize(tooth.id, tooth.isDeciduous);
+                      return (
                       <div key={tooth.id} className="relative group flex flex-col items-center cursor-pointer" onClick={() => onToothClick(tooth.id)}>
-                        <div className="text-xs font-medium text-blue-600 mb-1">{tooth.id}</div>
+                        <div
+                        className="text-xs font-bold mb-1 px-2 py-1 rounded-full bg-white/90 shadow-sm border"
+                        style={{ color: getToothNumberColor(tooth) }}
+                      >
+                        {tooth.id}
+                      </div>
                         <img
                           src={`/tooth/${tooth.id}${tooth.status !== 'healthy' ? 'c' : ''}.svg`}
                           alt={`Dente ${tooth.id} (Decíduo)`}
-                          width="32"
-                          height="42"
+                          width={size.width}
+                          height={size.height}
                           className={`transition-all duration-200 opacity-90 ${selectedTooth === tooth.id ? 'scale-110 drop-shadow-lg ring-2 ring-blue-400 rounded-lg p-1' : ''}`}
                           style={{
                             filter: tooth.status === 'treated' ? 'hue-rotate(120deg) saturate(1.2)' :
@@ -368,7 +472,7 @@ const Odontogram: React.FC<OdontogramProps> = ({
                           })}
                         </div>
                       </div>
-                    ))}
+                    )})}
                 </div>
               </div>
             </div>
@@ -384,9 +488,6 @@ const Odontogram: React.FC<OdontogramProps> = ({
           {/* Dentes Decíduos Inferiores */}
           {teethData.filter(t => (t.id >= 71 && t.id <= 85) && t.isDeciduous).length > 0 && (
             <div>
-              <div className="flex items-center justify-center mb-3">
-                <h4 className="text-xs font-medium text-green-600 px-3 py-1 bg-green-100 rounded-full">DECÍDUOS - ARCADA INFERIOR</h4>
-              </div>
               <div className="overflow-x-auto">
                 <div className="flex gap-1 justify-center min-w-max px-4">
                   {teethData
@@ -397,14 +498,21 @@ const Odontogram: React.FC<OdontogramProps> = ({
                       if (a.id >= 81 && a.id <= 85 && b.id >= 71 && b.id <= 75) return -1;
                       return 1;
                     })
-                    .map(tooth => (
+                    .map(tooth => {
+                      const size = getToothSize(tooth.id, tooth.isDeciduous);
+                      return (
                       <div key={tooth.id} className="relative group flex flex-col items-center cursor-pointer" onClick={() => onToothClick(tooth.id)}>
-                        <div className="text-xs font-medium text-green-600 mb-1">{tooth.id}</div>
+                        <div
+                        className="text-xs font-bold mb-1 px-2 py-1 rounded-full bg-white/90 shadow-sm border"
+                        style={{ color: getToothNumberColor(tooth) }}
+                      >
+                        {tooth.id}
+                      </div>
                         <img
                           src={`/tooth/${tooth.id}${tooth.status !== 'healthy' ? 'c' : ''}.svg`}
                           alt={`Dente ${tooth.id} (Decíduo)`}
-                          width="32"
-                          height="42"
+                          width={size.width}
+                          height={size.height}
                           className={`transition-all duration-200 opacity-90 ${selectedTooth === tooth.id ? 'scale-110 drop-shadow-lg ring-2 ring-blue-400 rounded-lg p-1' : ''}`}
                           style={{
                             filter: tooth.status === 'treated' ? 'hue-rotate(120deg) saturate(1.2)' :
@@ -427,7 +535,7 @@ const Odontogram: React.FC<OdontogramProps> = ({
                           })}
                         </div>
                       </div>
-                    ))}
+                    )})}
                 </div>
               </div>
             </div>
@@ -435,11 +543,8 @@ const Odontogram: React.FC<OdontogramProps> = ({
 
           {/* Dentes Permanentes Inferiores */}
           <div>
-            <div className="flex items-center justify-center mb-4">
-              <h4 className="text-sm font-medium text-gray-700 px-3 py-1 bg-green-50 rounded-full">PERMANENTES - ARCADA INFERIOR</h4>
-            </div>
-            <div className="overflow-x-auto">
-              <div className="flex gap-1 justify-center min-w-max px-4">
+            <div className="overflow-x-auto lg:overflow-x-visible">
+              <div className="flex gap-1 lg:gap-2 xl:gap-3 justify-center min-w-max lg:min-w-0 px-4">
                 {teethData
                   .filter(t => t.id >= 31 && t.id <= 48 && !t.isDeciduous)
                   .sort((a, b) => {
@@ -448,20 +553,24 @@ const Odontogram: React.FC<OdontogramProps> = ({
                     if (a.id >= 31 && a.id <= 38 && b.id >= 41 && b.id <= 48) return -1;
                     return 1;
                   })
-                  .map(tooth => (
+                  .map(tooth => {
+                    const size = getToothSize(tooth.id, tooth.isDeciduous);
+                    return (
                     <div key={tooth.id} className="relative group flex flex-col items-center cursor-pointer" onClick={() => onToothClick(tooth.id)}>
-                      <div className="text-xs font-medium text-gray-600 mb-1">{tooth.id}</div>
+                      <div
+                        className="text-xs font-bold mb-1 px-2 py-1 rounded-full bg-white/90 shadow-sm border"
+                        style={{ color: getToothNumberColor(tooth) }}
+                      >
+                        {tooth.id}
+                      </div>
                       <img
                         src={`/tooth/${tooth.id}${tooth.status !== 'healthy' ? 'c' : ''}.svg`}
                         alt={`Dente ${tooth.id}`}
-                        width="42"
-                        height="56"
-                        className={`transition-all duration-200 ${selectedTooth === tooth.id ? 'scale-110 drop-shadow-lg ring-2 ring-blue-400 rounded-lg p-1' : ''}`}
+                        width={size.width}
+                        height={size.height}
+                        className={`tooth-svg transition-all duration-200 lg:scale-110 xl:scale-125 ${selectedTooth === tooth.id ? 'scale-110 lg:scale-125 xl:scale-150 drop-shadow-lg ring-2 ring-blue-400 rounded-lg p-1' : ''}`}
                         style={{
-                          filter: tooth.status === 'treated' ? 'hue-rotate(120deg) saturate(1.2)' :
-                                  tooth.status === 'needs_treatment' ? 'hue-rotate(0deg) saturate(1.5)' :
-                                  tooth.status === 'pending' ? 'hue-rotate(45deg) saturate(1.3)' :
-                                  tooth.status === 'missing' ? 'grayscale(100%) opacity(30%)' : 'none'
+                          opacity: tooth.status === 'missing' ? 0.3 : 1
                         }}
                       />
                       <div className="flex gap-1 mt-1 justify-center">
@@ -478,7 +587,7 @@ const Odontogram: React.FC<OdontogramProps> = ({
                         })}
                       </div>
                     </div>
-                  ))}
+                  )})}
               </div>
             </div>
           </div>
@@ -551,6 +660,89 @@ const Odontogram: React.FC<OdontogramProps> = ({
             </div>
           </div>
 
+        {/* Legenda de Status por Cores dos Números */}
+        <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+          <h4 className="text-sm font-semibold text-blue-900 mb-3 flex items-center gap-2">
+            <Info className="w-4 h-4" />
+            Sistema de Cores - Números dos Dentes
+          </h4>
+          <div className="grid grid-cols-2 gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-white border shadow-sm flex items-center justify-center">
+                <span className="text-xs font-bold" style={{ color: '#dc2626' }}>16</span>
+              </div>
+              <span className="text-gray-700">Urgente</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-white border shadow-sm flex items-center justify-center">
+                <span className="text-xs font-bold" style={{ color: '#f59e0b' }}>24</span>
+              </div>
+              <span className="text-gray-700">Em Tratamento</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-white border shadow-sm flex items-center justify-center">
+                <span className="text-xs font-bold" style={{ color: '#2563eb' }}>46</span>
+              </div>
+              <span className="text-gray-700">Planejado</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-white border shadow-sm flex items-center justify-center">
+                <span className="text-xs font-bold" style={{ color: '#7c3aed' }}>17</span>
+              </div>
+              <span className="text-gray-700">Concluído Aqui</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-white border shadow-sm flex items-center justify-center">
+                <span className="text-xs font-bold" style={{ color: '#059669' }}>26</span>
+              </div>
+              <span className="text-gray-700">Reabilitado</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-white border shadow-sm flex items-center justify-center">
+                <span className="text-xs font-bold" style={{ color: '#6b7280' }}>28</span>
+              </div>
+              <span className="text-gray-700">Ausente</span>
+            </div>
+          </div>
+          <div className="mt-3 p-2 bg-white/60 rounded border text-xs text-blue-800">
+            💡 <strong>Dica:</strong> Clique em qualquer dente para ver a análise inteligente completa com cronologia e prognóstico.
+          </div>
+        </div>
+
+        {/* Procedimentos Gerais */}
+        <div className="mt-6 p-4 bg-white rounded-lg border">
+          <h4 className="text-sm font-medium text-gray-700 mb-3">Procedimentos por Quadrante</h4>
+          <div className="grid grid-cols-2 gap-3 text-xs">
+            {[
+              { name: 'Superior Direito', procedures: ['Obturação (17)', 'Limpeza (13)'], color: 'bg-blue-50 border-blue-200' },
+              { name: 'Superior Esquerdo', procedures: ['Coroa (26)', 'Obturação (24)'], color: 'bg-green-50 border-green-200' },
+              { name: 'Inferior Esquerdo', procedures: ['Obturação (36)', 'Extração (38)'], color: 'bg-yellow-50 border-yellow-200' },
+              { name: 'Inferior Direito', procedures: ['Canal (46)', 'Obturação (45)'], color: 'bg-purple-50 border-purple-200' }
+            ].map((quadrant, index) => (
+              <div key={index} className={`p-3 rounded-lg border ${quadrant.color}`}>
+                <div className="font-medium text-gray-800 mb-2">{quadrant.name}</div>
+                <div className="space-y-1">
+                  {quadrant.procedures.map((proc, idx) => {
+                    const procType = proc.split(' (')[0];
+                    const color = procedureColors[procType];
+                    return (
+                      <div key={idx} className="flex items-center gap-2">
+                        {color && (
+                          <div
+                            className="w-3 h-3 rounded-full border border-white shadow-sm"
+                            style={{ backgroundColor: color.color }}
+                          />
+                        )}
+                        <span className="text-gray-700">{proc}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
           {/* Legenda de Procedimentos */}
           <div className="p-3 bg-gray-50 rounded-lg border">
             <h5 className="text-sm font-semibold text-gray-800 mb-2">Cores dos Procedimentos</h5>
@@ -568,6 +760,7 @@ const Odontogram: React.FC<OdontogramProps> = ({
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 };
